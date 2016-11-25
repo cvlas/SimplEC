@@ -5,11 +5,14 @@ working(X) iff
 
 % X rests if he is at the pub or on holiday or at work and taking a break
 resting(X) iff
-	atThePub(X) or onHoliday(X) or (atWork(X), takingBreak(X)).
+	atThePub(X) or
+	onHoliday(X) or
+	(atWork(X), takingBreak(X)).
 
 % X is happy if he is rich or resting
 happy(X) iff
-	rich(X) or resting(X).
+	rich(X) or
+	resting(X).
 
 % X is sad if he is poor and working, or poor and changing his child's diapers at home
 sad(X) iff
