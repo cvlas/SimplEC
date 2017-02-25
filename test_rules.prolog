@@ -1,26 +1,13 @@
-% X is working if he is at work and is not having a break
-working(X) iff
-	atWork(X),
-	not(takingBreak(X)).
+headFluent2(X)=value iff (condition6(X)=value or condition7(X)=value or not(condition8(X)=value, condition9(X)=value)), condition10(X)=value.
+	
+headFluent1(X)=value iff condition1(X)=value, condition2(X)=value, (condition3(X)=value or condition4(X)=value), not(condition5(X)=value).
 
-% X rests if he is at the pub or on holiday or at work and taking a break
-resting(X) iff
-	atThePub(X) or
-	onHoliday(X) or
-	(atWork(X), takingBreak(X)).
+working(X)=value iff location(X)=work, not(takingBreak(X)=value).
 
-% X is happy if he is rich or resting
-happy(X) iff
-	rich(X) or
-	resting(X).
+resting(X) iff location(X)=pub or onHoliday(X) or (location(X)=work, takingBreak(X)).
 
-% X is sad if he is poor and working, or poor and changing his child's diapers at home
-sad(X) iff
-	poor(X),
-	(working(X) or (atHome(X), changingDiapers(X))).
+happy(X) iff rich(X) or resting(X).
 
-% X and Y are friends if they are both at the pub and none of them is rich
-friends(X,Y) iff
-	atThePub(X),
-	atThePub(Y),
-	not(rich(X) or rich(Y)).
+sad(X) iff poor(X), (working(X) or (atHome(X), changingDiapers(X))).
+
+friends(X,Y) iff atThePub(X), atThePub(Y), not(rich(X) or rich(Y)).

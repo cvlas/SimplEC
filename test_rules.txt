@@ -1,0 +1,35 @@
+headFluent2(X) iff
+	(condition6(X) or
+	condition7(X) or
+	not(condition8(X), condition9(X))),
+	condition10(X).
+	
+headFluent1(X) iff
+	condition1(X),
+	condition2(X),
+	(condition3(X) or condition4(X)),
+	not(condition5(X)).
+
+
+
+working(X) iff
+	location(X)=work,
+	not(takingBreak(X)).
+
+resting(X) iff
+	location(X)=pub or
+	onHoliday(X) or
+	(location(X)=work, takingBreak(X)).
+
+happy(X) iff
+	rich(X) or
+	resting(X).
+
+sad(X) iff
+	poor(X),
+	(working(X) or (atHome(X), changingDiapers(X))).
+
+friends(X,Y) iff
+	atThePub(X),
+	atThePub(Y),
+	not(rich(X) or rich(Y)).
