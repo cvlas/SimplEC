@@ -1,9 +1,18 @@
-Goal		::= CE_Definition* <EOF>
-CE_Definition	::= Head "iff" Body
-Head		::= Atom
-Body		::= tab* Expression ([","|"or"] Expression)* "."
-Expression	::= "not" "(" Expression ")"	|	Atom ([","|"or"] Expression)*
-Atom		::= Predicate "(" Arglist ")"
-Predicate	::= [a-z][a-zA-Z0-9_]*
-Arglist		::= Argument ("," Argument)*
-Argument	::= [a-zA-Z0-9][a-zA-Z0-9_]*
+Goal		::=	CE_Definition* <EOF>
+
+CE_Definition	::=	Head "iff" Body
+
+Head		::=	CompoundTerm
+
+Body		::=	tab* Expression ([","|"or"] Expression)* "."
+
+Expression	::=	"not" "(" Expression ")"
+		;:=	CompoundTerm ([","|"or"] Expression)*
+
+CompoundTerm	::=	Functor "(" Arglist ")"
+
+Functor		::=	[a-z][a-zA-Z0-9_]*
+
+Arglist		::=	Argument ("," Argument)*
+
+Argument	::=	[a-zA-Z0-9][a-zA-Z0-9_]*
