@@ -6,9 +6,10 @@ space 			--> 	"\t".
 space 			--> 	"\n".
 space 			--> 	"\r".
 space 			--> 	" ".
+space			-->	[].
 
-goal 			--> 	[].
 goal 			--> 	ceDefinition, space, goal.
+goal 			--> 	[].
 
 ceDefinition 		--> 	head(Head), space, sep(_), space, body(Body, IB), ".",
 				{
