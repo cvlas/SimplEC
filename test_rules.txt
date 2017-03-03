@@ -1,35 +1,35 @@
-headFluent2(X) iff
-	(condition6(X) or
-	condition7(X) or
-	not(condition8(X), condition9(X))),
-	condition10(X).
+headFluent2(X)=true iff
+	(condition6(X)=true or
+	condition7(X)=true or
+	not(condition8(X)=true, condition9(X)=true)),
+	condition10(X)=true.
 	
-headFluent1(X) iff
-	condition1(X),
-	condition2(X),
-	(condition3(X) or condition4(X)),
-	not(condition5(X)).
+headFluent1(X)=true iff
+	condition1(X)=true,
+	condition2(X)=true,
+	(condition3(X)=true or condition4(X)=true),
+	not(condition5(X)=true).
 
 
 
-working(X) iff
+working(X)=true iff
 	location(X)=work,
-	not(takingBreak(X)).
+	not(takingBreak(X)=true).
 
-resting(X) iff
+resting(X)=true iff
 	location(X)=pub or
-	onHoliday(X) or
-	(location(X)=work, takingBreak(X)).
+	onHoliday(X)=true or
+	(location(X)=work, takingBreak(X)=true).
 
-happy(X) iff
-	rich(X) or
-	resting(X).
+happy(X)=true iff
+	rich(X)=true or
+	resting(X)=true.
 
-sad(X) iff
-	poor(X),
-	(working(X) or (atHome(X), changingDiapers(X))).
+sad(X)=true iff
+	poor(X)=true,
+	(working(X)=true or (atHome(X)=true, changingDiapers(X)=true)).
 
-friends(X,Y) iff
-	atThePub(X),
-	atThePub(Y),
-	not(rich(X) or rich(Y)).
+friends(X,Y)=true iff
+	atThePub(X)=true,
+	atThePub(Y)=true,
+	not(rich(X)=true or rich(Y)=true).

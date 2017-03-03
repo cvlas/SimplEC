@@ -4,10 +4,10 @@ headFluent1(X)=value iff condition1(X)=value, condition2(X)=value, (condition3(X
 
 working(X)=value iff location(X)=work, not(takingBreak(X)=value).
 
-resting(X) iff location(X)=pub or onHoliday(X) or (location(X)=work, takingBreak(X)).
+resting(X)=true iff location(X)=pub or onHoliday(X)=true or (location(X)=work=true, takingBreak(X)=true).
 
-happy(X) iff rich(X) or resting(X).
+happy(X)=true iff rich(X)=true or resting(X)=true.
 
-sad(X) iff poor(X), (working(X) or (atHome(X), changingDiapers(X))).
+sad(X)=true iff poor(X)=true, (working(X)=true or (atHome(X)=true, changingDiapers(X)=true)).
 
-friends(X,Y) iff atThePub(X), atThePub(Y), not(rich(X) or rich(Y)).
+friends(X,Y)=true iff atThePub(X)=true, atThePub(Y)=true, not(rich(X)=true or rich(Y)=true).
