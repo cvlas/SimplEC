@@ -36,7 +36,7 @@ holdsFor(sad(X)=true, I) :-
 
 % X and Y are fighting
 fighting(X,Y) iff
-	( (abrupt(X) or abrupt(Y)) and close(X,Y) ),
+	( (abrupt(X) or abrupt(Y)), close(X,Y) ),
 	not (inactive(X) or inactive(Y) ).
 
 holdsFor(fighting(X,Y)=true, I) :-

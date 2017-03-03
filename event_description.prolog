@@ -1,70 +1,51 @@
-holdsFor(headFluent2(X)=true, I_condition6_true_OR_I_condition7_true_OR_I_condition8_true_AND_I_condition9_true_COMPL_AND_I_condition10_true) :- 
-	true,
-	holdsFor(condition6(X)=true, I_condition6_true),
-	holdsFor(condition7(X)=true, I_condition7_true),
-	holdsFor(condition8(X)=true, I_condition8_true),
-	holdsFor(condition9(X)=true, I_condition9_true),
-	intersect_all([I_condition8_true, I_condition9_true], I_condition8_true_AND_I_condition9_true),
-	complement(I_condition8_true_AND_I_condition9_true, I_condition8_true_AND_I_condition9_true_COMPL),
-	union_all([I_condition7_true, I_condition8_true_AND_I_condition9_true_COMPL], I_condition7_true_OR_I_condition8_true_AND_I_condition9_true_COMPL),
-	union_all([I_condition6_true, I_condition7_true_OR_I_condition8_true_AND_I_condition9_true_COMPL], I_condition6_true_OR_I_condition7_true_OR_I_condition8_true_AND_I_condition9_true_COMPL),
-	holdsFor(condition10(X)=true, I_condition10_true),
-	intersect_all([I_condition6_true_OR_I_condition7_true_OR_I_condition8_true_AND_I_condition9_true_COMPL, I_condition10_true], I_condition6_true_OR_I_condition7_true_OR_I_condition8_true_AND_I_condition9_true_COMPL_AND_I_condition10_true).
+holdsFor(working(X)=true, I_loc_X_work_AND_I_takingBreak_X_true_COMPL) :-
+	holdsFor(loc(X)=work, I_loc_X_work),
+	holdsFor(takingBreak(X)=true, I_takingBreak_X_true),
+	complement_all(I_takingBreak_X_true, I_takingBreak_X_true_COMPL),
+	intersect_all([I_loc_X_work, I_takingBreak_X_true_COMPL], I_loc_X_work_AND_I_takingBreak_X_true_COMPL).
 
-holdsFor(headFluent1(X)=true, I_condition1_true_AND_I_condition2_true_AND_I_condition3_true_OR_I_condition4_true_AND_I_condition5_true_COMPL) :- 
-	true,
-	holdsFor(condition1(X)=true, I_condition1_true),
-	holdsFor(condition2(X)=true, I_condition2_true),
-	holdsFor(condition3(X)=true, I_condition3_true),
-	holdsFor(condition4(X)=true, I_condition4_true),
-	union_all([I_condition3_true, I_condition4_true], I_condition3_true_OR_I_condition4_true),
-	holdsFor(condition5(X)=true, I_condition5_true),
-	complement(I_condition5_true, I_condition5_true_COMPL),
-	intersect_all([I_condition3_true_OR_I_condition4_true, I_condition5_true_COMPL], I_condition3_true_OR_I_condition4_true_AND_I_condition5_true_COMPL),
-	intersect_all([I_condition2_true, I_condition3_true_OR_I_condition4_true_AND_I_condition5_true_COMPL], I_condition2_true_AND_I_condition3_true_OR_I_condition4_true_AND_I_condition5_true_COMPL),
-	intersect_all([I_condition1_true, I_condition2_true_AND_I_condition3_true_OR_I_condition4_true_AND_I_condition5_true_COMPL], I_condition1_true_AND_I_condition2_true_AND_I_condition3_true_OR_I_condition4_true_AND_I_condition5_true_COMPL).
+holdsFor(resting(X)=true, I_loc_X_pub_OR_I_onHoliday_X_true_OR_I_loc_X_work_AND_I_takingBreak_X_true) :-
+	holdsFor(loc(X)=pub, I_loc_X_pub),
+	holdsFor(onHoliday(X)=true, I_onHoliday_X_true),
+	holdsFor(loc(X)=work, I_loc_X_work),
+	holdsFor(takingBreak(X)=true, I_takingBreak_X_true),
+	intersect_all([I_loc_X_work, I_takingBreak_X_true], I_loc_X_work_AND_I_takingBreak_X_true),
+	union_all([I_onHoliday_X_true, I_loc_X_work_AND_I_takingBreak_X_true], I_onHoliday_X_true_OR_I_loc_X_work_AND_I_takingBreak_X_true),
+	union_all([I_loc_X_pub, I_onHoliday_X_true_OR_I_loc_X_work_AND_I_takingBreak_X_true], I_loc_X_pub_OR_I_onHoliday_X_true_OR_I_loc_X_work_AND_I_takingBreak_X_true).
 
-holdsFor(working(X)=true, I_location_work_AND_I_takingBreak_true_COMPL) :- 
-	true,
-	holdsFor(location(X)=work, I_location_work),
-	holdsFor(takingBreak(X)=true, I_takingBreak_true),
-	complement(I_takingBreak_true, I_takingBreak_true_COMPL),
-	intersect_all([I_location_work, I_takingBreak_true_COMPL], I_location_work_AND_I_takingBreak_true_COMPL).
+holdsFor(happy(X)=true, I_rich_X_true_OR_I_resting_X_true) :-
+	holdsFor(rich(X)=true, I_rich_X_true),
+	holdsFor(resting(X)=true, I_resting_X_true),
+	union_all([I_rich_X_true, I_resting_X_true], I_rich_X_true_OR_I_resting_X_true).
 
-holdsFor(resting(X)=true, I_location_pub_OR_I_onHoliday_true_OR_I_location_work_AND_I_takingBreak_true) :- 
-	true,
-	holdsFor(location(X)=pub, I_location_pub),
-	holdsFor(onHoliday(X)=true, I_onHoliday_true),
-	holdsFor(location(X)=work, I_location_work),
-	holdsFor(takingBreak(X)=true, I_takingBreak_true),
-	intersect_all([I_location_work, I_takingBreak_true], I_location_work_AND_I_takingBreak_true),
-	union_all([I_onHoliday_true, I_location_work_AND_I_takingBreak_true], I_onHoliday_true_OR_I_location_work_AND_I_takingBreak_true),
-	union_all([I_location_pub, I_onHoliday_true_OR_I_location_work_AND_I_takingBreak_true], I_location_pub_OR_I_onHoliday_true_OR_I_location_work_AND_I_takingBreak_true).
+holdsFor(sad(X)=true, I_poor_X_true_AND_I_working_X_true_OR_I_loc_X_home_AND_I_changingDiapers_X_true) :-
+	holdsFor(poor(X)=true, I_poor_X_true),
+	holdsFor(working(X)=true, I_working_X_true),
+	holdsFor(loc(X)=home, I_loc_X_home),
+	holdsFor(changingDiapers(X)=true, I_changingDiapers_X_true),
+	intersect_all([I_loc_X_home, I_changingDiapers_X_true], I_loc_X_home_AND_I_changingDiapers_X_true),
+	union_all([I_working_X_true, I_loc_X_home_AND_I_changingDiapers_X_true], I_working_X_true_OR_I_loc_X_home_AND_I_changingDiapers_X_true),
+	intersect_all([I_poor_X_true, I_working_X_true_OR_I_loc_X_home_AND_I_changingDiapers_X_true], I_poor_X_true_AND_I_working_X_true_OR_I_loc_X_home_AND_I_changingDiapers_X_true).
 
-holdsFor(happy(X)=true, I_rich_true_OR_I_resting_true) :- 
-	true,
-	holdsFor(rich(X)=true, I_rich_true),
-	holdsFor(resting(X)=true, I_resting_true),
-	union_all([I_rich_true, I_resting_true], I_rich_true_OR_I_resting_true).
+holdsFor(friends(X,Y)=true, I_loc_X_pub_AND_I_loc_Y_pub_AND_I_rich_X_true_OR_I_rich_Y_true_COMPL) :-
+	holdsFor(loc(X)=pub, I_loc_X_pub),
+	holdsFor(loc(Y)=pub, I_loc_Y_pub),
+	holdsFor(rich(X)=true, I_rich_X_true),
+	holdsFor(rich(Y)=true, I_rich_Y_true),
+	union_all([I_rich_X_true, I_rich_Y_true], I_rich_X_true_OR_I_rich_Y_true),
+	complement_all(I_rich_X_true_OR_I_rich_Y_true, I_rich_X_true_OR_I_rich_Y_true_COMPL),
+	intersect_all([I_loc_Y_pub, I_rich_X_true_OR_I_rich_Y_true_COMPL], I_loc_Y_pub_AND_I_rich_X_true_OR_I_rich_Y_true_COMPL),
+	intersect_all([I_loc_X_pub, I_loc_Y_pub_AND_I_rich_X_true_OR_I_rich_Y_true_COMPL], I_loc_X_pub_AND_I_loc_Y_pub_AND_I_rich_X_true_OR_I_rich_Y_true_COMPL).
 
-holdsFor(sad(X)=true, I_poor_true_AND_I_working_true_OR_I_atHome_true_AND_I_changingDiapers_true) :- 
-	true,
-	holdsFor(poor(X)=true, I_poor_true),
-	holdsFor(working(X)=true, I_working_true),
-	holdsFor(atHome(X)=true, I_atHome_true),
-	holdsFor(changingDiapers(X)=true, I_changingDiapers_true),
-	intersect_all([I_atHome_true, I_changingDiapers_true], I_atHome_true_AND_I_changingDiapers_true),
-	union_all([I_working_true, I_atHome_true_AND_I_changingDiapers_true], I_working_true_OR_I_atHome_true_AND_I_changingDiapers_true),
-	intersect_all([I_poor_true, I_working_true_OR_I_atHome_true_AND_I_changingDiapers_true], I_poor_true_AND_I_working_true_OR_I_atHome_true_AND_I_changingDiapers_true).
-
-holdsFor(friends(X,Y)=true, I_atThePub_true_AND_I_atThePub_true_AND_I_rich_true_OR_I_rich_true_COMPL) :- 
-	true,
-	holdsFor(atThePub(X)=true, I_atThePub_true),
-	holdsFor(atThePub(Y)=true, I_atThePub_true),
-	holdsFor(rich(X)=true, I_rich_true),
-	holdsFor(rich(Y)=true, I_rich_true),
-	union_all([I_rich_true, I_rich_true], I_rich_true_OR_I_rich_true),
-	complement(I_rich_true_OR_I_rich_true, I_rich_true_OR_I_rich_true_COMPL),
-	intersect_all([I_atThePub_true, I_rich_true_OR_I_rich_true_COMPL], I_atThePub_true_AND_I_rich_true_OR_I_rich_true_COMPL),
-	intersect_all([I_atThePub_true, I_atThePub_true_AND_I_rich_true_OR_I_rich_true_COMPL], I_atThePub_true_AND_I_atThePub_true_AND_I_rich_true_OR_I_rich_true_COMPL).
+holdsFor(fighting(X,Y)=true, I_abrupt_X_true_OR_I_abrupt_Y_true_AND_I_close_X_Y_true_AND_I_inactive_X_true_OR_I_inactive_Y_true_COMPL) :-
+	holdsFor(abrupt(X)=true, I_abrupt_X_true),
+	holdsFor(abrupt(Y)=true, I_abrupt_Y_true),
+	union_all([I_abrupt_X_true, I_abrupt_Y_true], I_abrupt_X_true_OR_I_abrupt_Y_true),
+	holdsFor(close(X,Y)=true, I_close_X_Y_true),
+	intersect_all([I_abrupt_X_true_OR_I_abrupt_Y_true, I_close_X_Y_true], I_abrupt_X_true_OR_I_abrupt_Y_true_AND_I_close_X_Y_true),
+	holdsFor(inactive(X)=true, I_inactive_X_true),
+	holdsFor(inactive(Y)=true, I_inactive_Y_true),
+	union_all([I_inactive_X_true, I_inactive_Y_true], I_inactive_X_true_OR_I_inactive_Y_true),
+	complement_all(I_inactive_X_true_OR_I_inactive_Y_true, I_inactive_X_true_OR_I_inactive_Y_true_COMPL),
+	intersect_all([I_abrupt_X_true_OR_I_abrupt_Y_true_AND_I_close_X_Y_true, I_inactive_X_true_OR_I_inactive_Y_true_COMPL], I_abrupt_X_true_OR_I_abrupt_Y_true_AND_I_close_X_Y_true_AND_I_inactive_X_true_OR_I_inactive_Y_true_COMPL).
 
