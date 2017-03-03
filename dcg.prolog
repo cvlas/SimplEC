@@ -13,7 +13,7 @@ goal 			--> 	[].
 
 ceDefinition 		--> 	head(Head), space, sep(_), space, body(Body, IB), ".",
 				{
-					write("holdsFor("), write(Head), write(", "), write(IB), write(") :- \n\ttrue"), write(Body), write(".\n")
+					write("holdsFor("), write(Head), write(", "), write(IB), write(") :- \n\ttrue"), write(Body), write(".\n\n")
 				}.
 	
 sep("iff")		--> 	"iff".
