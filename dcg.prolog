@@ -1,8 +1,11 @@
-space 			--> 	" ".
-space 			--> 	" ", space.
 space 			--> 	"\t", space.
 space 			--> 	"\n", space.
 space 			--> 	"\r", space.
+space 			--> 	" ", space.
+space 			--> 	"\t".
+space 			--> 	"\n".
+space 			--> 	"\r".
+space 			--> 	" ".
 
 goal 			--> 	[].
 goal 			--> 	ceDefinition, space, goal.
