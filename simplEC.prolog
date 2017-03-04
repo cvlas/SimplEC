@@ -38,6 +38,7 @@ ceDefinition 				--> 	head(Head), space, sep(_), space, body(Body, IB), ".",
 						}.
 	
 sep("iff")				--> 	"iff".
+sep("if")				--> 	"if".
 
 head(CTStr) 				--> 	compoundTerm(CTStr, _).
 
