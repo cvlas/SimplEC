@@ -64,5 +64,5 @@ terminatedAt(moving(P1,P2)=true, T) :-
 	happensAt(end(walking(P1)=true), T).
 
 terminatedAt(moving(P1,P2)=true, T) :-
-	happensAt(exit(P1)=true, T).
+	happensAt(exit(P1), T).
 

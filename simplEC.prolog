@@ -52,25 +52,25 @@ initTerm				-->	head(Head, _), space, sep("if"), space, itBody(Body), ".",
 sep("iff")				--> 	"iff".
 sep("if")				--> 	"if".
 
-head(HeadStr, CTT) 			--> 	compoundTerm(CTStr, CTT),
+head(HeadStr, CTT) 			--> 	fluent(CTStr, CTT),
 						{
 							string_concat("holdsFor(", CTStr, HeadStrPending1),
 							string_concat(HeadStrPending1, ", ", HeadStrPending2),
 							string_concat(HeadStrPending2, CTT, HeadStrPending3),
 							string_concat(HeadStrPending3, ")", HeadStr)
 						}.
-head(HeadStr, CTT) 			--> 	"initiate", space, compoundTerm(CTStr, CTT),
+head(HeadStr, CTT) 			--> 	"initiate", space, fluent(CTStr, CTT),
 						{
 							string_concat("initiatedAt(", CTStr, HeadStrPending1),
 							string_concat(HeadStrPending1, ", T)", HeadStr)
 						}.
-head(HeadStr, CTT) 			--> 	"terminate", space, compoundTerm(CTStr, CTT),
+head(HeadStr, CTT) 			--> 	"terminate", space, fluent(CTStr, CTT),
 						{
 							string_concat("terminatedAt(", CTStr, HeadStrPending1),
 							string_concat(HeadStrPending1, ", T)", HeadStr)
 						}.
 
-compoundTerm(CTStr, T) 			--> 	functawr(FncStr), "(", argumentsList(ArgLStr, IArgLStr), ")", value(ValStr, Str),
+fluent(CTStr, T) 			--> 	functawr(FncStr), "(", argumentsList(ArgLStr, IArgLStr), ")", value(ValStr, Str),
 						{
 							string_concat(FncStr, "(", FncPending1),
 							string_concat(FncPending1, ArgLStr, FncPending2),
@@ -81,6 +81,16 @@ compoundTerm(CTStr, T) 			--> 	functawr(FncStr), "(", argumentsList(ArgLStr, IAr
 							string_concat(TPending2, IArgLStr, TPending3),
 							string_concat(TPending3, "_", TPending4),
 							string_concat(TPending4, Str, T) 
+						}.
+
+event(EvStr, EvT)			-->	functawr(FncStr), "(", argumentsList(ArgLStr, IArgLStr), ")",
+						{
+							string_concat(FncStr, "(", EvStrPending1),
+							string_concat(EvStrPending1, ArgLStr, EvStrPending2),
+							string_concat(EvStrPending2, ")", EvStr),
+							string_concat("T_", FncStr, EvTPending1),
+							string_concat(EvTPending1, "_", EvTPending2),
+							string_concat(EvTPending2, IArgLStr, EvT)
 						}.
 
 functawr(FncStr) 			--> 	[Lower], { char_type(Lower, lower) }, restChars(RCList),
@@ -154,7 +164,7 @@ moreComponents(MCompStr, I, and)	-->	",", space, expression(MCompStr, I).
 moreComponents(MCompStr, I, or)		-->	space, "or", space, expression(MCompStr, I).
 moreComponents(null)			-->	[].
 
-component(CompStr, T)			-->	compoundTerm(Str, T),
+component(CompStr, T)			-->	fluent(Str, T),
 						{
 							string_concat(",\n\tholdsFor(", Str, CompStrPending1),
 							string_concat(CompStrPending1, ", ", CompStrPending2),
@@ -177,22 +187,22 @@ itBody(ITBodyStr)			-->	condition(CondStr), moreConditions(MCondStr),
 							string_concat(CondStr, MCondStr, ITBodyStr)
 						}.
 
-condition(CondStr)			-->	"start", space, compoundTerm(CTStr, _),
+condition(CondStr)			-->	"start", space, fluent(CTStr, _),
 						{
 							string_concat(",\n\thappensAt(start(", CTStr, CondStrPending1),
 							string_concat(CondStrPending1, "), T)", CondStr)
 						}.
-condition(CondStr)			-->	"end", space, compoundTerm(CTStr, _),
+condition(CondStr)			-->	"end", space, fluent(CTStr, _),
 						{
 							string_concat(",\n\thappensAt(end(", CTStr, CondStrPending1),
 							string_concat(CondStrPending1, "), T)", CondStr)
 						}.
-condition(CondStr)			-->	"happens", space, compoundTerm(CTStr, _),
+condition(CondStr)			-->	"happens", space, event(CTStr, _),
 						{
 							string_concat(",\n\thappensAt(", CTStr, CondStrPending1),
 							string_concat(CondStrPending1, ", T)", CondStr)
 						}.
-condition(CondStr)			-->	compoundTerm(CTStr, _),
+condition(CondStr)			-->	fluent(CTStr, _),
 						{
 							string_concat(",\n\tholdsAt(", CTStr, CondStrPending1),
 							string_concat(CondStrPending1, ", T)", CondStr)
@@ -202,5 +212,5 @@ moreConditions(MCondStr)		-->	",", space, condition(CondStr), moreConditions(MMC
 						{
 							string_concat(CondStr, MMCondStr, MCondStr)
 						}.
-moreConditions("")		-->	[].
+moreConditions("")			-->	[].
 
