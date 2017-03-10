@@ -1,3 +1,2 @@
 1) relative_complement_all
-2) initiatedAt/terminatedAt
-3) ceDefinition must be generic, not holdsFor-specific
+2) events should not have values

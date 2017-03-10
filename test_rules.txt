@@ -23,3 +23,19 @@ friends(X,Y) iff
 fighting(X,Y) iff
 	( (abrupt(X) or abrupt(Y)), close(X,Y) ),
 	not(inactive(X) or inactive(Y) ).
+
+		
+			
+			
+
+
+initiate moving(P1,P2) if
+	start walking(P1),
+	walking(P2),		
+	close(P1,P2).
+											
+terminate moving(P1,P2) if
+	end walking(P1).
+
+terminate moving(P1,P2) if
+	happens exit(P1).

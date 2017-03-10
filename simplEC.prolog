@@ -29,18 +29,46 @@ space					-->	[].
 goal 					--> 	ceDefinition, space, goal.
 goal 					--> 	[].
 
-ceDefinition 				--> 	head(Head), space, sep(_), space, body(Body, IB), ".",
+ceDefinition 				-->	holdsFor.
+ceDefinition 				-->	initTerm.
+					
+holdsFor				--> 	head(Head, HeadT), space, sep("iff"), space, hfBody(Body, BodyT), ".",
 						{
 							string_codes(Body, BodyCodes),
 							list_head(BodyCodes, _, CommaFreeBodyCodes),
 							string_codes(CommaFreeBody, CommaFreeBodyCodes),
-							write("holdsFor("), write(Head), write(", "), write(IB), write(") :-"), write(CommaFreeBody), write(".\n\n")
+							write(Head), write(" :-"), write(CommaFreeBody),
+							write(",\n\tunion_all("), write(BodyT), write(", [], "), write(HeadT), write(").\n\n")
+						}.
+
+initTerm				-->	head(Head, _), space, sep("if"), space, itBody(Body), ".",
+						{
+							string_codes(Body, BodyCodes),
+							list_head(BodyCodes, _, CommaFreeBodyCodes),
+							string_codes(CommaFreeBody, CommaFreeBodyCodes),
+							write(Head), write(" :-"), write(CommaFreeBody), write(".\n\n")
 						}.
 	
 sep("iff")				--> 	"iff".
 sep("if")				--> 	"if".
 
-head(CTStr) 				--> 	compoundTerm(CTStr, _).
+head(HeadStr, CTT) 			--> 	compoundTerm(CTStr, CTT),
+						{
+							string_concat("holdsFor(", CTStr, HeadStrPending1),
+							string_concat(HeadStrPending1, ", ", HeadStrPending2),
+							string_concat(HeadStrPending2, CTT, HeadStrPending3),
+							string_concat(HeadStrPending3, ")", HeadStr)
+						}.
+head(HeadStr, CTT) 			--> 	"initiate", space, compoundTerm(CTStr, CTT),
+						{
+							string_concat("initiatedAt(", CTStr, HeadStrPending1),
+							string_concat(HeadStrPending1, ", T)", HeadStr)
+						}.
+head(HeadStr, CTT) 			--> 	"terminate", space, compoundTerm(CTStr, CTT),
+						{
+							string_concat("terminatedAt(", CTStr, HeadStrPending1),
+							string_concat(HeadStrPending1, ", T)", HeadStr)
+						}.
 
 compoundTerm(CTStr, T) 			--> 	functawr(FncStr), "(", argumentsList(ArgLStr, IArgLStr), ")", value(ValStr, Str),
 						{
@@ -92,7 +120,7 @@ moreArguments(MArgStr, IMArgStr)	-->	",", argument(ArgStr), moreArguments(MMArgS
 							string_concat(IMArgPending, IMMArgStr, IMArgStr)
 						}.
 
-body(BodyStr, I)			-->	expression(BodyStr, I).
+hfBody(BodyStr, I)			-->	expression(BodyStr, I).
 
 expression(ExprStr, I)			-->	component(CompStr, T1), moreComponents(MCompStr, T2, and),
 						{
@@ -143,4 +171,36 @@ component(CompStr, T)			-->	"not", space, expression(Str, ExpT),
 							string_concat(CompStrPending5, T, CompStrPending6),
 							string_concat(CompStrPending6, ")", CompStr)
 						}.
+
+itBody(ITBodyStr)			-->	condition(CondStr), moreConditions(MCondStr),
+						{
+							string_concat(CondStr, MCondStr, ITBodyStr)
+						}.
+
+condition(CondStr)			-->	"start", space, compoundTerm(CTStr, _),
+						{
+							string_concat(",\n\thappensAt(start(", CTStr, CondStrPending1),
+							string_concat(CondStrPending1, "), T)", CondStr)
+						}.
+condition(CondStr)			-->	"end", space, compoundTerm(CTStr, _),
+						{
+							string_concat(",\n\thappensAt(end(", CTStr, CondStrPending1),
+							string_concat(CondStrPending1, "), T)", CondStr)
+						}.
+condition(CondStr)			-->	"happens", space, compoundTerm(CTStr, _),
+						{
+							string_concat(",\n\thappensAt(", CTStr, CondStrPending1),
+							string_concat(CondStrPending1, ", T)", CondStr)
+						}.
+condition(CondStr)			-->	compoundTerm(CTStr, _),
+						{
+							string_concat(",\n\tholdsAt(", CTStr, CondStrPending1),
+							string_concat(CondStrPending1, ", T)", CondStr)
+						}.
+
+moreConditions(MCondStr)		-->	",", space, condition(CondStr), moreConditions(MMCondStr),
+						{
+							string_concat(CondStr, MMCondStr, MCondStr)
+						}.
+moreConditions("")		-->	[].
 
