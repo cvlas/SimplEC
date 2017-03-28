@@ -8,13 +8,14 @@ list_head([H|T], H, T).
 % SIMPL-EC
 % -----------------------------------------------
 	
-simplEC(InputFile, OutputFile) :-
+simplEC(InputFile, OutputFile, DeclarationsFile) :-
 	open(InputFile, read, Input),
+	open(DeclarationsFile, append, DeclStream),
 	tell(OutputFile),
 	read_stream_to_codes(Input, Codes),
-	phrase(goal, Codes),
+	phrase(goal(DeclStream), Codes),
 	told,
-	close(Input), !.
+	close(Input), close(DeclStream) !.
 
 % -----------------------------------------------
 % DEFINITE CLAUSE GRAMMAR
@@ -26,13 +27,13 @@ space 					--> 	"\r", space.
 space 					--> 	" ", space.
 space					-->	[].
 
-goal 					--> 	ceDefinition, space, goal.
-goal 					--> 	[].
+goal(DeclStream)			--> 	ceDefinition(DeclStream), space, goal(DeclStream).
+goal(DeclStream)			--> 	[].
 
-ceDefinition 				-->	holdsFor.
-ceDefinition 				-->	initTerm.
+ceDefinition(DeclStream)		-->	holdsFor(DeclStream).
+ceDefinition(DeclStream)		-->	initTerm(DeclStream).
 					
-holdsFor				--> 	head(Head, HeadT), space, sep("iff"), space, hfBody(Body, BodyT), ".",
+holdsFor(DeclStream)			--> 	head(Head, HeadT, DeclStream), space, sep("iff"), space, hfBody(Body, BodyT), ".",
 						{
 							string_codes(Body, BodyCodes),
 							list_head(BodyCodes, _, CommaFreeBodyCodes),
@@ -41,7 +42,7 @@ holdsFor				--> 	head(Head, HeadT), space, sep("iff"), space, hfBody(Body, BodyT
 							write(",\n\tunion_all("), write(BodyT), write(", [], "), write(HeadT), write(").\n\n")
 						}.
 
-initTerm				-->	head(Head, _), space, sep("if"), space, itBody(Body), ".",
+initTerm(DeclStream)			-->	head(Head, _, DeclStream), space, sep("if"), space, itBody(Body), ".",
 						{
 							string_codes(Body, BodyCodes),
 							list_head(BodyCodes, _, CommaFreeBodyCodes),
@@ -52,19 +53,23 @@ initTerm				-->	head(Head, _), space, sep("if"), space, itBody(Body), ".",
 sep("iff")				--> 	"iff".
 sep("if")				--> 	"if".
 
-head(HeadStr, CTT) 			--> 	fluent(CTStr, CTT),
+head(HeadStr, CTT, DeclStream)		--> 	fluent(CTStr, CTT),
 						{
 							string_concat("holdsFor(", CTStr, HeadStrPending1),
 							string_concat(HeadStrPending1, ", ", HeadStrPending2),
 							string_concat(HeadStrPending2, CTT, HeadStrPending3),
-							string_concat(HeadStrPending3, ")", HeadStr)
+							string_concat(HeadStrPending3, ")", HeadStr),
+							write(DeclStream, "sDFluent("), write(DeclStream, CTStr), write(DeclStream, ").\n"),
+							write(DeclStream, "outputEntity("), write(DeclStream, CTStr), write(DeclStream, ").\n")
 						}.
-head(HeadStr, CTT) 			--> 	"initiate", space, fluent(CTStr, CTT),
+head(HeadStr, CTT, DeclStream) 		--> 	"initiate", space, fluent(CTStr, CTT),
 						{
 							string_concat("initiatedAt(", CTStr, HeadStrPending1),
-							string_concat(HeadStrPending1, ", T)", HeadStr)
+							string_concat(HeadStrPending1, ", T)", HeadStr),
+							write(DeclStream, "simpleFluent("), write(DeclStream, CTStr), write(DeclStream, ").\n"),
+							write(DeclStream, "outputEntity("), write(DeclStream, CTStr), write(DeclStream, ").\n")
 						}.
-head(HeadStr, CTT) 			--> 	"terminate", space, fluent(CTStr, CTT),
+head(HeadStr, CTT, DeclStream) 		--> 	"terminate", space, fluent(CTStr, CTT),
 						{
 							string_concat("terminatedAt(", CTStr, HeadStrPending1),
 							string_concat(HeadStrPending1, ", T)", HeadStr)
