@@ -15,7 +15,7 @@ simplEC(InputFile, OutputFile, DeclarationsFile) :-
 	read_stream_to_codes(Input, Codes),
 	phrase(goal(DeclStream), Codes),
 	told,
-	close(Input), close(DeclStream) !.
+	close(Input), close(DeclStream), !.
 
 % -----------------------------------------------
 % DEFINITE CLAUSE GRAMMAR
@@ -28,12 +28,12 @@ space 					--> 	" ", space.
 space					-->	[].
 
 goal(DeclStream)			--> 	ceDefinition(DeclStream), space, goal(DeclStream).
-goal(DeclStream)			--> 	[].
+goal(_)					--> 	[].
 
 ceDefinition(DeclStream)		-->	holdsFor(DeclStream).
 ceDefinition(DeclStream)		-->	initTerm(DeclStream).
 					
-holdsFor(DeclStream)			--> 	head(Head, HeadT, DeclStream), space, sep("iff"), space, hfBody(Body, BodyT), ".",
+holdsFor(DeclStream)			--> 	head(Head, HeadT, DeclStream), space, sep("iff"), space, hfBody(Body, BodyT, DeclStream), ".",
 						{
 							string_codes(Body, BodyCodes),
 							list_head(BodyCodes, _, CommaFreeBodyCodes),
@@ -42,7 +42,7 @@ holdsFor(DeclStream)			--> 	head(Head, HeadT, DeclStream), space, sep("iff"), sp
 							write(",\n\tunion_all("), write(BodyT), write(", [], "), write(HeadT), write(").\n\n")
 						}.
 
-initTerm(DeclStream)			-->	head(Head, _, DeclStream), space, sep("if"), space, itBody(Body), ".",
+initTerm(DeclStream)			-->	head(Head, _, DeclStream), space, sep("if"), space, itBody(Body, DeclStream), ".",
 						{
 							string_codes(Body, BodyCodes),
 							list_head(BodyCodes, _, CommaFreeBodyCodes),
@@ -53,29 +53,31 @@ initTerm(DeclStream)			-->	head(Head, _, DeclStream), space, sep("if"), space, i
 sep("iff")				--> 	"iff".
 sep("if")				--> 	"if".
 
-head(HeadStr, CTT, DeclStream)		--> 	fluent(CTStr, CTT),
+head(HeadStr, CTT, DeclStream)		--> 	fluent(CTStr, CTT, DeclStream),
 						{
 							string_concat("holdsFor(", CTStr, HeadStrPending1),
 							string_concat(HeadStrPending1, ", ", HeadStrPending2),
 							string_concat(HeadStrPending2, CTT, HeadStrPending3),
-							string_concat(HeadStrPending3, ")", HeadStr),
-							write(DeclStream, "sDFluent("), write(DeclStream, CTStr), write(DeclStream, ").\n"),
-							write(DeclStream, "outputEntity("), write(DeclStream, CTStr), write(DeclStream, ").\n")
+							string_concat(HeadStrPending3, ")", HeadStr)
+							%, write(DeclStream, CTStr), write(DeclStream, ").\n"),
+							%write(DeclStream, "outputEntity("), write(DeclStream, CTStr), write(DeclStream, ").\n"),
+							%write(DeclStream, "index("), write(DeclStream, CTStr), write(DeclStream, ", X).\n\n")
 						}.
-head(HeadStr, CTT, DeclStream) 		--> 	"initiate", space, fluent(CTStr, CTT),
+head(HeadStr, CTT, DeclStream) 		--> 	"initiate", space, {write(DeclStream, "simple"), !}, fluent(CTStr, CTT, DeclStream),
 						{
 							string_concat("initiatedAt(", CTStr, HeadStrPending1),
-							string_concat(HeadStrPending1, ", T)", HeadStr),
-							write(DeclStream, "simpleFluent("), write(DeclStream, CTStr), write(DeclStream, ").\n"),
-							write(DeclStream, "outputEntity("), write(DeclStream, CTStr), write(DeclStream, ").\n")
+							string_concat(HeadStrPending1, ", T)", HeadStr)
+							%write(DeclStream, CTStr), write(DeclStream, ").\n"),
+							%write(DeclStream, "outputEntity("), write(DeclStream, CTStr), write(DeclStream, ").\n"),
+							%write(DeclStream, "index("), write(DeclStream, CTStr), write(DeclStream, ", X).\n\n")
 						}.
-head(HeadStr, CTT, DeclStream) 		--> 	"terminate", space, fluent(CTStr, CTT),
+head(HeadStr, CTT, DeclStream)	 		--> 	"terminate", space, {write(DeclStream, "simple"), !}, fluent(CTStr, CTT, DeclStream),
 						{
 							string_concat("terminatedAt(", CTStr, HeadStrPending1),
 							string_concat(HeadStrPending1, ", T)", HeadStr)
 						}.
 
-fluent(CTStr, T) 			--> 	functawr(FncStr), "(", argumentsList(ArgLStr, IArgLStr), ")", value(ValStr, Str),
+fluent(CTStr, T, DeclStream) 			--> 	functawr(FncStr), "(", argumentsList(ArgLStr, IArgLStr, UArgLStr), ")", value(ValStr, Str),
 						{
 							string_concat(FncStr, "(", FncPending1),
 							string_concat(FncPending1, ArgLStr, FncPending2),
@@ -85,17 +87,19 @@ fluent(CTStr, T) 			--> 	functawr(FncStr), "(", argumentsList(ArgLStr, IArgLStr)
 							string_concat(TPending1, "_", TPending2),
 							string_concat(TPending2, IArgLStr, TPending3),
 							string_concat(TPending3, "_", TPending4),
-							string_concat(TPending4, Str, T) 
+							string_concat(TPending4, Str, T),
+							write(DeclStream, "Fluent("), write(DeclStream, FncPending1), write(DeclStream, UArgLStr), write(DeclStream, ")"), write(DeclStream, ValStr), write(DeclStream, ").\n\n")
 						}.
 
-event(EvStr, EvT)			-->	functawr(FncStr), "(", argumentsList(ArgLStr, IArgLStr), ")",
+event(EvStr, EvT, DeclStream)			-->	functawr(FncStr), "(", argumentsList(ArgLStr, IArgLStr, UArgLStr), ")",
 						{
 							string_concat(FncStr, "(", EvStrPending1),
 							string_concat(EvStrPending1, ArgLStr, EvStrPending2),
 							string_concat(EvStrPending2, ")", EvStr),
 							string_concat("T_", FncStr, EvTPending1),
 							string_concat(EvTPending1, "_", EvTPending2),
-							string_concat(EvTPending2, IArgLStr, EvT)
+							string_concat(EvTPending2, IArgLStr, EvT),
+							write(DeclStream, "event("), write(DeclStream, EvStrPending1), write(DeclStream, UArgLStr), write(DeclStream, ")).\n\n")
 						}.
 
 functawr(FncStr) 			--> 	[Lower], { char_type(Lower, lower) }, restChars(RCList),
@@ -112,10 +116,11 @@ value(ValStr, Str)			-->	"=", functawr(Str),
 restChars([]) 				--> 	[].
 restChars([Alnum|Rest])			--> 	[Alnum], { char_type(Alnum, alnum) }, restChars(Rest).
 
-argumentsList(ArgLStr, IArgLStr) 	--> 	argument(ArgStr), moreArguments(MArgStr, IMArgStr),
+argumentsList(ArgLStr, IArgLStr, UArgLStr) 	--> 	argument(ArgStr), moreArguments(MArgStr, IMArgStr, UMArgStr),
 						{
 							string_concat(ArgStr, MArgStr, ArgLStr),
-							string_concat(ArgStr, IMArgStr, IArgLStr)
+							string_concat(ArgStr, IMArgStr, IArgLStr),
+							string_concat("_", UMArgStr, UArgLStr)
 						}.
 
 argument(ArgStr) 			--> 	[Alpha], { char_type(Alpha, alpha) }, restChars(RCList),
@@ -123,21 +128,22 @@ argument(ArgStr) 			--> 	[Alpha], { char_type(Alpha, alpha) }, restChars(RCList)
 							string_codes(ArgStr, [Alpha|RCList])
 						}.
 
-moreArguments(MArgStr, MArgStr)		--> 	[],
+moreArguments(MArgStr, MArgStr, MArgStr)		--> 	[],
 						{
 							string_codes(MArgStr, [])
 						}.
-moreArguments(MArgStr, IMArgStr)	-->	",", argument(ArgStr), moreArguments(MMArgStr, IMMArgStr),
+moreArguments(MArgStr, IMArgStr, UMArgStr)	-->	",", argument(ArgStr), moreArguments(MMArgStr, IMMArgStr, UMMArgStr),
 						{
 							string_concat(",", ArgStr, MArgPending),
 							string_concat(MArgPending, MMArgStr, MArgStr),
+							string_concat(",_", UMMArgStr, UMArgStr),
 							string_concat("_", ArgStr, IMArgPending),
 							string_concat(IMArgPending, IMMArgStr, IMArgStr)
 						}.
 
-hfBody(BodyStr, I)			-->	expression(BodyStr, I).
+hfBody(BodyStr, I, DeclStream)			-->	expression(BodyStr, I, DeclStream).
 
-expression(ExprStr, I)			-->	component(CompStr, T1), moreComponents(MCompStr, T2, and),
+expression(ExprStr, I, DeclStream)			-->	component(CompStr, T1, DeclStream), moreComponents(MCompStr, T2, and, DeclStream),
 						{
 							string_concat(CompStr, MCompStr, ExprStrPending5),
 							string_concat(ExprStrPending5, ",\n\tintersect_all([", ExprStrPending6),
@@ -150,72 +156,72 @@ expression(ExprStr, I)			-->	component(CompStr, T1), moreComponents(MCompStr, T2
 							string_concat(ExprStrPending10, I, ExprStrPending11),
 							string_concat(ExprStrPending11, ")", ExprStr)
 						}.
-expression(ExprStr, I)			-->	component(CompStr, T1), moreComponents(MCompStr, T2, or),
-						{
-							string_concat(CompStr, MCompStr, ExprStrPending5),
-							string_concat(ExprStrPending5, ",\n\tunion_all([", ExprStrPending6),
-							string_concat(ExprStrPending6, T1, ExprStrPending7),
-							string_concat(ExprStrPending7, ", ", ExprStrPending8),
-							string_concat(ExprStrPending8, T2, ExprStrPending9),
-							string_concat(ExprStrPending9, "], ", ExprStrPending10),
-							string_concat(T1, "_OR_", IPending),
-							string_concat(IPending, T2, I),
-							string_concat(ExprStrPending10, I, ExprStrPending11),
-							string_concat(ExprStrPending11, ")", ExprStr)
-						}.
-expression(ExprStr, I)			-->	component(ExprStr, I), moreComponents(null).
+expression(ExprStr, I, DeclStream)			-->	component(CompStr, T1, DeclStream), moreComponents(MCompStr, T2, or, DeclStream),
+								{
+									string_concat(CompStr, MCompStr, ExprStrPending5),
+									string_concat(ExprStrPending5, ",\n\tunion_all([", ExprStrPending6),
+									string_concat(ExprStrPending6, T1, ExprStrPending7),
+									string_concat(ExprStrPending7, ", ", ExprStrPending8),
+									string_concat(ExprStrPending8, T2, ExprStrPending9),
+									string_concat(ExprStrPending9, "], ", ExprStrPending10),
+									string_concat(T1, "_OR_", IPending),
+									string_concat(IPending, T2, I),
+									string_concat(ExprStrPending10, I, ExprStrPending11),
+									string_concat(ExprStrPending11, ")", ExprStr)
+								}.
+expression(ExprStr, I, DeclStream)			-->	component(ExprStr, I, DeclStream), moreComponents(null).
 
-moreComponents(MCompStr, I, and)	-->	",", space, expression(MCompStr, I).
-moreComponents(MCompStr, I, or)		-->	space, "or", space, expression(MCompStr, I).
-moreComponents(null)			-->	[].
+moreComponents(MCompStr, I, and, DeclStream)		-->	",", space, expression(MCompStr, I, DeclStream).
+moreComponents(MCompStr, I, or, DeclStream)		-->	space, "or", space, expression(MCompStr, I, DeclStream).
+moreComponents(null)					-->	[].
 
-component(CompStr, T)			-->	fluent(Str, T),
-						{
-							string_concat(",\n\tholdsFor(", Str, CompStrPending1),
-							string_concat(CompStrPending1, ", ", CompStrPending2),
-							string_concat(CompStrPending2, T, CompStrPending3),
-							string_concat(CompStrPending3, ")", CompStr)
-						}.
-component(CompStr, T)			-->	"(", space, expression(CompStr, T), space, ")".
-component(CompStr, T)			-->	"not", space, expression(Str, ExpT),
-						{
-							string_concat(Str, ",\n\tcomplement_all(", CompStrPending3),
-							string_concat(CompStrPending3, ExpT, CompStrPending4),
-							string_concat(CompStrPending4, ", ", CompStrPending5),
-							string_concat(ExpT, "_COMPL", T),
-							string_concat(CompStrPending5, T, CompStrPending6),
-							string_concat(CompStrPending6, ")", CompStr)
-						}.
+component(CompStr, T, DeclStream)			-->	fluent(Str, T, DeclStream),
+								{
+									string_concat(",\n\tholdsFor(", Str, CompStrPending1),
+									string_concat(CompStrPending1, ", ", CompStrPending2),
+									string_concat(CompStrPending2, T, CompStrPending3),
+									string_concat(CompStrPending3, ")", CompStr)
+								}.
+component(CompStr, T, DeclStream)			-->	"(", space, expression(CompStr, T, DeclStream), space, ")".
+component(CompStr, T, DeclStream)			-->	"not", space, expression(Str, ExpT, DeclStream),
+								{
+									string_concat(Str, ",\n\tcomplement_all(", CompStrPending3),
+									string_concat(CompStrPending3, ExpT, CompStrPending4),
+									string_concat(CompStrPending4, ", ", CompStrPending5),
+									string_concat(ExpT, "_COMPL", T),
+									string_concat(CompStrPending5, T, CompStrPending6),
+									string_concat(CompStrPending6, ")", CompStr)
+								}.
 
-itBody(ITBodyStr)			-->	condition(CondStr), moreConditions(MCondStr),
+itBody(ITBodyStr, DeclStream)			-->	condition(CondStr, DeclStream), moreConditions(MCondStr, DeclStream),
 						{
 							string_concat(CondStr, MCondStr, ITBodyStr)
 						}.
 
-condition(CondStr)			-->	"start", space, fluent(CTStr, _),
+condition(CondStr, DeclStream)			-->	"start", space, fluent(CTStr, _, DeclStream),
 						{
 							string_concat(",\n\thappensAt(start(", CTStr, CondStrPending1),
 							string_concat(CondStrPending1, "), T)", CondStr)
 						}.
-condition(CondStr)			-->	"end", space, fluent(CTStr, _),
+condition(CondStr, DeclStream)			-->	"end", space, fluent(CTStr, _, DeclStream),
 						{
 							string_concat(",\n\thappensAt(end(", CTStr, CondStrPending1),
 							string_concat(CondStrPending1, "), T)", CondStr)
 						}.
-condition(CondStr)			-->	"happens", space, event(CTStr, _),
+condition(CondStr, DeclStream)			-->	"happens", space, event(CTStr, _, DeclStream),
 						{
 							string_concat(",\n\thappensAt(", CTStr, CondStrPending1),
 							string_concat(CondStrPending1, ", T)", CondStr)
 						}.
-condition(CondStr)			-->	fluent(CTStr, _),
+condition(CondStr, DeclStream)			-->	fluent(CTStr, _, DeclStream),
 						{
 							string_concat(",\n\tholdsAt(", CTStr, CondStrPending1),
 							string_concat(CondStrPending1, ", T)", CondStr)
 						}.
 
-moreConditions(MCondStr)		-->	",", space, condition(CondStr), moreConditions(MMCondStr),
+moreConditions(MCondStr, DeclStream)		-->	",", space, condition(CondStr, DeclStream), moreConditions(MMCondStr, DeclStream),
 						{
 							string_concat(CondStr, MMCondStr, MCondStr)
 						}.
-moreConditions("")			-->	[].
+moreConditions("", _)			-->	[].
 
