@@ -1,4 +1,4 @@
 1) relative_complement_all
-2) (DONE) the first condition should always be an event
+2) (DONE) the first condition should always be an event in all init/term rules
 3) (IN PROGRESS) automatic declarations generation
 4) incorporation of SimplEC into RTEC
