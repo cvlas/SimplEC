@@ -1,3 +1,5 @@
+:- [library(dcg/basics)].
+
 % -----------------------------------------------
 % AUXILIARY TOOLS
 % -----------------------------------------------
@@ -93,7 +95,7 @@ head(HeadStr, CTT, DeclStream)	 		--> 	"terminate", space, fluent("simple", "out
 								string_concat(HeadStrPending1, ", T)", HeadStr)
 							}.
 
-fluent(Type, Etype, CTStr, T, DeclStream)	--> 	functawr(FncStr), "(", argumentsList(ArgLStr, IArgLStr, UArgLStr, IndArgLStr, Index), ")", value(ValStr, Str),
+fluent(Type, Etype, CTStr, T, DeclStream)	--> 	functawr(FncStr), "(", argumentsList(ArgLStr, IArgLStr, UArgLStr, IndArgLStr, Index), ")", value(ValStr, Str), !,
 							{
 								string_concat(FncStr, "(", FncPending1),
 								string_concat(FncPending1, ArgLStr, FncPending2),
@@ -161,8 +163,9 @@ value(ValStr, Str)						-->	"=", functawr(Str),
 									}.
 value("=true", "true")						-->	[].
 
-restChars([Alnum|Rest])						--> 	[Alnum], { char_type(Alnum, alnum) }, restChars(Rest).
-restChars([]) 							--> 	[].
+restChars(Chars)						--> 	string_without([9, 10, 13, 32, 40, 41, 44, 46], Chars).
+%									[Alnum], { char_type(Alnum, alnum) }, restChars(Rest).
+%restChars([Nalnum])						--> 	[Nalnum], { \+char_type(Nalnum, alnum) }.
 
 argumentsList(ArgLStr, IArgLStr, UArgLStr, IndArgLStr, ArgStr)	--> 	argument(ArgStr), moreArguments(MArgStr, IMArgStr, UMArgStr),
 									{

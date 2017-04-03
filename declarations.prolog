@@ -18,33 +18,9 @@ sDFluent(loc(_)=pub).
 inputEntity(loc(_)=pub).
 index(loc(X)=pub, X).
 
-sDFluent(loc(_)=pu).
-inputEntity(loc(_)=pu).
-index(loc(X)=pu, X).
-
-sDFluent(loc(_)=p).
-inputEntity(loc(_)=p).
-index(loc(X)=p, X).
-
-sDFluent(loc(_)=true).
-inputEntity(loc(_)=true).
-index(loc(X)=true, X).
-
 sDFluent(onHoliday(_)=true).
 inputEntity(onHoliday(_)=true).
 index(onHoliday(X)=true, X).
-
-sDFluent(loc(_)=wor).
-inputEntity(loc(_)=wor).
-index(loc(X)=wor, X).
-
-sDFluent(loc(_)=wo).
-inputEntity(loc(_)=wo).
-index(loc(X)=wo, X).
-
-sDFluent(loc(_)=w).
-inputEntity(loc(_)=w).
-index(loc(X)=w, X).
 
 sDFluent(happy(_)=true).
 outputEntity(happy(_)=true).
@@ -53,30 +29,6 @@ index(happy(X)=true, X).
 sDFluent(rich(_)=true).
 inputEntity(rich(_)=true).
 index(rich(X)=true, X).
-
-sDFluent(rich(_)=tru).
-inputEntity(rich(_)=tru).
-index(rich(X)=tru, X).
-
-sDFluent(rich(_)=tr).
-inputEntity(rich(_)=tr).
-index(rich(X)=tr, X).
-
-sDFluent(rich(_)=t).
-inputEntity(rich(_)=t).
-index(rich(X)=t, X).
-
-sDFluent(resting(_)=tru).
-inputEntity(resting(_)=tru).
-index(resting(X)=tru, X).
-
-sDFluent(resting(_)=tr).
-inputEntity(resting(_)=tr).
-index(resting(X)=tr, X).
-
-sDFluent(resting(_)=t).
-inputEntity(resting(_)=t).
-index(resting(X)=t, X).
 
 sDFluent(sad(_)=true).
 outputEntity(sad(_)=true).
@@ -93,18 +45,6 @@ index(loc(X)=home, X).
 sDFluent(changingDiapers(_)=true).
 inputEntity(changingDiapers(_)=true).
 index(changingDiapers(X)=true, X).
-
-sDFluent(loc(_)=hom).
-inputEntity(loc(_)=hom).
-index(loc(X)=hom, X).
-
-sDFluent(loc(_)=ho).
-inputEntity(loc(_)=ho).
-index(loc(X)=ho, X).
-
-sDFluent(loc(_)=h).
-inputEntity(loc(_)=h).
-index(loc(X)=h, X).
 
 sDFluent(friends(_,_)=true).
 outputEntity(friends(_,_)=true).
