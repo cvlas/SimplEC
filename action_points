@@ -1,4 +1,11 @@
 1) relative_complement_all
 2) (DONE) the first condition should always be an event in all init/term rules
 3) (IN PROGRESS) automatic declarations generation
-4) incorporation of SimplEC into RTEC
+	a) (DONE) Distinguish SD from Simple Fluents
+	b) (DONE) Distinguish input from output entities
+	c) (DONE) Remove duplicates and redundancies
+	d) CollectFromIntervals/BuildFromPoints
+	e) Grounding
+	f) Caching Order
+4) Incorporation of SimplEC into RTEC
+5) Clean and document source code

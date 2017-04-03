@@ -73,10 +73,6 @@ head(HeadStr, CTT, DeclStream)			--> 	fluent("sD", "output", CTStr, CTT, DeclStr
 								nb_getval(headFluents, HF),
 								addToTail(HF, CTStr, HF_new),
 								nb_setval(headFluents, HF_new)
-								%addToTail(Heads, CTStr, HeadsUpdated)
-								%, write(DeclStream, CTStr), write(DeclStream, ").\n"),
-								%write(DeclStream, "outputEntity("), write(DeclStream, CTStr), write(DeclStream, ").\n"),
-								%write(DeclStream, "index("), write(DeclStream, CTStr), write(DeclStream, ", X).\n\n")
 							}.
 head(HeadStr, CTT, DeclStream) 			--> 	"initiate", space, fluent("simple", "output", CTStr, CTT, DeclStream),
 							{
@@ -85,9 +81,6 @@ head(HeadStr, CTT, DeclStream) 			--> 	"initiate", space, fluent("simple", "outp
 								nb_getval(headFluents, HF),
 								addToTail(HF, CTStr, HF_new),
 								nb_setval(headFluents, HF_new)
-								%write(DeclStream, CTStr), write(DeclStream, ").\n"),
-								%write(DeclStream, "outputEntity("), write(DeclStream, CTStr), write(DeclStream, ").\n"),
-								%write(DeclStream, "index("), write(DeclStream, CTStr), write(DeclStream, ", X).\n\n")
 							}.
 head(HeadStr, CTT, DeclStream)	 		--> 	"terminate", space, fluent("simple", "output", CTStr, CTT, DeclStream),
 							{
@@ -111,27 +104,8 @@ fluent(Type, Etype, CTStr, T, DeclStream)	--> 	functawr(FncStr), "(", argumentsL
 								nb_getval(declared, Decl),
 								(member(CTStr, HF) -> true
 								;
-								%string_concat(FncStr, "(", FncPending1),
-								%string_concat(FncPending1, ArgLStr, FncPending2),
-								%string_concat(FncPending2, ")", FncPending3),
-								%string_concat(FncPending3, ValStr, CTStr),
-								%string_concat("I_", FncStr, TPending1),
-								%string_concat(TPending1, "_", TPending2),
-								%string_concat(TPending2, IArgLStr, TPending3),
-								%string_concat(TPending3, "_", TPending4),
-								%string_concat(TPending4, Str, T),
-								%nb_getval(declared, Decl),
 								member(DeclStr, Decl) -> true
 								;
-								%string_concat(FncStr, "(", FncPending1),
-								%string_concat(FncPending1, ArgLStr, FncPending2),
-								%string_concat(FncPending2, ")", FncPending3),
-								%string_concat(FncPending3, ValStr, CTStr),
-								%string_concat("I_", FncStr, TPending1),
-								%string_concat(TPending1, "_", TPending2),
-								%string_concat(TPending2, IArgLStr, TPending3),
-								%string_concat(TPending3, "_", TPending4),
-								%string_concat(TPending4, Str, T),
 								write(DeclStream, Type), write(DeclStream, "Fluent("), write(DeclStream, FncPending1), write(DeclStream, UArgLStr), write(DeclStream, ")"), write(DeclStream, ValStr), write(DeclStream, ").\n"),
 								write(DeclStream, Etype), write(DeclStream, "Entity("), write(DeclStream, FncPending1), write(DeclStream, UArgLStr), write(DeclStream, ")"), write(DeclStream, ValStr), write(DeclStream, ").\n"),
 								write(DeclStream, "index("), write(DeclStream, FncPending1), write(DeclStream, IndArgLStr), write(DeclStream, ")"), write(DeclStream, ValStr), write(DeclStream, ", "), write(DeclStream, Index), write(DeclStream, ").\n\n"),
@@ -164,8 +138,6 @@ value(ValStr, Str)						-->	"=", functawr(Str),
 value("=true", "true")						-->	[].
 
 restChars(Chars)						--> 	string_without([9, 10, 13, 32, 40, 41, 44, 46], Chars).
-%									[Alnum], { char_type(Alnum, alnum) }, restChars(Rest).
-%restChars([Nalnum])						--> 	[Nalnum], { \+char_type(Nalnum, alnum) }.
 
 argumentsList(ArgLStr, IArgLStr, UArgLStr, IndArgLStr, ArgStr)	--> 	argument(ArgStr), moreArguments(MArgStr, IMArgStr, UMArgStr),
 									{
