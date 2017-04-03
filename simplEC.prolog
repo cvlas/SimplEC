@@ -104,6 +104,7 @@ fluent(Type, Etype, CTStr, T, DeclStream)	--> 	functawr(FncStr), "(", argumentsL
 								string_concat(TPending2, IArgLStr, TPending3),
 								string_concat(TPending3, "_", TPending4),
 								string_concat(TPending4, Str, T),
+								string_concat(FncStr, ValStr, DeclStr),
 								nb_getval(headFluents, HF),
 								nb_getval(declared, Decl),
 								(member(CTStr, HF) -> true
@@ -118,7 +119,7 @@ fluent(Type, Etype, CTStr, T, DeclStream)	--> 	functawr(FncStr), "(", argumentsL
 								%string_concat(TPending3, "_", TPending4),
 								%string_concat(TPending4, Str, T),
 								%nb_getval(declared, Decl),
-								member(CTStr, Decl) -> true
+								member(DeclStr, Decl) -> true
 								;
 								%string_concat(FncStr, "(", FncPending1),
 								%string_concat(FncPending1, ArgLStr, FncPending2),
@@ -132,7 +133,7 @@ fluent(Type, Etype, CTStr, T, DeclStream)	--> 	functawr(FncStr), "(", argumentsL
 								write(DeclStream, Type), write(DeclStream, "Fluent("), write(DeclStream, FncPending1), write(DeclStream, UArgLStr), write(DeclStream, ")"), write(DeclStream, ValStr), write(DeclStream, ").\n"),
 								write(DeclStream, Etype), write(DeclStream, "Entity("), write(DeclStream, FncPending1), write(DeclStream, UArgLStr), write(DeclStream, ")"), write(DeclStream, ValStr), write(DeclStream, ").\n"),
 								write(DeclStream, "index("), write(DeclStream, FncPending1), write(DeclStream, IndArgLStr), write(DeclStream, ")"), write(DeclStream, ValStr), write(DeclStream, ", "), write(DeclStream, Index), write(DeclStream, ").\n\n"),
-								addToTail(Decl, CTStr, Decll),
+								addToTail(Decl, DeclStr, Decll),
 								nb_setval(declared, Decll))
 							}.
 
@@ -154,14 +155,14 @@ functawr(FncStr) 						--> 	[Lower], { char_type(Lower, lower) }, restChars(RCLi
 										string_codes(FncStr, [Lower|RCList])
 									}.
 
-value("=true", "true")						-->	[].
 value(ValStr, Str)						-->	"=", functawr(Str),
 									{
 										string_concat("=", Str, ValStr)
 									}.
+value("=true", "true")						-->	[].
 
-restChars([]) 							--> 	[].
 restChars([Alnum|Rest])						--> 	[Alnum], { char_type(Alnum, alnum) }, restChars(Rest).
+restChars([]) 							--> 	[].
 
 argumentsList(ArgLStr, IArgLStr, UArgLStr, IndArgLStr, ArgStr)	--> 	argument(ArgStr), moreArguments(MArgStr, IMArgStr, UMArgStr),
 									{
@@ -247,25 +248,25 @@ itBody(ITBodyStr, DeclStream)			-->	"happens", space, event("input", CTStr, _, D
 								string_concat(CondStrPending1, ", T)", CondStr),
 								string_concat(CondStr, MCondStr, ITBodyStr)
 							}.
-itBody(ITBodyStr, DeclStream)			-->	"start", space, fluent(_, _, CTStr, _, DeclStream), moreConditions(MCondStr, DeclStream),
+itBody(ITBodyStr, DeclStream)			-->	"start", space, fluent("sD", "input", CTStr, _, DeclStream), moreConditions(MCondStr, DeclStream),
 							{
 								string_concat(",\n\thappensAt(start(", CTStr, CondStrPending1),
 								string_concat(CondStrPending1, "), T)", CondStr),
 								string_concat(CondStr, MCondStr, ITBodyStr)
 							}.
-itBody(ITBodyStr, DeclStream)			-->	"end", space, fluent(_, _, CTStr, _, DeclStream), moreConditions(MCondStr, DeclStream),
+itBody(ITBodyStr, DeclStream)			-->	"end", space, fluent("sD", "input", CTStr, _, DeclStream), moreConditions(MCondStr, DeclStream),
 							{
 								string_concat(",\n\thappensAt(end(", CTStr, CondStrPending1),
 								string_concat(CondStrPending1, "), T)", CondStr),
 								string_concat(CondStr, MCondStr, ITBodyStr)
 							}.
 
-condition(CondStr, DeclStream)			-->	"start", space, fluent(_, _, CTStr, _, DeclStream),
+condition(CondStr, DeclStream)			-->	"start", space, fluent("sD", "input", CTStr, _, DeclStream),
 							{
 								string_concat(",\n\thappensAt(start(", CTStr, CondStrPending1),
 								string_concat(CondStrPending1, "), T)", CondStr)
 							}.
-condition(CondStr, DeclStream)			-->	"end", space, fluent(_, _, CTStr, _, DeclStream),
+condition(CondStr, DeclStream)			-->	"end", space, fluent("sD", "input", CTStr, _, DeclStream),
 							{
 								string_concat(",\n\thappensAt(end(", CTStr, CondStrPending1),
 								string_concat(CondStrPending1, "), T)", CondStr)
@@ -275,7 +276,7 @@ condition(CondStr, DeclStream)			-->	"happens", space, event("input", CTStr, _, 
 								string_concat(",\n\thappensAt(", CTStr, CondStrPending1),
 								string_concat(CondStrPending1, ", T)", CondStr)
 							}.
-condition(CondStr, DeclStream)			-->	fluent("simple", "output", CTStr, _, DeclStream),
+condition(CondStr, DeclStream)			-->	fluent("sD", "input", CTStr, _, DeclStream),
 							{
 								string_concat(",\n\tholdsAt(", CTStr, CondStrPending1),
 								string_concat(CondStrPending1, ", T)", CondStr)
