@@ -24,7 +24,20 @@ simplEC(InputFile, OutputFile, DeclarationsFile) :-
 	read_stream_to_codes(Input, Codes),
 	nb_setval(headFluents, []),
 	nb_setval(declared, []),
+	nb_setval(cached, []),
 	phrase(goal(DeclStream), Codes),
+	findall((OE,Pr), (cachingPriority(OE, Pr)), CachingUnordered),
+	sort(2, @>=, CachingUnordered, CachingOrdered),
+	findall(OE,
+		(member((OE, _), CachingOrdered),
+		nb_getval(cached, Cchd),
+		\+member(OE, Cchd),
+		addToTail(Cchd, OE, Cchdnew),
+		nb_setval(cached, Cchdnew),
+		write(DeclStream, "cachingOrder("), 
+		write(DeclStream, OE),
+		write(DeclStream, ").\n")),
+		_),
 	told,
 	close(Input), close(DeclStream), !.
 
@@ -64,7 +77,7 @@ initTerm(DeclStream)			-->	head(Head, _, DeclStream), space, sep("if"), space, i
 sep("iff")				--> 	"iff".
 sep("if")				--> 	"if".
 
-head(HeadStr, CTT, DeclStream)			--> 	fluent("sD", "output", CTStr, CTT, DeclStream),
+head(HeadStr, CTT, DeclStream)			--> 	fluent("sD", "output", CTStr, DeclRepr, CTT, DeclStream),
 							{
 								string_concat("holdsFor(", CTStr, HeadStrPending1),
 								string_concat(HeadStrPending1, ", ", HeadStrPending2),
@@ -72,23 +85,25 @@ head(HeadStr, CTT, DeclStream)			--> 	fluent("sD", "output", CTStr, CTT, DeclStr
 								string_concat(HeadStrPending3, ")", HeadStr),
 								nb_getval(headFluents, HF),
 								addToTail(HF, CTStr, HF_new),
-								nb_setval(headFluents, HF_new)
+								nb_setval(headFluents, HF_new),
+								assertz(cachingPriority(DeclRepr, 0))
 							}.
-head(HeadStr, CTT, DeclStream) 			--> 	"initiate", space, fluent("simple", "output", CTStr, CTT, DeclStream),
+head(HeadStr, CTT, DeclStream) 			--> 	"initiate", space, fluent("simple", "output", CTStr, DeclRepr, CTT, DeclStream),
 							{
 								string_concat("initiatedAt(", CTStr, HeadStrPending1),
 								string_concat(HeadStrPending1, ", T)", HeadStr),
 								nb_getval(headFluents, HF),
 								addToTail(HF, CTStr, HF_new),
-								nb_setval(headFluents, HF_new)
+								nb_setval(headFluents, HF_new),
+								assertz(cachingPriority(DeclRepr, 0))
 							}.
-head(HeadStr, CTT, DeclStream)	 		--> 	"terminate", space, fluent("simple", "output", CTStr, CTT, DeclStream),
+head(HeadStr, CTT, DeclStream)	 		--> 	"terminate", space, fluent("simple", "output", CTStr, _, CTT, DeclStream),
 							{
 								string_concat("terminatedAt(", CTStr, HeadStrPending1),
 								string_concat(HeadStrPending1, ", T)", HeadStr)
 							}.
 
-fluent(Type, Etype, CTStr, T, DeclStream)	--> 	functawr(FncStr), "(", argumentsList(ArgLStr, IArgLStr, UArgLStr, IndArgLStr, Index), ")", value(ValStr, Str), !,
+fluent(Type, Etype, CTStr, DeclRepr, T, DeclStream)	--> 	functawr(FncStr), "(", argumentsList(ArgLStr, IArgLStr, UArgLStr, IndArgLStr, Index), ")", value(ValStr, Str), !,
 							{
 								string_concat(FncStr, "(", FncPending1),
 								string_concat(FncPending1, ArgLStr, FncPending2),
@@ -100,14 +115,21 @@ fluent(Type, Etype, CTStr, T, DeclStream)	--> 	functawr(FncStr), "(", argumentsL
 								string_concat(TPending3, "_", TPending4),
 								string_concat(TPending4, Str, T),
 								string_concat(FncStr, ValStr, DeclStr),
+								string_concat(FncPending1, UArgLStr, DeclReprPending1),
+								string_concat(DeclReprPending1, ")", DeclReprPending2),
+								string_concat(DeclReprPending2, ValStr, DeclRepr),
 								nb_getval(headFluents, HF),
 								nb_getval(declared, Decl),
-								(member(CTStr, HF) -> true
+								(member(CTStr, HF) -> 
+								cachingPriority(DeclRepr, Priority),
+								NewPriority is Priority+1, 
+								retract(cachingPriority(DeclRepr, Priority)), 
+								assertz(cachingPriority(DeclRepr, NewPriority))
 								;
 								member(DeclStr, Decl) -> true
 								;
-								write(DeclStream, Type), write(DeclStream, "Fluent("), write(DeclStream, FncPending1), write(DeclStream, UArgLStr), write(DeclStream, ")"), write(DeclStream, ValStr), write(DeclStream, ").\n"),
-								write(DeclStream, Etype), write(DeclStream, "Entity("), write(DeclStream, FncPending1), write(DeclStream, UArgLStr), write(DeclStream, ")"), write(DeclStream, ValStr), write(DeclStream, ").\n"),
+								write(DeclStream, Type), write(DeclStream, "Fluent("), write(DeclStream, DeclRepr), write(DeclStream, ").\n"),
+								write(DeclStream, Etype), write(DeclStream, "Entity("), write(DeclStream, DeclRepr), write(DeclStream, ").\n"),
 								write(DeclStream, "index("), write(DeclStream, FncPending1), write(DeclStream, IndArgLStr), write(DeclStream, ")"), write(DeclStream, ValStr), write(DeclStream, ", "), write(DeclStream, Index), write(DeclStream, ").\n\n"),
 								addToTail(Decl, DeclStr, Decll),
 								nb_setval(declared, Decll))
@@ -199,7 +221,7 @@ moreComponents(MCompStr, I, and, DeclStream)	-->	",", space, expression(MCompStr
 moreComponents(MCompStr, I, or, DeclStream)	-->	space, "or", space, expression(MCompStr, I, DeclStream).
 moreComponents(null)				-->	[].
 
-component(CompStr, T, DeclStream)		-->	fluent("sD", "input", Str, T, DeclStream),
+component(CompStr, T, DeclStream)		-->	fluent("sD", "input", Str, _, T, DeclStream),
 							{
 								string_concat(",\n\tholdsFor(", Str, CompStrPending1),
 								string_concat(CompStrPending1, ", ", CompStrPending2),
@@ -223,25 +245,25 @@ itBody(ITBodyStr, DeclStream)			-->	"happens", space, event("input", CTStr, _, D
 								string_concat(CondStrPending1, ", T)", CondStr),
 								string_concat(CondStr, MCondStr, ITBodyStr)
 							}.
-itBody(ITBodyStr, DeclStream)			-->	"start", space, fluent("sD", "input", CTStr, _, DeclStream), moreConditions(MCondStr, DeclStream),
+itBody(ITBodyStr, DeclStream)			-->	"start", space, fluent("sD", "input", CTStr, _, _, DeclStream), moreConditions(MCondStr, DeclStream),
 							{
 								string_concat(",\n\thappensAt(start(", CTStr, CondStrPending1),
 								string_concat(CondStrPending1, "), T)", CondStr),
 								string_concat(CondStr, MCondStr, ITBodyStr)
 							}.
-itBody(ITBodyStr, DeclStream)			-->	"end", space, fluent("sD", "input", CTStr, _, DeclStream), moreConditions(MCondStr, DeclStream),
+itBody(ITBodyStr, DeclStream)			-->	"end", space, fluent("sD", "input", CTStr, _, _, DeclStream), moreConditions(MCondStr, DeclStream),
 							{
 								string_concat(",\n\thappensAt(end(", CTStr, CondStrPending1),
 								string_concat(CondStrPending1, "), T)", CondStr),
 								string_concat(CondStr, MCondStr, ITBodyStr)
 							}.
 
-condition(CondStr, DeclStream)			-->	"start", space, fluent("sD", "input", CTStr, _, DeclStream),
+condition(CondStr, DeclStream)			-->	"start", space, fluent("sD", "input", CTStr, _, _, DeclStream),
 							{
 								string_concat(",\n\thappensAt(start(", CTStr, CondStrPending1),
 								string_concat(CondStrPending1, "), T)", CondStr)
 							}.
-condition(CondStr, DeclStream)			-->	"end", space, fluent("sD", "input", CTStr, _, DeclStream),
+condition(CondStr, DeclStream)			-->	"end", space, fluent("sD", "input", CTStr, _, _, DeclStream),
 							{
 								string_concat(",\n\thappensAt(end(", CTStr, CondStrPending1),
 								string_concat(CondStrPending1, "), T)", CondStr)
@@ -251,7 +273,7 @@ condition(CondStr, DeclStream)			-->	"happens", space, event("input", CTStr, _, 
 								string_concat(",\n\thappensAt(", CTStr, CondStrPending1),
 								string_concat(CondStrPending1, ", T)", CondStr)
 							}.
-condition(CondStr, DeclStream)			-->	fluent("sD", "input", CTStr, _, DeclStream),
+condition(CondStr, DeclStream)			-->	fluent("sD", "input", CTStr, _, _, DeclStream),
 							{
 								string_concat(",\n\tholdsAt(", CTStr, CondStrPending1),
 								string_concat(CondStrPending1, ", T)", CondStr)

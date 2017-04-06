@@ -78,3 +78,10 @@ event(exit(_)).
 inputEntity(exit(_)).
 index(exit(P1), P1).
 
+cachingOrder(working(_)=true).
+cachingOrder(moving(_,_)=true).
+cachingOrder(resting(_)=true).
+cachingOrder(happy(_)=true).
+cachingOrder(sad(_)=true).
+cachingOrder(friends(_,_)=true).
+cachingOrder(fighting(_,_)=true).
