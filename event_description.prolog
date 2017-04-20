@@ -1,59 +1,59 @@
-holdsFor(working(X)=true, I_working_X_true) :-
-	holdsFor(loc(X)=work, I_loc_X_work),
-	holdsFor(takingBreak(X)=true, I_takingBreak_X_true),
-	complement_all(I_takingBreak_X_true, I_takingBreak_X_true_COMPL),
-	intersect_all([I_loc_X_work, I_takingBreak_X_true_COMPL], I_loc_X_work_AND_I_takingBreak_X_true_COMPL),
-	union_all([I_loc_X_work_AND_I_takingBreak_X_true_COMPL, []], I_working_X_true).
+holdsFor(working(X)=true, I1) :-
+	holdsFor(loc(X)=work, I2),
+	holdsFor(takingBreak(X)=true, I13),
+	complement_all(I13, I14),
+	intersect_all([I2, I14], I15),
+	union_all([I15, []], I1).
 
-holdsFor(resting(X)=true, I_resting_X_true) :-
-	holdsFor(loc(X)=pub, I_loc_X_pub),
-	holdsFor(onHoliday(X)=true, I_onHoliday_X_true),
-	holdsFor(loc(X)=work, I_loc_X_work),
-	holdsFor(takingBreak(X)=true, I_takingBreak_X_true),
-	intersect_all([I_loc_X_work, I_takingBreak_X_true], I_loc_X_work_AND_I_takingBreak_X_true),
-	union_all([I_onHoliday_X_true, I_loc_X_work_AND_I_takingBreak_X_true], I_onHoliday_X_true_OR_I_loc_X_work_AND_I_takingBreak_X_true),
-	union_all([I_loc_X_pub, I_onHoliday_X_true_OR_I_loc_X_work_AND_I_takingBreak_X_true], I_loc_X_pub_OR_I_onHoliday_X_true_OR_I_loc_X_work_AND_I_takingBreak_X_true),
-	union_all([I_loc_X_pub_OR_I_onHoliday_X_true_OR_I_loc_X_work_AND_I_takingBreak_X_true, []], I_resting_X_true).
+holdsFor(resting(X)=true, I16) :-
+	holdsFor(loc(X)=pub, I18),
+	holdsFor(onHoliday(X)=true, I20),
+	holdsFor(loc(X)=work, I35),
+	holdsFor(takingBreak(X)=true, I38),
+	intersect_all([I35, I38], I39),
+	union_all([I20, I39], I40),
+	union_all([I18, I40], I41),
+	union_all([I41, []], I16).
 
-holdsFor(happy(X)=true, I_happy_X_true) :-
-	holdsFor(rich(X)=true, I_rich_X_true),
-	holdsFor(resting(X)=true, I_resting_X_true),
-	union_all([I_rich_X_true, I_resting_X_true], I_rich_X_true_OR_I_resting_X_true),
-	union_all([I_rich_X_true_OR_I_resting_X_true, []], I_happy_X_true).
+holdsFor(happy(X)=true, I42) :-
+	holdsFor(rich(X)=true, I44),
+	holdsFor(resting(X)=true, I47),
+	union_all([I44, I47], I48),
+	union_all([I48, []], I42).
 
-holdsFor(sad(X)=true, I_sad_X_true) :-
-	holdsFor(poor(X)=true, I_poor_X_true),
-	holdsFor(working(X)=true, I_working_X_true),
-	holdsFor(loc(X)=home, I_loc_X_home),
-	holdsFor(changingDiapers(X)=true, I_changingDiapers_X_true),
-	intersect_all([I_loc_X_home, I_changingDiapers_X_true], I_loc_X_home_AND_I_changingDiapers_X_true),
-	union_all([I_working_X_true, I_loc_X_home_AND_I_changingDiapers_X_true], I_working_X_true_OR_I_loc_X_home_AND_I_changingDiapers_X_true),
-	intersect_all([I_poor_X_true, I_working_X_true_OR_I_loc_X_home_AND_I_changingDiapers_X_true], I_poor_X_true_AND_I_working_X_true_OR_I_loc_X_home_AND_I_changingDiapers_X_true),
-	union_all([I_poor_X_true_AND_I_working_X_true_OR_I_loc_X_home_AND_I_changingDiapers_X_true, []], I_sad_X_true).
+holdsFor(sad(X)=true, I49) :-
+	holdsFor(poor(X)=true, I50),
+	holdsFor(working(X)=true, I102),
+	holdsFor(loc(X)=home, I117),
+	holdsFor(changingDiapers(X)=true, I120),
+	intersect_all([I117, I120], I121),
+	union_all([I102, I121], I122),
+	intersect_all([I50, I122], I123),
+	union_all([I123, []], I49).
 
-holdsFor(friends(X,Y)=true, I_friends_X_Y_true) :-
-	holdsFor(loc(X)=pub, I_loc_X_pub),
-	holdsFor(loc(Y)=pub, I_loc_Y_pub),
-	holdsFor(rich(X)=true, I_rich_X_true),
-	holdsFor(rich(Y)=true, I_rich_Y_true),
-	union_all([I_rich_X_true, I_rich_Y_true], I_rich_X_true_OR_I_rich_Y_true),
-	complement_all(I_rich_X_true_OR_I_rich_Y_true, I_rich_X_true_OR_I_rich_Y_true_COMPL),
-	intersect_all([I_loc_Y_pub, I_rich_X_true_OR_I_rich_Y_true_COMPL], I_loc_Y_pub_AND_I_rich_X_true_OR_I_rich_Y_true_COMPL),
-	intersect_all([I_loc_X_pub, I_loc_Y_pub_AND_I_rich_X_true_OR_I_rich_Y_true_COMPL], I_loc_X_pub_AND_I_loc_Y_pub_AND_I_rich_X_true_OR_I_rich_Y_true_COMPL),
-	union_all([I_loc_X_pub_AND_I_loc_Y_pub_AND_I_rich_X_true_OR_I_rich_Y_true_COMPL, []], I_friends_X_Y_true).
+holdsFor(friends(X,Y)=true, I124) :-
+	holdsFor(loc(X)=pub, I125),
+	holdsFor(loc(Y)=pub, I126),
+	holdsFor(rich(X)=true, I186),
+	holdsFor(rich(Y)=true, I189),
+	union_all([I186, I189], I190),
+	complement_all(I190, I191),
+	intersect_all([I126, I191], I192),
+	intersect_all([I125, I192], I193),
+	union_all([I193, []], I124).
 
-holdsFor(fighting(X,Y)=true, I_fighting_X_Y_true) :-
-	holdsFor(abrupt(X)=true, I_abrupt_X_true),
-	holdsFor(abrupt(Y)=true, I_abrupt_Y_true),
-	union_all([I_abrupt_X_true, I_abrupt_Y_true], I_abrupt_X_true_OR_I_abrupt_Y_true),
-	holdsFor(close(X,Y)=true, I_close_X_Y_true),
-	intersect_all([I_abrupt_X_true_OR_I_abrupt_Y_true, I_close_X_Y_true], I_abrupt_X_true_OR_I_abrupt_Y_true_AND_I_close_X_Y_true),
-	holdsFor(inactive(X)=true, I_inactive_X_true),
-	holdsFor(inactive(Y)=true, I_inactive_Y_true),
-	union_all([I_inactive_X_true, I_inactive_Y_true], I_inactive_X_true_OR_I_inactive_Y_true),
-	complement_all(I_inactive_X_true_OR_I_inactive_Y_true, I_inactive_X_true_OR_I_inactive_Y_true_COMPL),
-	intersect_all([I_abrupt_X_true_OR_I_abrupt_Y_true_AND_I_close_X_Y_true, I_inactive_X_true_OR_I_inactive_Y_true_COMPL], I_abrupt_X_true_OR_I_abrupt_Y_true_AND_I_close_X_Y_true_AND_I_inactive_X_true_OR_I_inactive_Y_true_COMPL),
-	union_all([I_abrupt_X_true_OR_I_abrupt_Y_true_AND_I_close_X_Y_true_AND_I_inactive_X_true_OR_I_inactive_Y_true_COMPL, []], I_fighting_X_Y_true).
+holdsFor(fighting(X,Y)=true, I194) :-
+	holdsFor(abrupt(X)=true, I196),
+	holdsFor(abrupt(Y)=true, I199),
+	union_all([I196, I199], I200),
+	holdsFor(close(X,Y)=true, I203),
+	intersect_all([I200, I203], I204),
+	holdsFor(inactive(X)=true, I264),
+	holdsFor(inactive(Y)=true, I267),
+	union_all([I264, I267], I268),
+	complement_all(I268, I269),
+	intersect_all([I204, I269], I270),
+	union_all([I270, []], I194).
 
 initiatedAt(moving(P1,P2)=true, T) :-
 	happensAt(start(walking(P1)=true), T),

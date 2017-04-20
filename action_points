@@ -9,4 +9,4 @@
 5) Clean and document source code
 6) (DONE) Fix union_all's that have 3 arguments
 7) Remove unnecessary union_all's
-8) Make interval names shorter
+8) (DONE) Make interval names shorter
