@@ -10,3 +10,4 @@
 6) (DONE) Fix union_all's that have 3 arguments
 7) Remove unnecessary union_all's
 8) (DONE) Make interval names shorter
+9) Eliminate interval counter gaps (I1, I2, I13, I14, I29...)
