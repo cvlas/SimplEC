@@ -7,3 +7,6 @@
 	d) (DONE) Caching Order
 4) Incorporation of SimplEC into RTEC
 5) Clean and document source code
+6) Fix union_all's that have 3 arguments
+7) Remove unnecessary union_all's
+8) Make interval names shorter

@@ -51,7 +51,7 @@ space 					--> 	"\r", space.
 space 					--> 	" ", space.
 space					-->	[].
 
-goal(DeclStream)			--> 	ceDefinition(DeclStream), space, goal(DeclStream).
+goal(DeclStream)			--> 	space, ceDefinition(DeclStream), space, goal(DeclStream).
 goal(_)					--> 	[].
 
 ceDefinition(DeclStream)		-->	holdsFor(DeclStream).
