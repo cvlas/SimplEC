@@ -13,6 +13,7 @@ A set of event patterns in SimplEC can be compiled into the Run-Time Event Calcu
 % -----------------------------------------------
 
 1) Have SWI-Prolog installed (preferably version 7.x)
+
 2) Download simplEC.prolog
 
 % -----------------------------------------------
