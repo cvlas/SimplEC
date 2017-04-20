@@ -36,8 +36,12 @@ Then, load the compiler source code and call the main routine, as follows:
 	true.
 
 The main routine simplEC needs 3 arguments as input:
-	1) The input rules in SimplEC
-	2) A name for the output Event Description file
-    3) A name for the output Declarations file
+
+1) The input rules in SimplEC
+
+2) A name for the output Event Description file
+
+3) A name for the output Declarations file
+
 
 If Prolog answers "true." in both commands, then everything went well and the rules have been successfully compiled into RTEC rules ("event_description.prolog") and declarations ("declarations.prolog").
