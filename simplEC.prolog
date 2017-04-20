@@ -63,7 +63,7 @@ holdsFor(DeclStream)			--> 	head(Head, HeadT, DeclStream), space, sep("iff"), sp
 							list_head(BodyCodes, _, CommaFreeBodyCodes),
 							string_codes(CommaFreeBody, CommaFreeBodyCodes),
 							write(Head), write(" :-"), write(CommaFreeBody),
-							write(",\n\tunion_all("), write(BodyT), write(", [], "), write(HeadT), write(").\n\n")
+							write(",\n\tunion_all(["), write(BodyT), write(", []], "), write(HeadT), write(").\n\n")
 						}.
 
 initTerm(DeclStream)			-->	head(Head, _, DeclStream), space, sep("if"), space, itBody(Body, DeclStream), ".",

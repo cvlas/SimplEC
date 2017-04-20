@@ -1,4 +1,4 @@
-1) relative_complement_all
+1) Fix relative_complement_all
 2) (DONE) the first condition should always be an event in all init/term rules
 3) (DONE) automatic declarations generation
 	a) (DONE) Distinguish SD from Simple Fluents
@@ -7,6 +7,6 @@
 	d) (DONE) Caching Order
 4) Incorporation of SimplEC into RTEC
 5) Clean and document source code
-6) Fix union_all's that have 3 arguments
+6) (DONE) Fix union_all's that have 3 arguments
 7) Remove unnecessary union_all's
 8) Make interval names shorter
