@@ -4,10 +4,10 @@
 	a) (DONE) Distinguish SD from Simple Fluents
 	b) (DONE) Distinguish input from output entities
 	c) (DONE) Remove duplicates and redundancies
-	d) (DONE) Caching Order
-4) Incorporation of SimplEC into RTEC
-5) Clean and document source code
-6) (DONE) Fix union_all's that have 3 arguments
-7) Remove unnecessary union_all's
-8) (DONE) Make interval names shorter
-9) Eliminate interval counter gaps (I1, I2, I13, I14, I29...)
+	d) (DONE) Caching Order 
+		  (Found flaws on the first approach. Second approach seems to work well)
+4) Clean and document source code
+5) (DONE) Fix union_all's that have 3 arguments
+6) Remove unnecessary union_all's
+7) (DONE) Make interval names shorter
+8) Eliminate interval counter gaps (I1, I2, I13, I14, I29...)
