@@ -32,9 +32,9 @@ simplEC(InputFile, OutputFile, DeclarationsFile) :-
 	read_stream_to_codes(Input, Codes),
 	phrase(goal(DeclStream), Codes),
 	
-	% Caching order only applies to output entities (Head fluents)
-	nb_getval(headFluents, Heads),
-	findall((OE,Pr), (cachingPriority(OE, Pr), member(OE, Heads)), CachingUnordered),
+	% Caching order only applies to output entities
+	% Priority > 0 <=> Output Entity
+	findall((OE,Pr), (cachingPriority(OE, Pr), Pr > 0), CachingUnordered),
 	sort(2, @=<, CachingUnordered, CachingOrdered),
 	findall(OE,
 		(member((OE, Pr), CachingOrdered),
