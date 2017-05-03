@@ -271,9 +271,9 @@ component(CompStr, T, Priority, DeclStream)		-->	fluent("sD", "input", Str, _, P
 component(CompStr, T, Priority, DeclStream)		-->	"(", space, expression(CompStr, T, Priority, DeclStream), space, ")".
 component(CompStr, T, Priority, DeclStream)		-->	"not", space, expression(Str, ExpT, Priority, DeclStream),
 							{
-								string_concat(Str, ",\n\tcomplement_all(", CompStrPending3),
+								string_concat(Str, ",\n\tcomplement_all([", CompStrPending3),
 								string_concat(CompStrPending3, ExpT, CompStrPending4),
-								string_concat(CompStrPending4, ", ", CompStrPending5),
+								string_concat(CompStrPending4, "], ", CompStrPending5),
 								%string_concat(ExpT, "_COMPL", T),
 								nb_getval(intervalNo, Int),
 								string_concat("I", Int, T),

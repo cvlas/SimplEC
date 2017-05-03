@@ -1,7 +1,7 @@
 holdsFor(working(X)=true, I1) :-
 	holdsFor(loc(X)=work, I2),
 	holdsFor(takingBreak(X)=true, I13),
-	complement_all(I13, I14),
+	complement_all([I13], I14),
 	intersect_all([I2, I14], I15),
 	union_all([I15, []], I1).
 
@@ -37,7 +37,7 @@ holdsFor(friends(X,Y)=true, I124) :-
 	holdsFor(rich(X)=true, I186),
 	holdsFor(rich(Y)=true, I189),
 	union_all([I186, I189], I190),
-	complement_all(I190, I191),
+	complement_all([I190], I191),
 	intersect_all([I126, I191], I192),
 	intersect_all([I125, I192], I193),
 	union_all([I193, []], I124).
@@ -51,7 +51,7 @@ holdsFor(fighting(X,Y)=true, I194) :-
 	holdsFor(inactive(X)=true, I264),
 	holdsFor(inactive(Y)=true, I267),
 	union_all([I264, I267], I268),
-	complement_all(I268, I269),
+	complement_all([I268], I269),
 	intersect_all([I204, I269], I270),
 	union_all([I270, []], I194).
 
