@@ -33,20 +33,18 @@ holdsFor(friends(X,Y)=true, I124) :-
 	holdsFor(rich(Y)=true,I189),
 	union_all([I186,I189],I190),
 	complement_all([I190],I191),
-	intersect_all([I126,I191],I192),
-	intersect_all([I125,I192],I124)
+	intersect_all([I126,I191,I125],I124)
 
 holdsFor(fighting(X,Y)=true, I194) :-
 	holdsFor(abrupt(X)=true,I196),
 	holdsFor(abrupt(Y)=true,I199),
 	union_all([I196,I199],I200),
 	holdsFor(close(X,Y)=true,I203),
-	intersect_all([I200,I203],I204),
 	holdsFor(inactive(X)=true,I264),
 	holdsFor(inactive(Y)=true,I267),
 	union_all([I264,I267],I268),
 	complement_all([I268],I269),
-	intersect_all([I204,I269],I194)
+	intersect_all([I200,I203,I269],I194)
 
 initiatedAt(moving(P1,P2)=true, T) :-
 	happensAt(start(walking(P1)=true), T),

@@ -231,20 +231,42 @@ hfBody(BodyStr, I, Priority, DeclStream)			-->	expression(BodyStr, I, Priority, 
 
 expression(ExprStr, I, Priority, DeclStream)		-->	component(CompStr, T1, Priority1, DeclStream), moreComponents(MCompStr, T2, and, Priority2, DeclStream),
 							{
-								atomics_to_string([CompStr, MCompStr], ",\n\t", ExprStrPending),
-								string_concat(ExprStrPending, ",\n\tintersect_all([", ExprStrPending6),
-								string_concat(ExprStrPending6, T1, ExprStrPending7),
-								string_concat(ExprStrPending7, ", ", ExprStrPending8),
-								string_concat(ExprStrPending8, T2, ExprStrPending9),
-								string_concat(ExprStrPending9, "], ", ExprStrPending10),
-								%string_concat(T1, "_AND_", IPending),
-								%string_concat(IPending, T2, I),
 								nb_getval(intervalNo, Int),
 								string_concat("I", Int, I),
 								NewInt is Int + 1,
 								nb_setval(intervalNo, NewInt),
-								string_concat(ExprStrPending10, I, ExprStrPending11),
-								string_concat(ExprStrPending11, ")", ExprStr),
+								
+								atom_string(T1Atom, T1),
+								atom_string(T2Atom, T2),
+								atom_string(IAtom, I),
+								
+								atomics_to_string([CompStr, MCompStr], ",\n\t", ExprStrPending),
+								split_string(ExprStrPending, "\n", ",\t\n", SubStrings),
+								findall((Term, VNames), (member(Sub, SubStrings), term_string(Term, Sub, [variable_names(VNames)])), Terms),
+								(
+									(member((intersect_all(List, SomeI), Vars), Terms), last(Vars, T1Atom=SomeI)) ->
+									delete(Terms, (intersect_all(List, SomeI), Vars), TermsPending1),
+									delete(Vars, T1Atom=SomeI, VarsPending1),
+									addToHead(VarsPending1, T2Atom=Anon2, VarsPending2),
+									addToTail(VarsPending2, IAtom=AnonI, NewVars),
+									addToTail(List, Anon2, NewList),
+									addToTail(TermsPending1, (intersect_all(NewList, AnonI), NewVars), NewTerms)
+									;
+									(member((intersect_all(List, SomeI), Vars), Terms), last(Vars, T2Atom=SomeI)) ->
+									delete(Terms, (intersect_all(List, SomeI), Vars), TermsPending1),
+									delete(Vars, T2Atom=SomeI, VarsPending1),
+									addToHead(VarsPending1, T1Atom=Anon1, VarsPending2),
+									addToTail(VarsPending2, IAtom=AnonI, NewVars),
+									addToTail(List, Anon1, NewList),
+									addToTail(TermsPending1, (intersect_all(NewList, AnonI), NewVars), NewTerms)
+									;
+									% relative_complement_all
+									%;
+									addToTail(Terms, (intersect_all([Anon1, Anon2], AnonI), [T1Atom=Anon1, T2Atom=Anon2, IAtom=AnonI]), NewTerms)
+								),
+								findall(S, (member((T, V), NewTerms), term_string(T, S, [variable_names(V)])), ExprStrSplit),
+								atomics_to_string(ExprStrSplit, ",\n\t", ExprStr),
+
 								Priority is Priority1 + Priority2
 							}.
 expression(ExprStr, I, Priority, DeclStream)		-->	component(CompStr, T1, Priority1, DeclStream), moreComponents(MCompStr, T2, or, Priority2, DeclStream),
