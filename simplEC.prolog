@@ -336,6 +336,13 @@ itBody(ITBodyStr, Priority, DeclStream)			-->	"happens", space, event("input", C
 									string_concat(CondStr, MCondStr, ITBodyStr),
 									Priority is Priority1 + Priority2
 								}.
+itBody(ITBodyStr, Priority, DeclStream)			-->	"not", space, event("input", CTStr, Priority1, DeclStream), moreConditions(MCondStr, Priority2, DeclStream),
+								{
+									string_concat(",\n\t\\+ happensAt(", CTStr, CondStrPending1),
+									string_concat(CondStrPending1, ", T)", CondStr),
+									string_concat(CondStr, MCondStr, ITBodyStr),
+									Priority is Priority1 + Priority2
+								}.
 itBody(ITBodyStr, Priority, DeclStream)			-->	"start", space, fluent("sD", "input", CTStr, _, Priority1, _, DeclStream), moreConditions(MCondStr, Priority2, DeclStream),
 								{
 									string_concat(",\n\thappensAt(start(", CTStr, CondStrPending1),
@@ -366,9 +373,19 @@ condition(CondStr, Priority, DeclStream)		-->	"happens", space, event("input", C
 									string_concat(",\n\thappensAt(", CTStr, CondStrPending1),
 									string_concat(CondStrPending1, ", T)", CondStr)
 								}.
+condition(CondStr, Priority, DeclStream)		-->	"not", space, event("input", CTStr, Priority, DeclStream),
+								{
+									string_concat(",\n\t\\+ happensAt(", CTStr, CondStrPending1),
+									string_concat(CondStrPending1, ", T)", CondStr)
+								}.
 condition(CondStr, Priority, DeclStream)		-->	fluent("sD", "input", CTStr, _, Priority, _, DeclStream),
 								{
 									string_concat(",\n\tholdsAt(", CTStr, CondStrPending1),
+									string_concat(CondStrPending1, ", T)", CondStr)
+								}.
+condition(CondStr, Priority, DeclStream)		-->	"not", space, fluent("sD", "input", CTStr, _, Priority, _, DeclStream),
+								{
+									string_concat(",\n\t\\+ holdsAt(", CTStr, CondStrPending1),
 									string_concat(CondStrPending1, ", T)", CondStr)
 								}.
 
