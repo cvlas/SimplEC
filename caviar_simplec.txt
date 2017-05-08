@@ -1,0 +1,44 @@
+close(Id1, Id2, 24) iff
+	distance(Id1, Id2, 24).
+
+close(Id1, Id2, 25) iff
+	close(Id1, Id2, 24) or
+	distance(Id1, Id2, 25).
+
+close(Id1, Id2, 30) iff 
+	close(Id1, Id2, 25) or
+	distance(Id1, Id2, 30).
+
+close(Id1, Id2, 34) iff
+	close(Id1, Id2, 30) or
+	distance(Id1, Id2, 34).
+
+close(Id1, Id2, Threshold)=false iff
+	not close(Id1, Id2, Threshold).
+
+closeSymmetric(Id1, Id2, Threshold) iff
+	close(Id1, Id2, Threshold) or
+	close(Id2, Id1, Threshold).
+
+
+
+
+
+initiate person(Id) if
+	start walking(Id),
+	not disappear(Id).
+
+initiate person(Id) if
+	start running(Id),
+	not disappear(Id).
+
+initiate person(Id) if
+	start active(Id),
+	not disappear(Id).
+
+initiate person(Id) if
+	start abrupt(Id),
+	not disappear(Id).
+
+initiate person(Id)=false if
+	happens disappear(Id).
