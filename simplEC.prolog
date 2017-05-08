@@ -201,7 +201,7 @@ argumentsList(ArgLStr, UArgLStr, IndArgLStr, ArgStr)	--> 	argument(ArgStr), more
 									string_concat(ArgStr, UMArgStr, IndArgLStr)
 								}.
 
-argument(ArgStr) 					--> 	[Alpha], { char_type(Alpha, alpha) }, restChars(RCList),
+argument(ArgStr) 					--> 	[Alpha], { char_type(Alpha, alnum) }, restChars(RCList),
 								{
 									string_codes(ArgStr, [Alpha|RCList])
 								}.
@@ -210,7 +210,7 @@ moreArguments(MArgStr, MArgStr)				--> 	[],
 								{
 									string_codes(MArgStr, [])
 								}.
-moreArguments(MArgStr, UMArgStr)			-->	",", argument(ArgStr), moreArguments(MMArgStr, UMMArgStr),
+moreArguments(MArgStr, UMArgStr)			-->	",", space, argument(ArgStr), moreArguments(MMArgStr, UMMArgStr),
 								{
 									string_concat(",", ArgStr, MArgPending),
 									string_concat(MArgPending, MMArgStr, MArgStr),
