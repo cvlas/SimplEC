@@ -1,8 +1,7 @@
 holdsFor(working(X)=true, I1) :-
 	holdsFor(loc(X)=work,I2),
 	holdsFor(takingBreak(X)=true,I13),
-	complement_all([I13],I14),
-	intersect_all([I2,I14],I1)
+	relative_complement_all(I2,[I13],I1)
 
 holdsFor(resting(X)=true, I16) :-
 	holdsFor(loc(X)=pub,I18),
@@ -28,23 +27,23 @@ holdsFor(sad(X)=true, I49) :-
 
 holdsFor(friends(X,Y)=true, I124) :-
 	holdsFor(loc(X)=pub,I125),
-	holdsFor(loc(Y)=pub,I126),
-	holdsFor(rich(X)=true,I186),
-	holdsFor(rich(Y)=true,I189),
-	union_all([I186,I189],I190),
-	complement_all([I190],I191),
-	intersect_all([I126,I191,I125],I124)
+	holdsFor(loc(Y)=pub,I128),
+	intersect_all([I125,I128],I129),
+	holdsFor(rich(X)=true,I189),
+	holdsFor(rich(Y)=true,I192),
+	union_all([I189,I192],I193),
+	relative_complement_all(I129,[I193],I124)
 
-holdsFor(fighting(X,Y)=true, I194) :-
-	holdsFor(abrupt(X)=true,I196),
-	holdsFor(abrupt(Y)=true,I199),
-	union_all([I196,I199],I200),
-	holdsFor(close(X,Y)=true,I203),
-	holdsFor(inactive(X)=true,I264),
-	holdsFor(inactive(Y)=true,I267),
-	union_all([I264,I267],I268),
-	complement_all([I268],I269),
-	intersect_all([I200,I203,I269],I194)
+holdsFor(fighting(X,Y)=true, I196) :-
+	holdsFor(abrupt(X)=true,I198),
+	holdsFor(abrupt(Y)=true,I201),
+	union_all([I198,I201],I202),
+	holdsFor(close(X,Y)=true,I205),
+	intersect_all([I202,I205],I206),
+	holdsFor(inactive(X)=true,I266),
+	holdsFor(inactive(Y)=true,I269),
+	union_all([I266,I269],I270),
+	relative_complement_all(I206,[I270],I196)
 
 initiatedAt(moving(P1,P2)=true, T) :-
 	happensAt(start(walking(P1)=true), T),

@@ -244,12 +244,20 @@ expression(ExprStr, I, Priority, DeclStream)		-->	component(CompStr, T1, Priorit
 								split_string(ExprStrPending, "\n", ",\t\n", SubStrings),
 								findall((Term, VNames), (member(Sub, SubStrings), term_string(Term, Sub, [variable_names(VNames)])), Terms),
 								(
+									(member((complement_all(List, SomeI), Vars), Terms), last(Vars, T2Atom=SomeI)) ->
+									delete(Terms, (complement_all(List, SomeI), Vars), TermsPending1),
+									delete(Vars, T2Atom=SomeI, VarsPending1),
+									addToHead(VarsPending1, T1Atom=Anon1, VarsPending2),
+									addToTail(VarsPending2, IAtom=AnonI, NewVars),
+									%addToTail(List, Anon1, NewList),
+									addToTail(TermsPending1, (relative_complement_all(Anon1, List, AnonI), NewVars), NewTerms)
+									;
 									(member((intersect_all(List, SomeI), Vars), Terms), last(Vars, T1Atom=SomeI)) ->
 									delete(Terms, (intersect_all(List, SomeI), Vars), TermsPending1),
 									delete(Vars, T1Atom=SomeI, VarsPending1),
 									addToHead(VarsPending1, T2Atom=Anon2, VarsPending2),
 									addToTail(VarsPending2, IAtom=AnonI, NewVars),
-									addToTail(List, Anon2, NewList),
+									addToHead(List, Anon2, NewList),
 									addToTail(TermsPending1, (intersect_all(NewList, AnonI), NewVars), NewTerms)
 									;
 									(member((intersect_all(List, SomeI), Vars), Terms), last(Vars, T2Atom=SomeI)) ->
@@ -257,11 +265,9 @@ expression(ExprStr, I, Priority, DeclStream)		-->	component(CompStr, T1, Priorit
 									delete(Vars, T2Atom=SomeI, VarsPending1),
 									addToHead(VarsPending1, T1Atom=Anon1, VarsPending2),
 									addToTail(VarsPending2, IAtom=AnonI, NewVars),
-									addToTail(List, Anon1, NewList),
+									addToHead(List, Anon1, NewList),
 									addToTail(TermsPending1, (intersect_all(NewList, AnonI), NewVars), NewTerms)
 									;
-									% relative_complement_all
-									%;
 									addToTail(Terms, (intersect_all([Anon1, Anon2], AnonI), [T1Atom=Anon1, T2Atom=Anon2, IAtom=AnonI]), NewTerms)
 								),
 								findall(S, (member((T, V), NewTerms), term_string(T, S, [variable_names(V)])), ExprStrSplit),

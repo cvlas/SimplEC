@@ -16,8 +16,8 @@ sad(X) iff
 	(working(X) or (loc(X)=home, changingDiapers(X))).
 
 friends(X,Y) iff
-	loc(X)=pub,
-	loc(Y)=pub,
+	(loc(X)=pub,
+	loc(Y)=pub),
 	not(rich(X) or rich(Y)).
 
 fighting(X,Y) iff

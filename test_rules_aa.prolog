@@ -40,8 +40,8 @@ fighting(X,Y) iff
 	not (inactive(X) or inactive(Y) ).
 
 holdsFor(fighting(X,Y)=true, I) :-
-	holdsFor(active(X)=true, I1),
-	holdsFor(active(X)=true, I2),
+	holdsFor(abrupt(X)=true, I1),
+	holdsFor(abrupt(Y)=true, I2),
 	union_all([I1,I2], I3),
 	holdsFor(close(X,Y)=true, I4),
 	intersect_all([I3,I4], I5), 
