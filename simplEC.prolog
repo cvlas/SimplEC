@@ -82,7 +82,7 @@ holdsFor(DeclStream)			--> 	head(Head, HeadT, DeclRepr, DeclStream), space, sep(
 							findall(S, (member((T, V), NewTerms), term_string(T, S, [variable_names(V)])), ExprStrSplit),
 							atomics_to_string(ExprStrSplit, ",\n\t", BodyFinal),
 							
-							write(Head), write(" :-\n\t"), write(BodyFinal), write("\n\n"),
+							write(Head), write(" :-\n\t"), write(BodyFinal), write(".\n\n"),
 							
 							HeadPriority is BodyPriority + 1,
 							cachingPriority(DeclRepr, OldPriority),
