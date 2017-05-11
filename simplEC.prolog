@@ -67,9 +67,9 @@ goal(_)					--> 	[].
 ceDefinition(DeclStream)		-->	holdsFor(DeclStream).
 ceDefinition(DeclStream)		-->	initTerm(DeclStream).
 					
-holdsFor(DeclStream)			--> 	head(Head, HeadT, DeclRepr, DeclStream), space, sep("iff"), space, hfBody(Body, BodyPriority, DeclStream), ".",
+holdsFor(DeclStream)			--> 	head(Head, DeclRepr, DeclStream), space, sep("iff"), space, {nb_setval(intervalNo, 1)}, hfBody(Body, BodyPriority, DeclStream), ".",
 						{
-							atom_string(HeadTAtom, HeadT),
+							%atom_string(HeadTAtom, HeadT),
 							
 							split_string(Body, "\n", ",\t\n", BodySubs),
 							findall((Term, VNames), (member(Sub, BodySubs), term_string(Term, Sub, [variable_names(VNames)])), Terms),
@@ -77,7 +77,7 @@ holdsFor(DeclStream)			--> 	head(Head, HeadT, DeclRepr, DeclStream), space, sep(
 							last(Vars, Name=Var),
 							delete(Terms, (LastTerm, Vars), TermsPending),
 							delete(Vars, Name=Var, VarsPending),
-							addToTail(VarsPending, HeadTAtom=Var, NewVars),
+							addToTail(VarsPending, 'I'=Var, NewVars),
 							addToTail(TermsPending, (LastTerm, NewVars), NewTerms),
 							findall(S, (member((T, V), NewTerms), term_string(T, S, [variable_names(V)])), ExprStrSplit),
 							atomics_to_string(ExprStrSplit, ",\n\t", BodyFinal),
@@ -93,7 +93,7 @@ holdsFor(DeclStream)			--> 	head(Head, HeadT, DeclRepr, DeclStream), space, sep(
 							assertz(cachingPriority(DeclRepr, HeadPriority)))
 						}.
 
-initTerm(DeclStream)			-->	head(Head, _, DeclRepr, DeclStream), space, sep("if"), space, itBody(Body, BodyPriority, DeclStream), ".",
+initTerm(DeclStream)			-->	head(Head, DeclRepr, DeclStream), space, sep("if"), space, itBody(Body, BodyPriority, DeclStream), ".",
 						{
 							string_codes(Body, BodyCodes),
 							list_head(BodyCodes, _, CommaFreeBodyCodes),
@@ -111,17 +111,18 @@ initTerm(DeclStream)			-->	head(Head, _, DeclRepr, DeclStream), space, sep("if")
 sep("iff")				--> 	"iff".
 sep("if")				--> 	"if".
 
-head(HeadStr, CTT, DeclRepr, DeclStream)		--> 	fluent("sD", "output", CTStr, DeclRepr, _, CTT, DeclStream),
+head(HeadStr, DeclRepr, DeclStream)		--> 	fluent("sD", "output", CTStr, DeclRepr, _, _, DeclStream),
 								{
-									string_concat("holdsFor(", CTStr, HeadStrPending1),
-									string_concat(HeadStrPending1, ", ", HeadStrPending2),
-									string_concat(HeadStrPending2, CTT, HeadStrPending3),
-									string_concat(HeadStrPending3, ")", HeadStr),
+									%string_concat("holdsFor(", CTStr, HeadStrPending1),
+									%string_concat(HeadStrPending1, ", ", HeadStrPending2),
+									%string_concat(HeadStrPending2, "Ι", HeadStrPending3),
+									%string_concat(HeadStrPending3, ")", HeadStr),
+									atomics_to_string(["holdsFor(", CTStr, ", ", "I", ")"], "", HeadStr),
 									nb_getval(headFluents, HF),
 									addToTail(HF, DeclRepr, HF_new),
 									nb_setval(headFluents, HF_new)
 								}.
-head(HeadStr, CTT, DeclRepr, DeclStream) 		--> 	"initiate", space, fluent("simple", "output", CTStr, DeclRepr, _, CTT, DeclStream),
+head(HeadStr, DeclRepr, DeclStream) 		--> 	"initiate", space, fluent("simple", "output", CTStr, DeclRepr, _, _, DeclStream),
 								{
 									string_concat("initiatedAt(", CTStr, HeadStrPending1),
 									string_concat(HeadStrPending1, ", T)", HeadStr),
@@ -129,13 +130,13 @@ head(HeadStr, CTT, DeclRepr, DeclStream) 		--> 	"initiate", space, fluent("simpl
 									addToTail(HF, DeclRepr, HF_new),
 									nb_setval(headFluents, HF_new)
 								}.
-head(HeadStr, CTT, DeclRepr, DeclStream)	 	--> 	"terminate", space, fluent("simple", "output", CTStr, DeclRepr, _, CTT, DeclStream),
+head(HeadStr, DeclRepr, DeclStream)	 	--> 	"terminate", space, fluent("simple", "output", CTStr, DeclRepr, _, _, DeclStream),
 								{
 									string_concat("terminatedAt(", CTStr, HeadStrPending1),
 									string_concat(HeadStrPending1, ", T)", HeadStr)
 								}.
 
-fluent(Type, Etype, CTStr, DeclRepr, Priority, T, DeclStream)	--> 	functawr(FncStr), "(", argumentsList(ArgLStr, UArgLStr, IndArgLStr, Index), ")", value(ValStr), !,
+fluent(Type, Etype, CTStr, DeclRepr, Priority, I, DeclStream)	--> 	functawr(FncStr), "(", argumentsList(ArgLStr, UArgLStr, IndArgLStr, Index), ")", value(ValStr), !,
 								{
 									string_concat(FncStr, "(", FncPending1),
 									string_concat(FncPending1, ArgLStr, FncPending2),
@@ -143,7 +144,7 @@ fluent(Type, Etype, CTStr, DeclRepr, Priority, T, DeclStream)	--> 	functawr(FncS
 									string_concat(FncPending3, ValStr, CTStr),
 									
 									nb_getval(intervalNo, Int),
-									string_concat("I", Int, T),
+									string_concat("I", Int, I),
 									NewInt is Int + 1,
 									nb_setval(intervalNo, NewInt),
 									
@@ -310,6 +311,10 @@ moreComponents(null)					-->	[].
 
 component(CompStr, T, Priority, DeclStream)		-->	fluent("sD", "input", Str, _, Priority, T, DeclStream),
 								{
+									%nb_getval(intervalNo, Int),
+									%string_concat("I", Int, T),
+									%NewInt is Int + 1,
+									%nb_setval(intervalNo, NewInt),
 									string_concat(",\n\tholdsFor(", Str, CompStrPending1),
 									string_concat(CompStrPending1, ", ", CompStrPending2),
 									string_concat(CompStrPending2, T, CompStrPending3),
