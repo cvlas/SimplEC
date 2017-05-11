@@ -30,33 +30,17 @@ sDFluent(running(_)=true).
 inputEntity(running(_)=true).
 index(running(Id)=true, Id).
 
-event(disappear(_)).
-inputEntity(disappear(_)).
-index(disappear(Id), Id).
-
 sDFluent(active(_)=true).
 inputEntity(active(_)=true).
 index(active(Id)=true, Id).
-
-event(disappear(_)).
-inputEntity(disappear(_)).
-index(disappear(Id), Id).
 
 sDFluent(abrupt(_)=true).
 inputEntity(abrupt(_)=true).
 index(abrupt(Id)=true, Id).
 
-event(disappear(_)).
-inputEntity(disappear(_)).
-index(disappear(Id), Id).
-
 simpleFluent(person(_)=false).
 outputEntity(person(_)=false).
 index(person(Id)=false, Id).
-
-event(disappear(_)).
-inputEntity(disappear(_)).
-index(disappear(Id), Id).
 
 cachingOrder(person(_)=true). %1
 cachingOrder(person(_)=false). %1
