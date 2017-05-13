@@ -21,20 +21,28 @@ addToTail([H|T], E, [H|L]) :- addToTail(T, E, L).
 
 propagatePriority(E, P) :-
 	%sleep(1),
-	write("\n\nLook, as far as I know, the priority of "), write(E), write(" is "), write(P), assertz(finalCachingPriority(E, P)), write(". I am going to propagate this to all dependants...\n"),
-	(\+ defines(E, H, P_Old) -> write("There are no dependants. Exiting...\n\n")
+	%write("\n\nLook, as far as I know, the priority of "), write(E), write(" is "), write(P), 
+	assertz(finalCachingPriority(E, P)), 
+	%write(". I am going to propagate this to all dependants...\n"),
+	(\+ defines(E, H, P_Old) -> true %write("There are no dependants. Exiting...\n\n")
 	;
-	defines(E, E, P_Old) -> write("Self-dependency. Exiting...\n\n")
+	defines(E, E, P_Old) -> true %write("Self-dependency. Exiting...\n\n")
 	;
 	findall(H, defines(E, H, P_Old), Heads), Heads \= [], sort(Heads, HeadsSorted),
-	write("Dependants Unsorted: "), write(Heads), write("\tDependants Sorted: "), write(HeadsSorted), nl,
+	%write("Dependants Unsorted: "), write(Heads), write("\tDependants Sorted: "), write(HeadsSorted), nl,
 	findall((E, B, C), (defines(E, B, C), retract(defines(E, B, C))), _),
-	forall(member(H, HeadsSorted), (assertz(defines(E, H, P)), write("Asserted new dependency for rule "), write(H), write(". Now the new priority of "), write(H), calculatePriority(H, Q), write(" is "), write(Q), assertz(finalCachingPriority(H, Q)), write("! Repeating procedure...\n\n"), propagatePriority(H, Q)))).
+	forall(member(H, HeadsSorted), (assertz(defines(E, H, P)), 
+	%write("Asserted new dependency for rule "), write(H), write(". Now the new priority of "), write(H), 
+	calculatePriority(H, Q), 
+	%write(" is "), write(Q), 
+	assertz(finalCachingPriority(H, Q)), 
+	%write("! Repeating procedure...\n\n"), 
+	propagatePriority(H, Q)))).
 
 calculatePriority(H, Q) :-
 	findall(P, defines(O, H, P), PS),
-	findall((O,P), defines(O, H, P), OPS),
-	write(OPS),
+	%findall((O,P), defines(O, H, P), OPS),
+	%write(OPS),
 	sum_list(PS, TmpQ),
 	Q is TmpQ + 1.
 
@@ -45,7 +53,7 @@ calculatePriority(H, Q) :-
 simplEC(InputFile, OutputFile, DeclarationsFile) :-
 	open(InputFile, read, Input),
 	open(DeclarationsFile, write, DeclStream),
-	%tell(OutputFile),
+	tell(OutputFile),
 	
 	% Auxiliary global variables
 	nb_setval(headFluents, []),
@@ -54,6 +62,12 @@ simplEC(InputFile, OutputFile, DeclarationsFile) :-
 	% Parse and translate the rules
 	read_stream_to_codes(Input, Codes),
 	phrase(goal, Codes),
+	
+	findall(looloody(DeclRepr, IndRepr, Type, EType), (declared(DeclRepr, IndRepr, Type, EType), retract(declared(DeclRepr, IndRepr, Type, EType))), Tuples),
+	sort(4, @>=, Tuples, TuplesDistorted),
+	sort(1, @<, TuplesDistorted, TuplesSorted),
+	%forall(member(looloody(A, B, C, D), TuplesSorted), (atomics_to_string(["looloody", A, B, C, D], "\t", Luludi), writeln(Luludi))),
+	forall(member(looloody(DeclRepr, IndRepr, Type, EType), TuplesSorted), assertz(declared(DeclRepr, IndRepr, Type, EType))),
 	
 	findall((DeclRepr, IndRepr, "event", "input"),
 		(declared(DeclRepr, IndRepr, "event", "input"),
@@ -87,7 +101,7 @@ simplEC(InputFile, OutputFile, DeclarationsFile) :-
 	
 	% Caching order only applies to output entities
 	% Priority > 0 <=> Output Entity
-	findall(H, head(H), HP), write(HP),
+	%findall(H, head(H), HP), write(HP),
 	findall((H, Q), (head(H), findall(Pr, finalCachingPriority(H, Pr), Prs), max_list(Prs, Q)), CachingUnordered),
 	sort(1, @<, CachingUnordered, CachingSorted),
 	sort(2, @=<, CachingSorted, CachingOrdered),
@@ -96,7 +110,7 @@ simplEC(InputFile, OutputFile, DeclarationsFile) :-
 		atomics_to_string(["cachingOrder(", H, ").\t%", Q, "\n"], "", Out),
 		write(DeclStream, Out)),
 		_),
-	%told,
+	told,
 	close(Input), close(DeclStream), !.
 
 % -----------------------------------------------
@@ -204,8 +218,8 @@ fluent(Type, Etype, CTStr, DeclRepr, Priority, I, HeadDeclRepr)	--> 	functawr(Fn
 									(declared(DeclRepr, IndRepr2, "sD", "input"), IndRepr2 \= IndRepr, Etype = "input") -> true
 									;
 									(declared(DeclRepr, IndRepr, "sD", "input"), Etype = "output") ->
-									retract(declared(DeclRepr, IndRepr, "sD", "input")),
-									assert(declared(DeclRepr, IndRepr, Type, Etype))
+									%forall(declared(DeclRepr, IndRepr, "sD", "input"), retract(declared(DeclRepr, IndRepr, "sD", "input"))),
+									assertz(declared(DeclRepr, IndRepr, Type, Etype))
 									;
 									assertz(declared(DeclRepr, IndRepr, Type, Etype)),
 									assertz(cachingPriority(DeclRepr, 0))),
