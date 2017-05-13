@@ -1,8 +1,12 @@
 :- [library(dcg/basics)].
 
+:- dynamic cachingPriority/2, declared/4, defines/3, head/1.
+
 % -----------------------------------------------
 % AUXILIARY TOOLS
 % -----------------------------------------------
+
+% Split a list into its head and the rest
 
 list_head([H|T], H, T).
 
@@ -13,127 +17,178 @@ addToHead(L, H, [H|L]).
 addToTail([], E, [E]).
 addToTail([H|T], E, [H|L]) :- addToTail(T, E, L).
 
+% Update the caching priority of an element and propagate this update to all output entities that depend on it
+
+propagatePriority(E, P) :-
+	%sleep(1),
+	write("\n\nLook, as far as I know, the priority of "), write(E), write(" is "), write(P), assertz(finalCachingPriority(E, P)), write(". I am going to propagate this to all dependants...\n"),
+	(\+ defines(E, H, P_Old) -> write("There are no dependants. Exiting...\n\n")
+	;
+	defines(E, E, P_Old) -> write("Self-dependency. Exiting...\n\n")
+	;
+	findall(H, defines(E, H, P_Old), Heads), Heads \= [], sort(Heads, HeadsSorted),
+	write("Dependants Unsorted: "), write(Heads), write("\tDependants Sorted: "), write(HeadsSorted), nl,
+	findall((E, B, C), (defines(E, B, C), retract(defines(E, B, C))), _),
+	forall(member(H, HeadsSorted), (assertz(defines(E, H, P)), write("Asserted new dependency for rule "), write(H), write(". Now the new priority of "), write(H), calculatePriority(H, Q), write(" is "), write(Q), assertz(finalCachingPriority(H, Q)), write("! Repeating procedure...\n\n"), propagatePriority(H, Q)))).
+
+calculatePriority(H, Q) :-
+	findall(P, defines(O, H, P), PS),
+	findall((O,P), defines(O, H, P), OPS),
+	write(OPS),
+	sum_list(PS, TmpQ),
+	Q is TmpQ + 1.
+
 % -----------------------------------------------
 % SIMPL-EC
 % -----------------------------------------------
 	
 simplEC(InputFile, OutputFile, DeclarationsFile) :-
 	open(InputFile, read, Input),
-	open(DeclarationsFile, append, DeclStream),
-	tell(OutputFile),
+	open(DeclarationsFile, write, DeclStream),
+	%tell(OutputFile),
 	
 	% Auxiliary global variables
 	nb_setval(headFluents, []),
-	nb_setval(declared, []),
-	nb_setval(cached, []),
 	nb_setval(intervalNo, 1),
 	
 	% Parse and translate the rules
 	read_stream_to_codes(Input, Codes),
-	phrase(goal(DeclStream), Codes),
+	phrase(goal, Codes),
+	
+	findall((DeclRepr, IndRepr, "event", "input"),
+		(declared(DeclRepr, IndRepr, "event", "input"),
+		atomics_to_string(["event(", DeclRepr, ").\tinputEntity(", DeclRepr, ").\tindex(", IndRepr, ").\n"], "", OutStr),
+		write(DeclStream, OutStr)),
+		_), nl(DeclStream),
+	
+	findall((DeclRepr, IndRepr, "sD", "input"),
+		(declared(DeclRepr, IndRepr, "sD", "input"),
+		atomics_to_string(["sDFluent(", DeclRepr, ").\tinputEntity(", DeclRepr, ").\tindex(", IndRepr, ").\n"], "", OutStr),
+		write(DeclStream, OutStr)),
+		_), nl(DeclStream),
+	
+	findall((DeclRepr, IndRepr, "event", "output"),
+		(declared(DeclRepr, IndRepr, "event", "output"),
+		atomics_to_string(["event(", DeclRepr, ").\toutputEntity(", DeclRepr, ").\tindex(", IndRepr, ").\n"], "", OutStr),
+		write(DeclStream, OutStr)),
+		_), nl(DeclStream),
+	
+	findall((DeclRepr, IndRepr, "simple", "output"),
+		(declared(DeclRepr, IndRepr, "simple", "output"),
+		atomics_to_string(["simpleFluent(", DeclRepr, ").\toutputEntity(", DeclRepr, ").\tindex(", IndRepr, ").\n"], "", OutStr),
+		write(DeclStream, OutStr)),
+		_), nl(DeclStream),
+	
+	findall((DeclRepr, IndRepr, "sD", "output"),
+		(declared(DeclRepr, IndRepr, "sD", "output"),
+		atomics_to_string(["sDFluent(", DeclRepr, ").\toutputEntity(", DeclRepr, ").\tindex(", IndRepr, ").\n"], "", OutStr),
+		write(DeclStream, OutStr)),
+		_), nl(DeclStream),
 	
 	% Caching order only applies to output entities
 	% Priority > 0 <=> Output Entity
-	findall((OE,Pr), (cachingPriority(OE, Pr), Pr > 0), CachingUnordered),
-	sort(2, @=<, CachingUnordered, CachingOrdered),
-	findall(OE,
-		(member((OE, Pr), CachingOrdered),
-		nb_getval(cached, Cchd),
-		\+member(OE, Cchd),
-		addToTail(Cchd, OE, Cchdnew),
-		nb_setval(cached, Cchdnew),
-		write(DeclStream, "cachingOrder("), 
-		write(DeclStream, OE),
-		write(DeclStream, "). %"),
-		write(DeclStream, Pr),
-		nl(DeclStream)),
+	findall(H, head(H), HP), write(HP),
+	findall((H, Q), (head(H), findall(Pr, finalCachingPriority(H, Pr), Prs), max_list(Prs, Q)), CachingUnordered),
+	sort(1, @<, CachingUnordered, CachingSorted),
+	sort(2, @=<, CachingSorted, CachingOrdered),
+	findall(H,
+		(member((H, Q), CachingOrdered),
+		atomics_to_string(["cachingOrder(", H, ").\t%", Q, "\n"], "", Out),
+		write(DeclStream, Out)),
 		_),
-	told,
+	%told,
 	close(Input), close(DeclStream), !.
 
 % -----------------------------------------------
 % DEFINITE CLAUSE GRAMMAR
 % -----------------------------------------------
 
-space 					--> 	"\t", space.
-space 					--> 	"\n", space.
-space 					--> 	"\r", space.
-space 					--> 	" ", space.
-space					-->	[].
+space 			--> 	"\t", space.
+space 			--> 	"\n", space.
+space 			--> 	"\r", space.
+space 			--> 	" ", space.
+space			-->	[].
 
-goal(DeclStream)			--> 	space, ceDefinition(DeclStream), space, goal(DeclStream).
-goal(_)					--> 	[].
+goal			--> 	space, ceDefinition, space, goal.
+goal			--> 	[].
 
-ceDefinition(DeclStream)		-->	holdsFor(DeclStream).
-ceDefinition(DeclStream)		-->	initTerm(DeclStream).
+ceDefinition		-->	holdsFor.
+ceDefinition		-->	initTerm.
 					
-holdsFor(DeclStream)			--> 	head(Head, DeclRepr, DeclStream), space, sep("iff"), space, {nb_setval(intervalNo, 1)}, hfBody(Body, BodyPriority, DeclStream), ".",
-						{
-							split_string(Body, "\n", ",\t\n", BodySubs),
-							findall((Term, VNames), (member(Sub, BodySubs), term_string(Term, Sub, [variable_names(VNames)])), Terms),
-							last(Terms, (LastTerm, Vars)),
-							last(Vars, Name=Var),
-							delete(Terms, (LastTerm, Vars), TermsPending),
-							delete(Vars, Name=Var, VarsPending),
-							addToTail(VarsPending, 'I'=Var, NewVars),
-							addToTail(TermsPending, (LastTerm, NewVars), NewTerms),
-							findall(S, (member((T, V), NewTerms), term_string(T, S, [variable_names(V)])), ExprStrSplit),
-							atomics_to_string(ExprStrSplit, ",\n\t", BodyFinal),
-							
-							write(Head), write(" :-\n\t"), write(BodyFinal), write(".\n\n"),
-							
-							HeadPriority is BodyPriority + 1,
-							cachingPriority(DeclRepr, OldPriority),
-							% On multiple definitions, we keep the max priority.
-							(OldPriority >= HeadPriority -> true
-							;
-							retract(cachingPriority(DeclRepr, OldPriority)),
-							assertz(cachingPriority(DeclRepr, HeadPriority)))
-						}.
+holdsFor		--> 	head(Head, HeadDeclRepr), space, sep("iff"), space, {nb_setval(intervalNo, 1)}, hfBody(Body, BodyPriority, HeadDeclRepr), ".",
+				{
+					split_string(Body, "\n", ",\t\n", BodySubs),
+					findall((Term, VNames), (member(Sub, BodySubs), term_string(Term, Sub, [variable_names(VNames)])), Terms),
+					last(Terms, (LastTerm, Vars)),
+					last(Vars, Name=Var),
+					delete(Terms, (LastTerm, Vars), TermsPending),
+					delete(Vars, Name=Var, VarsPending),
+					addToTail(VarsPending, 'I'=Var, NewVars),
+					addToTail(TermsPending, (LastTerm, NewVars), NewTerms),
+					findall(S, (member((T, V), NewTerms), term_string(T, S, [variable_names(V)])), ExprStrSplit),
+					atomics_to_string(ExprStrSplit, ",\n\t", BodyFinal),
+					
+					write(Head), write(" :-\n\t"), write(BodyFinal), write(".\n\n"),
+					
+					HeadPriority is BodyPriority + 1,
+					
+					findall(P, cachingPriority(HeadDeclRepr, P), PS), max_list(PS, OldPriority),
+					findall((HeadDeclRepr, P), (cachingPriority(HeadDeclRepr, P), retract(cachingPriority(HeadDeclRepr, P))), _),
+					assertz(cachingPriority(HeadDeclRepr, OldPriority)),
+					
+					% On multiple definitions, we keep the max priority.
+					(OldPriority >= HeadPriority -> true
+					;
+					retract(cachingPriority(HeadDeclRepr, OldPriority)),
+					assertz(cachingPriority(HeadDeclRepr, HeadPriority)),
+					propagatePriority(HeadDeclRepr, HeadPriority))
+				}.
 
-initTerm(DeclStream)			-->	head(Head, DeclRepr, DeclStream), space, sep("if"), space, itBody(Body, BodyPriority, DeclStream), ".",
-						{
-							string_codes(Body, BodyCodes),
-							list_head(BodyCodes, _, CommaFreeBodyCodes),
-							string_codes(CommaFreeBody, CommaFreeBodyCodes),
-							write(Head), write(" :-"), write(CommaFreeBody), write(".\n\n"),
-							HeadPriority is BodyPriority + 1,
-							cachingPriority(DeclRepr, OldPriority),
-							% On multiple definitions, we keep the max priority.
-							(OldPriority >= HeadPriority -> true
-							;
-							retract(cachingPriority(DeclRepr, OldPriority)),
-							assertz(cachingPriority(DeclRepr, HeadPriority)))
-						}.
+initTerm		-->	head(Head, HeadDeclRepr), space, sep("if"), space, itBody(Body, BodyPriority, HeadDeclRepr), ".",
+				{
+					string_codes(Body, BodyCodes),
+					list_head(BodyCodes, _, CommaFreeBodyCodes),
+					string_codes(CommaFreeBody, CommaFreeBodyCodes),
+					
+					write(Head), write(" :-"), write(CommaFreeBody), write(".\n\n"),
+					
+					HeadPriority is BodyPriority + 1,
+					cachingPriority(HeadDeclRepr, OldPriority),
+					% On multiple definitions, we keep the max priority.
+					(OldPriority >= HeadPriority -> true
+					;
+					retract(cachingPriority(HeadDeclRepr, OldPriority)),
+					assertz(cachingPriority(HeadDeclRepr, HeadPriority)),
+					propagatePriority(HeadDeclRepr, HeadPriority))
+				}.
 	
-sep("iff")				--> 	"iff".
-sep("if")				--> 	"if".
+sep("iff")		--> 	"iff".
+sep("if")		--> 	"if".
 
-head(HeadStr, DeclRepr, DeclStream)	--> 	fluent("sD", "output", CTStr, DeclRepr, _, _, DeclStream),
-						{
-							atomics_to_string(["holdsFor(", CTStr, ", ", "I", ")"], "", HeadStr),
-							nb_getval(headFluents, HF),
-							addToTail(HF, DeclRepr, HF_new),
-							nb_setval(headFluents, HF_new)
-						}.
-head(HeadStr, DeclRepr, DeclStream)	--> 	"initiate", space, fluent("simple", "output", CTStr, DeclRepr, _, _, DeclStream),
-						{
-							atomics_to_string(["initiatedAt(", CTStr, ", T)"], "", HeadStr),
-							nb_getval(headFluents, HF),
-							addToTail(HF, DeclRepr, HF_new),
-							nb_setval(headFluents, HF_new)
-						}.
-head(HeadStr, DeclRepr, DeclStream)	--> 	"terminate", space, fluent("simple", "output", CTStr, DeclRepr, _, _, DeclStream),
-						{
-							atomics_to_string(["terminatedAt(", CTStr, ", T)"], "", HeadStr)
-						}.
+head(HeadStr, DeclRepr)		--> 	fluent("sD", "output", CTStr, DeclRepr, _, _, null),
+					{
+						atomics_to_string(["holdsFor(", CTStr, ", I)"], "", HeadStr),
+						(\+ head(DeclRepr) -> assertz(head(DeclRepr))
+						;
+						true)
+					}.
+head(HeadStr, DeclRepr)		--> 	"initiate", space, fluent("simple", "output", CTStr, DeclRepr, _, _, null),
+					{
+						atomics_to_string(["initiatedAt(", CTStr, ", T)"], "", HeadStr),
+						(\+ head(DeclRepr) -> assertz(head(DeclRepr))
+						;
+						true)
+					}.
+head(HeadStr, DeclRepr)		--> 	"terminate", space, fluent("simple", "output", CTStr, DeclRepr, _, _, null),
+					{
+						atomics_to_string(["terminatedAt(", CTStr, ", T)"], "", HeadStr)
+					}.
 
-fluent(Type, Etype, CTStr, DeclRepr, Priority, I, DeclStream)	--> 	functawr(FncStr), "(", argumentsList(ArgLStr, UArgLStr, IndArgLStr, Index), ")", value(ValStr), !,
+fluent(Type, Etype, CTStr, DeclRepr, Priority, I, HeadDeclRepr)	--> 	functawr(FncStr), "(", argumentsList(ArgLStr, UArgLStr, IndArgLStr, Index), ")", value(ValStr), !,
 								{
 									atomics_to_string([FncStr, "(", ArgLStr, ")", ValStr], "", CTStr),
 									atomics_to_string([FncStr, "(", UArgLStr, ")", ValStr], "", DeclRepr),
 									atomics_to_string([FncStr, "(", IndArgLStr, ")", ValStr, ", ", Index], "", IndRepr),
-									string_concat(FncStr, ValStr, DeclStr),
 									
 									nb_getval(intervalNo, Int),
 									string_concat("I", Int, I),
@@ -141,37 +196,41 @@ fluent(Type, Etype, CTStr, DeclRepr, Priority, I, DeclStream)	--> 	functawr(FncS
 									nb_setval(intervalNo, NewInt),
 									
 									nb_getval(headFluents, HF),
-									nb_getval(declared, Decl),
 									
 									(member(DeclRepr, HF) -> true
 									;
-									member(DeclStr, Decl) -> true
+									(declared(DeclRepr, IndRepr2, "sD", "input"), IndRepr2 = IndRepr, Etype = "input") -> true
 									;
-									write(DeclStream, Type), write(DeclStream, "Fluent("), write(DeclStream, DeclRepr), write(DeclStream, ").\n"),
-									write(DeclStream, Etype), write(DeclStream, "Entity("), write(DeclStream, DeclRepr), write(DeclStream, ").\n"),
-									write(DeclStream, "index("), write(DeclStream, IndRepr), write(DeclStream, ").\n\n"),
-									addToTail(Decl, DeclStr, Decll),
-									nb_setval(declared, Decll),
+									(declared(DeclRepr, IndRepr2, "sD", "input"), IndRepr2 \= IndRepr, Etype = "input") -> true
+									;
+									(declared(DeclRepr, IndRepr, "sD", "input"), Etype = "output") ->
+									retract(declared(DeclRepr, IndRepr, "sD", "input")),
+									assert(declared(DeclRepr, IndRepr, Type, Etype))
+									;
+									assertz(declared(DeclRepr, IndRepr, Type, Etype)),
 									assertz(cachingPriority(DeclRepr, 0))),
 									
-									cachingPriority(DeclRepr, Priority)
+									cachingPriority(DeclRepr, Priority),
+									
+									(HeadDeclRepr = null -> assertz(head(DeclRepr))
+									;
+									assertz(defines(DeclRepr, HeadDeclRepr, Priority)))
 								}.
 
-event(Etype, EvStr, 0, DeclStream)			-->	functawr(FncStr), "(", argumentsList(ArgLStr, UArgLStr, IndArgLStr, Index), ")",
+event(Etype, EvStr, Priority, HeadDeclRepr)		-->	functawr(FncStr), "(", argumentsList(ArgLStr, UArgLStr, IndArgLStr, Index), ")",
 								{
 									atomics_to_string([FncStr, "(", ArgLStr, ")"], "", EvStr),
 									atomics_to_string([FncStr, "(", UArgLStr, ")"], "", DeclRepr),
 									atomics_to_string([FncStr, "(", IndArgLStr, "), ", Index], "", IndRepr),
 									
-									nb_getval(declared, Decl),
-									
-									(member(FncStr, Decl) -> true
+									(declared(DeclRepr, IndRepr, "event", Etype) -> true
 									;
-									write(DeclStream, "event("), write(DeclStream, DeclRepr), write(DeclStream, ").\n"),
-									write(DeclStream, Etype), write(DeclStream, "Entity("), write(DeclStream, DeclRepr), write(DeclStream, ").\n"),
-									write(DeclStream, "index("), write(DeclStream, IndRepr), write(DeclStream, ").\n\n"),
-									addToTail(Decl, FncStr, Decll),
-									nb_setval(declared, Decll))
+									assertz(declared(DeclRepr, IndRepr, "event", Etype)),
+									assertz(cachingPriority(DeclRepr, 0))),
+									
+									cachingPriority(DeclRepr, Priority),
+									
+									assertz(defines(DeclRepr, HeadDeclRepr, Priority))
 								}.
 
 functawr(FncStr) 					--> 	[Lower], { char_type(Lower, lower) }, restChars(RCList),
@@ -210,9 +269,9 @@ moreArguments(MArgStr, UMArgStr)			-->	",", space, argument(ArgStr), moreArgumen
 									string_concat(",_", UMMArgStr, UMArgStr)
 								}.
 
-hfBody(BodyStr, Priority, DeclStream)			-->	expression(BodyStr, _, Priority, DeclStream).
+hfBody(BodyStr, Priority, HeadDeclRepr)			-->	expression(BodyStr, _, Priority, HeadDeclRepr).
 
-expression(ExprStr, I, Priority, DeclStream)		-->	component(CompStr, T1, Priority1, DeclStream), moreComponents(MCompStr, T2, and, Priority2, DeclStream),
+expression(ExprStr, I, Priority, HeadDeclRepr)		-->	component(CompStr, T1, Priority1, HeadDeclRepr), moreComponents(MCompStr, T2, and, Priority2, HeadDeclRepr),
 								{
 									nb_getval(intervalNo, Int),
 									string_concat("I", Int, I),
@@ -257,7 +316,7 @@ expression(ExprStr, I, Priority, DeclStream)		-->	component(CompStr, T1, Priorit
 	
 									Priority is Priority1 + Priority2
 								}.
-expression(ExprStr, I, Priority, DeclStream)		-->	component(CompStr, T1, Priority1, DeclStream), moreComponents(MCompStr, T2, or, Priority2, DeclStream),
+expression(ExprStr, I, Priority, HeadDeclRepr)		-->	component(CompStr, T1, Priority1, HeadDeclRepr), moreComponents(MCompStr, T2, or, Priority2, HeadDeclRepr),
 								{
 									nb_getval(intervalNo, Int),
 									string_concat("I", Int, I),
@@ -295,21 +354,21 @@ expression(ExprStr, I, Priority, DeclStream)		-->	component(CompStr, T1, Priorit
 	
 									Priority is Priority1 + Priority2
 								}.
-expression(ExprStr, I, Priority, DeclStream)		-->	component(ExprStr, I, Priority, DeclStream), moreComponents(null).
+expression(ExprStr, I, Priority, HeadDeclRepr)		-->	component(ExprStr, I, Priority, HeadDeclRepr), moreComponents(null).
 
-moreComponents(MCompStr, I, and, Priority, DeclStream)	-->	",", space, expression(MCompStr, I, Priority, DeclStream).
-moreComponents(MCompStr, I, or, Priority, DeclStream)	-->	space, "or", space, expression(MCompStr, I, Priority, DeclStream).
+moreComponents(MCompStr, I, and, Priority, HeadDeclRepr)	-->	",", space, expression(MCompStr, I, Priority, HeadDeclRepr).
+moreComponents(MCompStr, I, or, Priority, HeadDeclRepr)	-->	space, "or", space, expression(MCompStr, I, Priority, HeadDeclRepr).
 moreComponents(null)					-->	[].
 
-component(CompStr, T, Priority, DeclStream)		-->	fluent("sD", "input", Str, _, Priority, T, DeclStream),
+component(CompStr, T, Priority, HeadDeclRepr)		-->	fluent("sD", "input", Str, _, Priority, T, HeadDeclRepr),
 								{
 									string_concat(",\n\tholdsFor(", Str, CompStrPending1),
 									string_concat(CompStrPending1, ", ", CompStrPending2),
 									string_concat(CompStrPending2, T, CompStrPending3),
 									string_concat(CompStrPending3, ")", CompStr)
 								}.
-component(CompStr, T, Priority, DeclStream)		-->	"(", space, expression(CompStr, T, Priority, DeclStream), space, ")".
-component(CompStr, T, Priority, DeclStream)		-->	"not", space, expression(Str, ExpT, Priority, DeclStream),
+component(CompStr, T, Priority, HeadDeclRepr)		-->	"(", space, expression(CompStr, T, Priority, HeadDeclRepr), space, ")".
+component(CompStr, T, Priority, HeadDeclRepr)		-->	"not", space, expression(Str, ExpT, Priority, HeadDeclRepr),
 								{
 									string_concat(Str, ",\n\tcomplement_all([", CompStrPending3),
 									string_concat(CompStrPending3, ExpT, CompStrPending4),
@@ -322,28 +381,28 @@ component(CompStr, T, Priority, DeclStream)		-->	"not", space, expression(Str, E
 									string_concat(CompStrPending6, ")", CompStr)
 								}.
 
-itBody(ITBodyStr, Priority, DeclStream)			-->	"happens", space, event("input", CTStr, Priority1, DeclStream), moreConditions(MCondStr, Priority2, DeclStream),
+itBody(ITBodyStr, Priority, HeadDeclRepr)			-->	"happens", space, event("input", CTStr, Priority1, HeadDeclRepr), moreConditions(MCondStr, Priority2, HeadDeclRepr),
 								{
 									string_concat(",\n\thappensAt(", CTStr, CondStrPending1),
 									string_concat(CondStrPending1, ", T)", CondStr),
 									string_concat(CondStr, MCondStr, ITBodyStr),
 									Priority is Priority1 + Priority2
 								}.
-itBody(ITBodyStr, Priority, DeclStream)			-->	"not", space, event("input", CTStr, Priority1, DeclStream), moreConditions(MCondStr, Priority2, DeclStream),
+itBody(ITBodyStr, Priority, HeadDeclRepr)			-->	"not", space, event("input", CTStr, Priority1, HeadDeclRepr), moreConditions(MCondStr, Priority2, HeadDeclRepr),
 								{
 									string_concat(",\n\t\\+ happensAt(", CTStr, CondStrPending1),
 									string_concat(CondStrPending1, ", T)", CondStr),
 									string_concat(CondStr, MCondStr, ITBodyStr),
 									Priority is Priority1 + Priority2
 								}.
-itBody(ITBodyStr, Priority, DeclStream)			-->	"start", space, fluent("sD", "input", CTStr, _, Priority1, _, DeclStream), moreConditions(MCondStr, Priority2, DeclStream),
+itBody(ITBodyStr, Priority, HeadDeclRepr)			-->	"start", space, fluent("sD", "input", CTStr, _, Priority1, _, HeadDeclRepr), moreConditions(MCondStr, Priority2, HeadDeclRepr),
 								{
 									string_concat(",\n\thappensAt(start(", CTStr, CondStrPending1),
 									string_concat(CondStrPending1, "), T)", CondStr),
 									string_concat(CondStr, MCondStr, ITBodyStr),
 									Priority is Priority1 + Priority2
 								}.
-itBody(ITBodyStr, Priority, DeclStream)			-->	"end", space, fluent("sD", "input", CTStr, _, Priority1, _, DeclStream), moreConditions(MCondStr, Priority2, DeclStream),
+itBody(ITBodyStr, Priority, HeadDeclRepr)			-->	"end", space, fluent("sD", "input", CTStr, _, Priority1, _, HeadDeclRepr), moreConditions(MCondStr, Priority2, HeadDeclRepr),
 								{
 									string_concat(",\n\thappensAt(end(", CTStr, CondStrPending1),
 									string_concat(CondStrPending1, "), T)", CondStr),
@@ -351,38 +410,38 @@ itBody(ITBodyStr, Priority, DeclStream)			-->	"end", space, fluent("sD", "input"
 									Priority is Priority1 + Priority2
 								}.
 
-condition(CondStr, Priority, DeclStream)		-->	"start", space, fluent("sD", "input", CTStr, _, Priority, _, DeclStream),
+condition(CondStr, Priority, HeadDeclRepr)		-->	"start", space, fluent("sD", "input", CTStr, _, Priority, _, HeadDeclRepr),
 								{
 									string_concat(",\n\thappensAt(start(", CTStr, CondStrPending1),
 									string_concat(CondStrPending1, "), T)", CondStr)
 								}.
-condition(CondStr, Priority, DeclStream)		-->	"end", space, fluent("sD", "input", CTStr, _, Priority, _, DeclStream),
+condition(CondStr, Priority, HeadDeclRepr)		-->	"end", space, fluent("sD", "input", CTStr, _, Priority, _, HeadDeclRepr),
 								{
 									string_concat(",\n\thappensAt(end(", CTStr, CondStrPending1),
 									string_concat(CondStrPending1, "), T)", CondStr)
 								}.
-condition(CondStr, Priority, DeclStream)		-->	"happens", space, event("input", CTStr, Priority, DeclStream),
+condition(CondStr, Priority, HeadDeclRepr)		-->	"happens", space, event("input", CTStr, Priority, HeadDeclRepr),
 								{
 									string_concat(",\n\thappensAt(", CTStr, CondStrPending1),
 									string_concat(CondStrPending1, ", T)", CondStr)
 								}.
-condition(CondStr, Priority, DeclStream)		-->	"not", space, event("input", CTStr, Priority, DeclStream),
+condition(CondStr, Priority, HeadDeclRepr)		-->	"not", space, event("input", CTStr, Priority, HeadDeclRepr),
 								{
 									string_concat(",\n\t\\+ happensAt(", CTStr, CondStrPending1),
 									string_concat(CondStrPending1, ", T)", CondStr)
 								}.
-condition(CondStr, Priority, DeclStream)		-->	fluent("sD", "input", CTStr, _, Priority, _, DeclStream),
+condition(CondStr, Priority, HeadDeclRepr)		-->	fluent("sD", "input", CTStr, _, Priority, _, HeadDeclRepr),
 								{
 									string_concat(",\n\tholdsAt(", CTStr, CondStrPending1),
 									string_concat(CondStrPending1, ", T)", CondStr)
 								}.
-condition(CondStr, Priority, DeclStream)		-->	"not", space, fluent("sD", "input", CTStr, _, Priority, _, DeclStream),
+condition(CondStr, Priority, HeadDeclRepr)		-->	"not", space, fluent("sD", "input", CTStr, _, Priority, _, HeadDeclRepr),
 								{
 									string_concat(",\n\t\\+ holdsAt(", CTStr, CondStrPending1),
 									string_concat(CondStrPending1, ", T)", CondStr)
 								}.
 
-moreConditions(MCondStr, Priority, DeclStream)		-->	",", space, condition(CondStr, Priority1, DeclStream), moreConditions(MMCondStr, Priority2, DeclStream),
+moreConditions(MCondStr, Priority, HeadDeclRepr)		-->	",", space, condition(CondStr, Priority1, HeadDeclRepr), moreConditions(MMCondStr, Priority2, HeadDeclRepr),
 								{
 									string_concat(CondStr, MMCondStr, MCondStr),
 									Priority is Priority1 + Priority2

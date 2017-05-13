@@ -42,3 +42,60 @@ initiate person(Id) if
 
 initiate person(Id)=false if
 	happens disappear(Id).
+
+
+
+
+
+initiate leaving_object(Person, Object) if
+	happens appear(Object),
+	inactive(Object),
+	person(Person),
+	closeSymmetric(Person, Object, 30).
+
+initiate leaving_object(Person, Object)=false if
+	happens disappear(Object).
+
+
+
+
+
+initiate meeting(P1, P2) if
+	start greeting1(P1, P2),
+	not disappear(P1),
+	not disappear(P2).
+
+initiate meeting(P1, P2) if
+	start greeting2(P1, P2),
+	not disappear(P1),
+	not disappear(P2).
+
+greeting1(P1, P2) iff
+	(activeOrInactivePerson(P1),
+	person(P2),
+	close(P1, P2, 25)),
+	not(running(P2) or abrupt(P2)).
+
+greeting2(P1, P2) iff
+	walking(P1),
+	activeOrInactivePerson(P2),
+	close(P2, P1, 25).
+
+activeOrInactivePerson(P) iff
+	active(P) or (inactive(P), person(P)).
+
+initiate meeting(P1, P2)=false if
+	start running(P1).
+
+initiate meeting(P1, P2)=false if
+	start running(P2).
+
+initiate meeting(P1, P2)=false if
+	start abrupt(P1).
+
+initiate meeting(P1, P2)=false if
+	start abrupt(P2).
+
+initiate meeting(P1, P2)=false if
+	start close(P1, P2, 34)=false.
+
