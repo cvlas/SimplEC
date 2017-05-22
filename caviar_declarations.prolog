@@ -20,8 +20,10 @@ sDFluent(activeOrInactivePerson(_)=true).	outputEntity(activeOrInactivePerson(_)
 sDFluent(close(_,_,_)=false).	outputEntity(close(_,_,_)=false).	index(close(Id1,_,_)=false, Id1).
 sDFluent(close(_,_,_)=true).	outputEntity(close(_,_,_)=true).	index(close(Id1,_,_)=true, Id1).
 sDFluent(closeSymmetric(_,_,_)=true).	outputEntity(closeSymmetric(_,_,_)=true).	index(closeSymmetric(Id1,_,_)=true, Id1).
+sDFluent(fighting(_,_)=true).	outputEntity(fighting(_,_)=true).	index(fighting(P1,_)=true, P1).
 sDFluent(greeting1(_,_)=true).	outputEntity(greeting1(_,_)=true).	index(greeting1(P1,_)=true, P1).
 sDFluent(greeting2(_,_)=true).	outputEntity(greeting2(_,_)=true).	index(greeting2(P1,_)=true, P1).
+sDFluent(moving(_,_)=true).	outputEntity(moving(_,_)=true).	index(moving(P1,_)=true, P1).
 
 cachingOrder(leaving_object(_,_)=false).	%1
 cachingOrder(person(_)=false).	%1
@@ -29,6 +31,8 @@ cachingOrder(person(_)=true).	%1
 cachingOrder(activeOrInactivePerson(_)=true).	%2
 cachingOrder(close(_,_,_)=true).	%4
 cachingOrder(close(_,_,_)=false).	%5
+cachingOrder(fighting(_,_)=true).	%5
+cachingOrder(moving(_,_)=true).	%5
 cachingOrder(meeting(_,_)=false).	%6
 cachingOrder(closeSymmetric(_,_,_)=true).	%9
 cachingOrder(leaving_object(_,_)=true).	%11

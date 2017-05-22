@@ -99,3 +99,21 @@ initiate meeting(P1, P2)=false if
 initiate meeting(P1, P2)=false if
 	start close(P1, P2, 34)=false.
 
+
+	
+	
+	
+moving(P1, P2) iff
+	walking(P1),
+	walking(P2),
+	close(P1, P2, 34).
+
+	
+	
+	
+
+fighting(P1, P2) iff
+	((abrupt(P1) or abrupt(P2)),
+	close(P1, P2, 24)),
+	not(inactive(P1) or inactive(P2)).
+	

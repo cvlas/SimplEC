@@ -101,3 +101,20 @@ initiatedAt(meeting(P1,P2)=false, T) :-
 initiatedAt(meeting(P1,P2)=false, T) :-
 	happensAt(start(close(P1,P2,34)=false), T).
 
+holdsFor(moving(P1,P2)=true, I) :-
+	holdsFor(walking(P1)=true,I1),
+	holdsFor(walking(P2)=true,I2),
+	holdsFor(close(P1,P2,34)=true,I5),
+	intersect_all([I1,I2,I5],I).
+
+holdsFor(fighting(P1,P2)=true, I) :-
+	holdsFor(abrupt(P1)=true,I2),
+	holdsFor(abrupt(P2)=true,I5),
+	union_all([I2,I5],I6),
+	holdsFor(close(P1,P2,24)=true,I9),
+	intersect_all([I6,I9],I10),
+	holdsFor(inactive(P1)=true,I70),
+	holdsFor(inactive(P2)=true,I73),
+	union_all([I70,I73],I74),
+	relative_complement_all(I10,[I74],I).
+
