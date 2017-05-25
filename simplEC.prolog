@@ -126,8 +126,17 @@ space			-->	[].
 goal			--> 	space, ceDefinition, space, goal.
 goal			--> 	[].
 
+ceDefinition		-->	initially.
 ceDefinition		-->	holdsFor.
 ceDefinition		-->	initTerm.
+
+initially		-->	"initially", space, fluent("simple", "output", CTStr, DeclRepr, _, _, null), ".",
+				{
+					atomics_to_string(["initially(", CTStr, ").\n\n"], "", InitiallyStr),
+					write(InitiallyStr),
+					assertz(cachingPriority(DeclRepr, 1)),
+					propagatePriority(DeclRepr, 1)
+				}.
 					
 holdsFor		--> 	head(Head, HeadDeclRepr), space, sep("iff"), space, {nb_setval(intervalNo, 1)}, hfBody(Body, BodyPriority, HeadDeclRepr), ".",
 				{
@@ -146,6 +155,7 @@ holdsFor		--> 	head(Head, HeadDeclRepr), space, sep("iff"), space, {nb_setval(in
 					
 					HeadPriority is BodyPriority + 1,
 					
+					% Duplicate handling
 					findall(P, cachingPriority(HeadDeclRepr, P), PS), max_list(PS, OldPriority),
 					findall((HeadDeclRepr, P), (cachingPriority(HeadDeclRepr, P), retract(cachingPriority(HeadDeclRepr, P))), _),
 					assertz(cachingPriority(HeadDeclRepr, OldPriority)),
@@ -167,7 +177,10 @@ initTerm		-->	head(Head, HeadDeclRepr), space, sep("if"), space, itBody(Body, Bo
 					write(Head), write(" :-"), write(CommaFreeBody), write(".\n\n"),
 					
 					HeadPriority is BodyPriority + 1,
+					
+					% Duplicate handling???
 					cachingPriority(HeadDeclRepr, OldPriority),
+					
 					% On multiple definitions, we keep the max priority.
 					(OldPriority >= HeadPriority -> true
 					;
@@ -266,6 +279,12 @@ argumentsList(ArgLStr, UArgLStr, IndArgLStr, ArgStr)	--> 	argument(ArgStr), more
 									string_concat("_", UMArgStr, UArgLStr),
 									string_concat(ArgStr, UMArgStr, IndArgLStr)
 								}.
+argumentsList(ArgLStr, UArgLStr, IndArgLStr, "X")	--> 	"_", moreArguments(MArgStr, UMArgStr),
+								{
+									string_concat("_", MArgStr, ArgLStr),
+									string_concat("_", UMArgStr, UArgLStr),
+									string_concat("X", UMArgStr, IndArgLStr)
+								}.
 
 argument(ArgStr) 					--> 	[Alpha], { char_type(Alpha, alnum) }, restChars(RCList),
 								{
@@ -280,6 +299,11 @@ moreArguments(MArgStr, UMArgStr)			-->	",", space, argument(ArgStr), moreArgumen
 								{
 									string_concat(",", ArgStr, MArgPending),
 									string_concat(MArgPending, MMArgStr, MArgStr),
+									string_concat(",_", UMMArgStr, UMArgStr)
+								}.
+moreArguments(MArgStr, UMArgStr)			-->	",", space, "_", moreArguments(MMArgStr, UMMArgStr),
+								{
+									string_concat(",_", MMArgStr, MArgStr),
 									string_concat(",_", UMMArgStr, UMArgStr)
 								}.
 
