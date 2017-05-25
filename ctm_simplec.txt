@@ -1,1 +1,16 @@
 initially punctuality(_,_)=punctual.
+
+initiate punctuality(Id, VehicleType)=punctual if
+	happens stop_enter(Id, VehicleType, _, scheduled).
+
+initiate punctuality(Id, VehicleType)=punctual if
+	happens stop_enter(Id, VehicleType, _, early).
+
+initiate punctuality(Id, VehicleType)=non_punctual if
+	happens stop_enter(Id, VehicleType, _, late).
+
+initiate punctuality(Id, VehicleType)=non_punctual if
+	happens stop_leave(Id, VehicleType, _, early).
+
+punctuality(Id, VehicleType)=non_punctual iff
+	not punctuality(Id, VehicleType)=punctual.
