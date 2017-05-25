@@ -26,19 +26,19 @@ closeSymmetric(Id1, Id2, Threshold) iff
 
 initiate person(Id) if
 	start walking(Id),
-	not disappear(Id).
+	not happens disappear(Id).
 
 initiate person(Id) if
 	start running(Id),
-	not disappear(Id).
+	not happens disappear(Id).
 
 initiate person(Id) if
 	start active(Id),
-	not disappear(Id).
+	not happens disappear(Id).
 
 initiate person(Id) if
 	start abrupt(Id),
-	not disappear(Id).
+	not happens disappear(Id).
 
 initiate person(Id)=false if
 	happens disappear(Id).
@@ -62,13 +62,13 @@ initiate leaving_object(Person, Object)=false if
 
 initiate meeting(P1, P2) if
 	start greeting1(P1, P2),
-	not disappear(P1),
-	not disappear(P2).
+	not happens disappear(P1),
+	not happens disappear(P2).
 
 initiate meeting(P1, P2) if
 	start greeting2(P1, P2),
-	not disappear(P1),
-	not disappear(P2).
+	not happens disappear(P1),
+	not happens disappear(P2).
 
 greeting1(P1, P2) iff
 	(activeOrInactivePerson(P1),

@@ -39,3 +39,16 @@ terminate moving(P1,P2) if
 
 terminate moving(P1,P2) if
 	happens exit(P1).
+
+
+
+
+
+
+
+initiate a(X) if
+	not happens b(X),
+	not c(X).
+
+initiate c(X) if
+	happens d(X).

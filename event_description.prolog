@@ -18,12 +18,12 @@ holdsFor(happy(X)=true, I) :-
 
 holdsFor(sad(X)=true, I) :-
 	holdsFor(poor(X)=true,I1),
-	holdsFor(working(X)=true,I53),
-	holdsFor(loc(X)=home,I68),
-	holdsFor(changingDiapers(X)=true,I71),
-	intersect_all([I68,I71],I72),
-	union_all([I53,I72],I73),
-	intersect_all([I1,I73],I).
+	holdsFor(working(X)=true,I97),
+	holdsFor(loc(X)=home,I112),
+	holdsFor(changingDiapers(X)=true,I115),
+	intersect_all([I112,I115],I116),
+	union_all([I97,I116],I117),
+	intersect_all([I1,I117],I).
 
 holdsFor(friends(X,Y)=true, I) :-
 	holdsFor(loc(X)=pub,I1),
@@ -55,4 +55,11 @@ terminatedAt(moving(P1,P2)=true, T) :-
 
 terminatedAt(moving(P1,P2)=true, T) :-
 	happensAt(exit(P1), T).
+
+initiatedAt(a(X)=true, T) :-
+	\+ happensAt(b(X), T),
+	\+ holdsAt(c(X)=true, T).
+
+initiatedAt(c(X)=true, T) :-
+	happensAt(d(X), T).
 

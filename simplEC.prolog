@@ -402,7 +402,7 @@ itBody(ITBodyStr, Priority, HeadDeclRepr)			-->	"happens", space, event("input",
 									string_concat(CondStr, MCondStr, ITBodyStr),
 									Priority is Priority1 + Priority2
 								}.
-itBody(ITBodyStr, Priority, HeadDeclRepr)			-->	"not", space, event("input", CTStr, Priority1, HeadDeclRepr), moreConditions(MCondStr, Priority2, HeadDeclRepr),
+itBody(ITBodyStr, Priority, HeadDeclRepr)			-->	"not happens", space, event("input", CTStr, Priority1, HeadDeclRepr), moreConditions(MCondStr, Priority2, HeadDeclRepr),
 								{
 									string_concat(",\n\t\\+ happensAt(", CTStr, CondStrPending1),
 									string_concat(CondStrPending1, ", T)", CondStr),
@@ -439,7 +439,7 @@ condition(CondStr, Priority, HeadDeclRepr)		-->	"happens", space, event("input",
 									string_concat(",\n\thappensAt(", CTStr, CondStrPending1),
 									string_concat(CondStrPending1, ", T)", CondStr)
 								}.
-condition(CondStr, Priority, HeadDeclRepr)		-->	"not", space, event("input", CTStr, Priority, HeadDeclRepr),
+condition(CondStr, Priority, HeadDeclRepr)		-->	"not happens", space, event("input", CTStr, Priority, HeadDeclRepr),
 								{
 									string_concat(",\n\t\\+ happensAt(", CTStr, CondStrPending1),
 									string_concat(CondStrPending1, ", T)", CondStr)
