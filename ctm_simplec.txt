@@ -6,10 +6,10 @@ initiate punctuality(Id, VehicleType)=punctual if
 initiate punctuality(Id, VehicleType)=punctual if
 	happens stop_enter(Id, VehicleType, _, early).
 
-initiate punctuality(Id, VehicleType)=non_punctual if
+terminate punctuality(Id, VehicleType)=punctual if
 	happens stop_enter(Id, VehicleType, _, late).
 
-initiate punctuality(Id, VehicleType)=non_punctual if
+terminate punctuality(Id, VehicleType)=punctual if
 	happens stop_leave(Id, VehicleType, _, early).
 
 punctuality(Id, VehicleType)=non_punctual iff
