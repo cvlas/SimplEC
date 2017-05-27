@@ -15,6 +15,12 @@ terminate punctuality(Id, VehicleType)=punctual if
 punctuality(Id, VehicleType)=non_punctual iff
 	not punctuality(Id, VehicleType)=punctual.
 
+happens punctuality_change(Id, VehicleType, punctual) if
+	end punctuality(Id, VehicleType)=non_punctual.
+
+happens punctuality_change(Id, VehicleType, non_punctual) if
+	end punctuality(Id, VehicleType)=punctual.
+
 	
 	
 	
@@ -65,7 +71,7 @@ passenger_comfort(Id, VehicleType)=reducing iff
 initially passenger_density(_,_)=low.
 
 initiate passenger_density(Id, VehicleType)=Value if
-	passenger_density_change(Id, VehicleType, Value).
+	happens passenger_density_change(Id, VehicleType, Value).
 
 
 
@@ -74,7 +80,7 @@ initiate passenger_density(Id, VehicleType)=Value if
 initially noise_level(_,_)=low.
 
 initiate noise_level(Id, VehicleType)=Value if
-	noise_level_change(Id, VehicleType, Value).
+	happens noise_level_change(Id, VehicleType, Value).
 
 
 
@@ -83,7 +89,7 @@ initiate noise_level(Id, VehicleType)=Value if
 initially internal_temperature(_,_)=normal.
 
 initiate internal_temperature(Id, VehicleType)=Value if
-	internal_temperature_change(Id, VehicleType, Value).
+	happens internal_temperature_change(Id, VehicleType, Value).
 
 
 

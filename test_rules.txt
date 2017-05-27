@@ -1,3 +1,27 @@
+happens punctuality_change(Id, VehicleType, punctual) if
+	end punctuality(Id, VehicleType)=non_punctual.
+
+happens punctuality_change(Id, VehicleType, non_punctual) if
+	end punctuality(Id, VehicleType)=punctual.
+	
+
+
+
+
+
+dddt(A,B) iff
+	passenger_density(A,B)=high.
+
+initially passenger_density(_,_)=low.
+
+initiate passenger_density(Id, VehicleType)=Value if
+	happens passenger_density_change(Id, VehicleType, Value).
+
+
+
+
+
+
 working(X) iff
 	loc(X)=work,
 	not takingBreak(X).

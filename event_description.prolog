@@ -1,3 +1,17 @@
+happensAt(punctuality_change(Id,VehicleType,punctual), T) :-
+	happensAt(end(punctuality(Id,VehicleType)=non_punctual), T).
+
+happensAt(punctuality_change(Id,VehicleType,non_punctual), T) :-
+	happensAt(end(punctuality(Id,VehicleType)=punctual), T).
+
+holdsFor(dddt(A,B)=true, I) :-
+	holdsFor(passenger_density(A,B)=high,I).
+
+initially(passenger_density(_,_)=low).
+
+initiatedAt(passenger_density(Id,VehicleType)=Value, T) :-
+	happensAt(passenger_density_change(Id,VehicleType,Value), T).
+
 holdsFor(working(X)=true, I) :-
 	holdsFor(loc(X)=work,I1),
 	holdsFor(takingBreak(X)=true,I12),

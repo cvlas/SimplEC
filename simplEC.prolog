@@ -1,6 +1,6 @@
 :- [library(dcg/basics)].
 
-:- dynamic cachingPriority/2, declared/4, defines/3, head/1.
+:- dynamic cachingPriority/2, declared/4, defines/3, head/1, noCaching/1.
 
 % -----------------------------------------------
 % AUXILIARY TOOLS
@@ -24,11 +24,11 @@ propagatePriority(E, P) :-
 	%write("\n\nLook, as far as I know, the priority of "), write(E), write(" is "), write(P), 
 	assertz(finalCachingPriority(E, P)), 
 	%write(". I am going to propagate this to all dependants...\n"),
-	(\+ defines(E, H, P_Old) -> true %write("There are no dependants. Exiting...\n\n")
+	(\+ defines(E, _, _) -> true %write("There are no dependants. Exiting...\n\n")
 	;
-	defines(E, E, P_Old) -> true %write("Self-dependency. Exiting...\n\n")
+	defines(E, E, _) -> true %write("Self-dependency. Exiting...\n\n")
 	;
-	findall(H, defines(E, H, P_Old), Heads), Heads \= [], sort(Heads, HeadsSorted),
+	findall(H, defines(E, H, _), Heads), Heads \= [], sort(Heads, HeadsSorted),
 	%write("Dependants Unsorted: "), write(Heads), write("\tDependants Sorted: "), write(HeadsSorted), nl,
 	findall((E, B, C), (defines(E, B, C), retract(defines(E, B, C))), _),
 	forall(member(H, HeadsSorted), (assertz(defines(E, H, P)), 
@@ -40,9 +40,7 @@ propagatePriority(E, P) :-
 	propagatePriority(H, Q)))).
 
 calculatePriority(H, Q) :-
-	findall(P, defines(O, H, P), PS),
-	%findall((O,P), defines(O, H, P), OPS),
-	%write(OPS),
+	findall(P, defines(_, H, P), PS),
 	sum_list(PS, TmpQ),
 	Q is TmpQ + 1.
 
@@ -102,7 +100,7 @@ simplEC(InputFile, OutputFile, DeclarationsFile) :-
 	% Caching order only applies to output entities
 	% Priority > 0 <=> Output Entity
 	%findall(H, head(H), HP), write(HP),
-	findall((H, Q), (head(H), findall(Pr, finalCachingPriority(H, Pr), Prs), max_list(Prs, Q)), CachingUnordered),
+	findall((H, Q), (head(H), \+ noCaching(H), findall(Pr, finalCachingPriority(H, Pr), Prs), max_list(Prs, Q)), CachingUnordered),
 	sort(1, @<, CachingUnordered, CachingSorted),
 	sort(2, @=<, CachingSorted, CachingOrdered),
 	findall(H,
@@ -165,7 +163,16 @@ holdsFor		--> 	head(Head, HeadDeclRepr), space, sep("iff"), space, {nb_setval(in
 					;
 					retract(cachingPriority(HeadDeclRepr, OldPriority)),
 					assertz(cachingPriority(HeadDeclRepr, HeadPriority)),
-					propagatePriority(HeadDeclRepr, HeadPriority))
+					propagatePriority(HeadDeclRepr, HeadPriority)),
+					
+					split_string(HeadDeclRepr, "=", "", Parts),
+					list_head(Parts, Prefix, [Value]),
+					string_codes(Value, ValueCodes),
+					list_head(ValueCodes, First, _),
+					(char_type(First, lower) -> true
+					;
+					assertz(noCaching(HeadDeclRepr)),
+					findall((D, P), (cachingPriority(D, P), sub_string(D, 0, _, _, Prefix), assertz(head(D)), HeadPriority > P, assertz(cachingPriority(D, HeadPriority)), propagatePriority(D, HeadPriority)), _))
 				}.
 
 starAt			-->	head(Head, HeadDeclRepr), space, sep("if"), space, atBody(Body, BodyPriority, HeadDeclRepr), ".",
@@ -186,7 +193,20 @@ starAt			-->	head(Head, HeadDeclRepr), space, sep("if"), space, atBody(Body, Bod
 					;
 					retract(cachingPriority(HeadDeclRepr, OldPriority)),
 					assertz(cachingPriority(HeadDeclRepr, HeadPriority)),
-					propagatePriority(HeadDeclRepr, HeadPriority))
+					propagatePriority(HeadDeclRepr, HeadPriority)),
+					
+					split_string(HeadDeclRepr, "=", "", Parts),
+					length(Parts, Length),
+					(Length = 2 ->
+					(list_head(Parts, Prefix, [Value]),
+					string_codes(Value, ValueCodes),
+					list_head(ValueCodes, First, _),
+					(char_type(First, lower) -> true
+					;
+					assertz(noCaching(HeadDeclRepr)),
+					findall((D, P), (cachingPriority(D, P), sub_string(D, 0, _, _, Prefix), assertz(head(D)), HeadPriority > P, assertz(cachingPriority(D, HeadPriority)), propagatePriority(D, HeadPriority)), _)))
+					;
+					true)
 				}.
 	
 sep("iff")		--> 	"iff".
@@ -215,11 +235,16 @@ head(HeadStr, DeclRepr)		--> 	"happens", space, event("output", EvStr, DeclRepr,
 						atomics_to_string(["happensAt(", EvStr, ", T)"], "", HeadStr)
 					}.
 
-fluent(Type, Etype, CTStr, DeclRepr, Priority, I, HeadDeclRepr)	--> 	functawr(FncStr), "(", argumentsList(ArgLStr, UArgLStr, IndArgLStr, Index), ")", value(ValStr), !,
+fluent(Type, Etype, CTStr, DeclRepr, Priority, I, HeadDeclRepr)	--> 	functawr(FncStr), "(", argumentsList(ArgLStr, UArgLStr, IndArgLStr, Index), ")", value(ValStr, VType), !,
 								{
 									atomics_to_string([FncStr, "(", ArgLStr, ")", ValStr], "", CTStr),
-									atomics_to_string([FncStr, "(", UArgLStr, ")", ValStr], "", DeclRepr),
+									atomics_to_string([FncStr, "(", UArgLStr, ")"], "", DeclRePrefix),
+									atomics_to_string([DeclRePrefix, ValStr], "", DeclRepr),
 									atomics_to_string([FncStr, "(", IndArgLStr, ")", ValStr, ", ", Index], "", IndRepr),
+									
+									(VType = val -> true
+									;
+									findall((D, I, T, E), (declared(D, I, T, E), sub_string(D, 0, _, _, DeclRePrefix), assertz(declared(D, I, Type, Etype))), _)),
 									
 									nb_getval(intervalNo, Int),
 									string_concat("I", Int, I),
@@ -238,7 +263,9 @@ fluent(Type, Etype, CTStr, DeclRepr, Priority, I, HeadDeclRepr)	--> 	functawr(Fn
 									%forall(declared(DeclRepr, IndRepr, "sD", "input"), retract(declared(DeclRepr, IndRepr, "sD", "input"))),
 									assertz(declared(DeclRepr, IndRepr, Type, Etype))
 									;
-									assertz(declared(DeclRepr, IndRepr, Type, Etype)),
+									(VType = var -> true
+									;
+									assertz(declared(DeclRepr, IndRepr, Type, Etype))),
 									assertz(cachingPriority(DeclRepr, 0))),
 									
 									cachingPriority(DeclRepr, Priority),
@@ -271,11 +298,17 @@ functawr(FncStr) 					--> 	[Lower], { char_type(Lower, lower) }, restChars(RCLis
 									string_codes(FncStr, [Lower|RCList])
 								}.
 
-value(ValStr)						-->	"=", functawr(Str),
+value(ValStr, val)						-->	"=", [Lower], { char_type(Lower, lower) }, restChars(RCList),
 								{
+									string_codes(Str, [Lower|RCList]),
 									string_concat("=", Str, ValStr)
 								}.
-value("=true")						-->	[].
+value(ValStr, var)						-->	"=", [Upper], { char_type(Upper, upper) }, restChars(RCList),
+								{
+									string_codes(Str, [Upper|RCList]),
+									string_concat("=", Str, ValStr)
+								}.
+value("=true", val)						-->	[].
 
 restChars(Chars)					--> 	string_without([9, 10, 13, 32, 40, 41, 44, 46], Chars).
 
