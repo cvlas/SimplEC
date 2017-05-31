@@ -1,0 +1,75 @@
+space 		::= 	"\t", space.
+space 		::= 	"\n", space.
+space 		::= 	"\r", space.
+space 		::= 	" ", space.
+space		::=	[].
+
+goal		::= 	space, ceDefinition, space, goal.
+goal		::= 	[].
+
+ceDefinition	::=	initially.
+ceDefinition	::=	holdsFor.
+ceDefinition	::=	starAt.
+
+initially	::=	"initially", space, fluent, ".".
+					
+holdsFor	::= 	head, space, sep, space, forBody, ".".
+
+starAt		::=	head, space, sep, space, atBody, ".".
+	
+sep		::= 	"iff".
+sep		::= 	"if".
+
+head		::= 	fluent.
+head		::= 	"initiate", space, fluent.
+head		::= 	"terminate", space, fluent.
+head		::= 	"happens", space, event.
+
+fluent		::= 	functawr, "(", argumentsList, ")", value.
+
+event		::=	functawr, "(", argumentsList, ")".
+
+functawr 	::= 	[Lower], restChars.
+
+value		::=	"=", [Lower], restChars.
+value		::=	"=", [Upper], restChars.
+value		::=	[].
+
+restChars	::= 	string_without([9, 10, 13, 32, 40, 41, 44, 46], Chars).
+
+argumentsList	::= 	argument, moreArguments.
+argumentsList	::= 	"_", moreArguments.
+
+argument 	::= 	[Alpha], restChars(RCList).
+
+moreArguments	::= 	[].
+moreArguments	::=	",", space, argument, moreArguments.
+moreArguments	::=	",", space, "_", moreArguments.
+
+forBody		::=	expression.
+
+expression	::=	component, moreComponents.
+
+moreComponents	::=	",", space, expression.
+moreComponents	::=	space, "or", space, expression.
+moreComponents	::=	[].
+
+component	::=	fluent.
+component	::=	"(", space, expression, space, ")".
+component	::=	"not", space, expression.
+
+atBody		::=	"happens", space, event, moreConditions.
+atBody		::=	"not happens", space, event, moreConditions.
+atBody		::=	"start", space, fluent, moreConditions.
+atBody		::=	"end", space, fluent, moreConditions.
+
+condition	::=	"start", space, fluent.
+condition	::=	"end", space, fluent.
+condition	::=	"happens", space, event.
+condition	::=	"not happens", space, event.
+condition	::=	fluent.
+condition	::=	"not", space, fluent.
+
+moreConditions	::=	",", space, condition, moreConditions.
+moreConditions	::=	[].
+
