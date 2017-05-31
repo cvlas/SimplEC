@@ -109,3 +109,4 @@ driver_comfort(Id, VehicleType)=reducing iff
 passenger_satisfaction(Id, VehicleType)=reducing iff
 	punctuality(Id, VehicleType)=non_punctual or
 	passenger_comfort(Id, VehicleType)=reducing.
+
