@@ -51,4 +51,4 @@ The main routine simplEC needs 3 arguments as input:
 3) A name for the output Declarations file
 
 
-If Prolog answers "true." in both commands, then everything went well and the rules have been successfully compiled into RTEC rules ("event_description.prolog") and declarations ("declarations.prolog").
+If Prolog answers "true." in all commands, then everything went well and the rules have been successfully compiled into RTEC rules ("event_description.prolog") and declarations ("declarations.prolog").
