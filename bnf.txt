@@ -1,75 +1,85 @@
-space 		::= 	"\t", space.
-space 		::= 	"\n", space.
-space 		::= 	"\r", space.
-space 		::= 	" ", space.
-space		::=	[].
+spaceChar	::=	"\t" | "\n" | "\r" | " ".
 
-goal		::= 	space, ceDefinition, space, goal.
-goal		::= 	[].
+space 		::= 	spaceChar, space
+		|	"".
 
-ceDefinition	::=	initially.
-ceDefinition	::=	holdsFor.
-ceDefinition	::=	starAt.
+goal		::= 	space, ceDefinition, space, goal
+		|	"".
+
+ceDefinition	::=	initially
+		|	durative
+		|	instantaneous.
 
 initially	::=	"initially", space, fluent, ".".
-					
-holdsFor	::= 	head, space, sep, space, forBody, ".".
 
-starAt		::=	head, space, sep, space, atBody, ".".
-	
-sep		::= 	"iff".
-sep		::= 	"if".
+durative	::= 	head, space, sep, space, duraBody, ".".
 
-head		::= 	fluent.
-head		::= 	"initiate", space, fluent.
-head		::= 	"terminate", space, fluent.
-head		::= 	"happens", space, event.
+instantaneous	::=	head, space, sep, space, instaBody, ".".
 
-fluent		::= 	functawr, "(", argumentsList, ")", value.
+sep		::= 	"iff"
+		|	"if".
 
-event		::=	functawr, "(", argumentsList, ")".
+head		::= 	fluent
+		|	"initiate", space, fluent
+		|	"terminate", space, fluent
+		|	"happens", space, event.
 
-functawr 	::= 	[Lower], restChars.
+fluent		::= 	functor, "(", argumentsList, ")", value.
 
-value		::=	"=", [Lower], restChars.
-value		::=	"=", [Upper], restChars.
-value		::=	[].
+event		::=	functor, "(", argumentsList, ")".
 
-restChars	::= 	string_without([9, 10, 13, 32, 40, 41, 44, 46], Chars).
+functor 	::= 	lower, restChars.
+
+variable	::=	upper, restChars
+		|	"_", restChars.
+
+value		::=	"=", argument
+		|	"".
 
 argumentsList	::= 	argument, moreArguments.
-argumentsList	::= 	"_", moreArguments.
 
-argument 	::= 	[Alpha], restChars(RCList).
+argument 	::= 	functor
+		|	variable
+		|	number.
 
-moreArguments	::= 	[].
-moreArguments	::=	",", space, argument, moreArguments.
-moreArguments	::=	",", space, "_", moreArguments.
+moreArguments	::=	",", space, argument, moreArguments
+		|	"".
 
-forBody		::=	expression.
+duraBody	::=	expression.
 
 expression	::=	component, moreComponents.
 
-moreComponents	::=	",", space, expression.
-moreComponents	::=	space, "or", space, expression.
-moreComponents	::=	[].
+component	::=	fluent
+		|	"(", space, expression, space, ")"
+		|	"not", space, expression.
 
-component	::=	fluent.
-component	::=	"(", space, expression, space, ")".
-component	::=	"not", space, expression.
+moreComponents	::=	",", space, expression
+		|	space, "or", space, expression
+		|	"".
 
-atBody		::=	"happens", space, event, moreConditions.
-atBody		::=	"not happens", space, event, moreConditions.
-atBody		::=	"start", space, fluent, moreConditions.
-atBody		::=	"end", space, fluent, moreConditions.
+instaBody	::=	"happens", space, event, moreConditions
+		|	"not happens", space, event, moreConditions
+		|	"start", space, fluent, moreConditions
+		|	"end", space, fluent, moreConditions.
 
-condition	::=	"start", space, fluent.
-condition	::=	"end", space, fluent.
-condition	::=	"happens", space, event.
-condition	::=	"not happens", space, event.
-condition	::=	fluent.
-condition	::=	"not", space, fluent.
+condition	::=	"start", space, fluent
+		|	"end", space, fluent
+		|	"happens", space, event
+		|	"not happens", space, event
+		|	fluent
+		|	"not", space, fluent.
 
-moreConditions	::=	",", space, condition, moreConditions.
-moreConditions	::=	[].
+moreConditions	::=	",", space, condition, moreConditions
+		|	"".
+
+lower		::=	[a-z].
+
+upper		::=	[A-Z].
+
+number		::= 	[0-9], number
+		|	"".
+
+restChars	::= 	[a-zA-Z0-9_], restChars
+		|	"".
+
 
