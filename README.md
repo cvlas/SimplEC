@@ -35,6 +35,12 @@ Then, load the compiler source code and call the main routine, as follows:
 	?- simplEC('sample_rules.txt','event_description.prolog','declarations.prolog').
 	true.
 
+To extract the dependency graph of the event description in a text file, also run:
+
+    ?- dependencyGraph('dependency_graph.txt')
+
+The resulting text file could be later used as input to GraphViz (http://www.graphviz.org/) to visualize the dependencies.
+
 The main routine simplEC needs 3 arguments as input:
 
 1) The input rules in SimplEC
