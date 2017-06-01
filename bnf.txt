@@ -1,5 +1,3 @@
-spaceChar	::=	"\t" | "\n" | "\r" | " ".
-
 space 		::= 	spaceChar, space
 		|	"".
 
@@ -71,6 +69,8 @@ condition	::=	"start", space, fluent
 
 moreConditions	::=	",", space, condition, moreConditions
 		|	"".
+
+spaceChar	::=	"\t" | "\n" | "\r" | " ".
 
 lower		::=	[a-z].
 
