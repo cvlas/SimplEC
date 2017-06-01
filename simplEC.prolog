@@ -64,7 +64,6 @@ simplEC(InputFile, OutputFile, DeclarationsFile) :-
 	findall(looloody(DeclRepr, IndRepr, Type, EType), (declared(DeclRepr, IndRepr, Type, EType), retract(declared(DeclRepr, IndRepr, Type, EType))), Tuples),
 	sort(4, @>=, Tuples, TuplesDistorted),
 	sort(1, @<, TuplesDistorted, TuplesSorted),
-	%forall(member(looloody(A, B, C, D), TuplesSorted), (atomics_to_string(["looloody", A, B, C, D], "\t", Luludi), writeln(Luludi))),
 	forall(member(looloody(DeclRepr, IndRepr, Type, EType), TuplesSorted), assertz(declared(DeclRepr, IndRepr, Type, EType))),
 	
 	findall((DeclRepr, IndRepr, "event", "input"),
@@ -110,6 +109,15 @@ simplEC(InputFile, OutputFile, DeclarationsFile) :-
 		_),
 	told,
 	close(Input), close(DeclStream), !.
+
+dependencyGraph(GraphFile) :-
+	tell(GraphFile),
+	write("digraph {\n"),
+	findall(edge(I, J), (defines(I, J, _)), Edges),
+	sort(Edges, EdgesSorted),
+	forall(member(edge(K, L), EdgesSorted), (write("\""), write(K), write("\" -> \""), write(L), write("\"\n"))),
+	write("}\n"),
+	told.
 
 % -----------------------------------------------
 % DEFINITE CLAUSE GRAMMAR
