@@ -195,7 +195,7 @@ starAt			-->	head(Head, HeadDeclRepr), space, sep("if"), space, atBody(Body, Bod
 					HeadPriority is BodyPriority + 1,
 					
 					% Duplicate handling???
-					cachingPriority(HeadDeclRepr, OldPriority),
+					findall(P, cachingPriority(HeadDeclRepr, P), PS), max_list(PS, OldPriority),
 					
 					% On multiple definitions, we keep the max priority.
 					(OldPriority >= HeadPriority -> true
@@ -262,9 +262,6 @@ fluent(Type, Etype, CTStr, DeclRepr, Priority, I, HeadDeclRepr)	--> 	functawr(Fn
 									
 									(declared(DeclRepr, IndRepr, Type, Etype) -> true
 									;
-									(declared(DeclRepr, IndRepr, "sD", "input"), Etype = "output") ->
-									assertz(declared(DeclRepr, IndRepr, Type, Etype))
-									;
 									(VType = var -> true
 									;
 									assertz(declared(DeclRepr, IndRepr, Type, Etype))),
@@ -284,9 +281,6 @@ event(Etype, EvStr, DeclRepr, Priority, HeadDeclRepr)		-->	functawr(FncStr), "("
 									atomics_to_string([FncStr, "(", IndArgLStr, "), ", Index], "", IndRepr),
 									
 									(declared(DeclRepr, IndRepr, "event", Etype) -> true
-									;
-									(declared(DeclRepr, IndRepr, "event", "input"), Etype = "output") ->
-									assertz(declared(DeclRepr, IndRepr, "event", Etype))
 									;
 									assertz(declared(DeclRepr, IndRepr, "event", Etype)),
 									assertz(cachingPriority(DeclRepr, 0))),
