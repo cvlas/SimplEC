@@ -68,10 +68,10 @@ holdsFor(greeting1(P1,P2)=true, I) :-
 	holdsFor(person(P2)=true,I2),
 	holdsFor(close(P1,P2,25)=true,I5),
 	intersect_all([I1,I2,I5],I7),
-	holdsFor(running(P2)=true,I67),
-	holdsFor(abrupt(P2)=true,I70),
-	union_all([I67,I70],I71),
-	relative_complement_all(I7,[I71],I).
+	holdsFor(running(P2)=true,I121),
+	holdsFor(abrupt(P2)=true,I124),
+	union_all([I121,I124],I125),
+	relative_complement_all(I7,[I125],I).
 
 holdsFor(greeting2(P1,P2)=true, I) :-
 	holdsFor(walking(P1)=true,I1),
@@ -81,10 +81,10 @@ holdsFor(greeting2(P1,P2)=true, I) :-
 
 holdsFor(activeOrInactivePerson(P)=true, I) :-
 	holdsFor(active(P)=true,I2),
-	holdsFor(inactive(P)=true,I33),
-	holdsFor(person(P)=true,I36),
-	intersect_all([I33,I36],I37),
-	union_all([I2,I37],I).
+	holdsFor(inactive(P)=true,I37),
+	holdsFor(person(P)=true,I40),
+	intersect_all([I37,I40],I41),
+	union_all([I2,I41],I).
 
 initiatedAt(meeting(P1,P2)=false, T) :-
 	happensAt(start(running(P1)=true), T).
@@ -113,8 +113,8 @@ holdsFor(fighting(P1,P2)=true, I) :-
 	union_all([I2,I5],I6),
 	holdsFor(close(P1,P2,24)=true,I9),
 	intersect_all([I6,I9],I10),
-	holdsFor(inactive(P1)=true,I70),
-	holdsFor(inactive(P2)=true,I73),
-	union_all([I70,I73],I74),
-	relative_complement_all(I10,[I74],I).
+	holdsFor(inactive(P1)=true,I285),
+	holdsFor(inactive(P2)=true,I288),
+	union_all([I285,I288],I289),
+	relative_complement_all(I10,[I289],I).
 

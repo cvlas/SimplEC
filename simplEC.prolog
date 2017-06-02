@@ -20,23 +20,21 @@ addToTail([H|T], E, [H|L]) :- addToTail(T, E, L).
 % Update the caching priority of an element and propagate this update to all output entities that depend on it
 
 propagatePriority(E, P) :-
-	%sleep(1),
-	%write("\n\nLook, as far as I know, the priority of "), write(E), write(" is "), write(P), 
+	% The priority of E is P 
 	assertz(finalCachingPriority(E, P)), 
-	%write(". I am going to propagate this to all dependants...\n"),
-	(\+ defines(E, _, _) -> true %write("There are no dependants. Exiting...\n\n")
+	% Propagate this to all dependants...
+	(\+ defines(E, _, _) -> true % There are no dependants. Exiting...
 	;
-	defines(E, E, _) -> true %write("Self-dependency. Exiting...\n\n")
+	defines(E, E, _) -> true % Self-dependency. Exiting...
 	;
+	% Sort dependants
 	findall(H, defines(E, H, _), Heads), Heads \= [], sort(Heads, HeadsSorted),
-	%write("Dependants Unsorted: "), write(Heads), write("\tDependants Sorted: "), write(HeadsSorted), nl,
 	findall((E, B, C), (defines(E, B, C), retract(defines(E, B, C))), _),
+	% Assert new dependency for rule H
 	forall(member(H, HeadsSorted), (assertz(defines(E, H, P)), 
-	%write("Asserted new dependency for rule "), write(H), write(". Now the new priority of "), write(H), 
-	calculatePriority(H, Q), 
-	%write(" is "), write(Q), 
+	calculatePriority(H, Q),
 	assertz(finalCachingPriority(H, Q)), 
-	%write("! Repeating procedure...\n\n"), 
+	% Repeat procedure...
 	propagatePriority(H, Q)))).
 
 calculatePriority(H, Q) :-
@@ -49,12 +47,15 @@ calculatePriority(H, Q) :-
 % -----------------------------------------------
 	
 simplEC(InputFile, OutputFile, DeclarationsFile) :-
+	split_string(InputFile, ".", "", InputFileTokens),
+	list_head(InputFileTokens, InputName, _),
+	atomics_to_string([InputName, ".log"], LogFile),
 	open(InputFile, read, Input),
 	open(DeclarationsFile, write, DeclStream),
+	open(LogFile, write, LogStream),
 	tell(OutputFile),
 	
 	% Auxiliary global variables
-	nb_setval(headFluents, []), % REDUNDANT!!!
 	nb_setval(intervalNo, 1),
 	
 	% Parse and translate the rules
@@ -108,7 +109,7 @@ simplEC(InputFile, OutputFile, DeclarationsFile) :-
 		write(DeclStream, Out)),
 		_),
 	told,
-	close(Input), close(DeclStream), !.
+	close(Input), close(DeclStream), close(LogStream), !.
 
 dependencyGraph(GraphFile) :-
 	tell(GraphFile),
@@ -259,16 +260,9 @@ fluent(Type, Etype, CTStr, DeclRepr, Priority, I, HeadDeclRepr)	--> 	functawr(Fn
 									NewInt is Int + 1,
 									nb_setval(intervalNo, NewInt),
 									
-									nb_getval(headFluents, HF), % !!!
-									
-									(member(DeclRepr, HF) -> true % !!!
-									;
-									(declared(DeclRepr, IndRepr2, "sD", "input"), IndRepr2 = IndRepr, Etype = "input") -> true
-									;
-									(declared(DeclRepr, IndRepr2, "sD", "input"), IndRepr2 \= IndRepr, Etype = "input") -> true
+									(declared(DeclRepr, IndRepr, Type, Etype) -> true
 									;
 									(declared(DeclRepr, IndRepr, "sD", "input"), Etype = "output") ->
-									%forall(declared(DeclRepr, IndRepr, "sD", "input"), retract(declared(DeclRepr, IndRepr, "sD", "input"))),
 									assertz(declared(DeclRepr, IndRepr, Type, Etype))
 									;
 									(VType = var -> true
@@ -290,6 +284,9 @@ event(Etype, EvStr, DeclRepr, Priority, HeadDeclRepr)		-->	functawr(FncStr), "("
 									atomics_to_string([FncStr, "(", IndArgLStr, "), ", Index], "", IndRepr),
 									
 									(declared(DeclRepr, IndRepr, "event", Etype) -> true
+									;
+									(declared(DeclRepr, IndRepr, "event", "input"), Etype = "output") ->
+									assertz(declared(DeclRepr, IndRepr, "event", Etype))
 									;
 									assertz(declared(DeclRepr, IndRepr, "event", Etype)),
 									assertz(cachingPriority(DeclRepr, 0))),
