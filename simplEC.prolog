@@ -164,8 +164,8 @@ holdsFor		--> 	head(Head, HeadDeclRepr), space, sep("iff"), space, {nb_setval(in
 					
 					% Duplicate handling
 					findall(P, cachingPriority(HeadDeclRepr, P), PS), max_list(PS, OldPriority),
-					findall((HeadDeclRepr, P), (cachingPriority(HeadDeclRepr, P), retract(cachingPriority(HeadDeclRepr, P))), _),
-					assertz(cachingPriority(HeadDeclRepr, OldPriority)),
+					%findall((HeadDeclRepr, P), (cachingPriority(HeadDeclRepr, P), retract(cachingPriority(HeadDeclRepr, P))), _),
+					%assertz(cachingPriority(HeadDeclRepr, OldPriority)),
 					
 					% On multiple definitions, we keep the max priority.
 					(OldPriority >= HeadPriority -> true

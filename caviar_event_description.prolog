@@ -17,8 +17,8 @@ holdsFor(close(Id1,Id2,34)=true, I) :-
 	union_all([I2,I5],I).
 
 holdsFor(close(Id1,Id2,Threshold)=false, I) :-
-	holdsFor(close(Id1,Id2,Threshold)=true,I11),
-	complement_all([I11],I).
+	holdsFor(close(Id1,Id2,Threshold)=true,I13),
+	complement_all([I13],I).
 
 holdsFor(closeSymmetric(Id1,Id2,Threshold)=true, I) :-
 	holdsFor(close(Id1,Id2,Threshold)=true,I2),
