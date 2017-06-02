@@ -14,10 +14,8 @@
 9)  (DONE) First argument of complement_all has to be a List
 10) (DONE) Add full-stops at the end of all rules
 11) (DONE) Setup gitlab project for the compiler with (pending/resolved) issues. Grant access to AA
-12) (IN PROGRESS) Write the CAVIAR and CTM action descriptions in the simplified language of the compiler
-13) Automatically construct the *dependency graph* of the action description. 
-	The dependency graph is a directed graph where each node is a fluent/event appearing in the head of a rule,
-	and there is an edge from node A to node B iff A is the body of a rule defining B.
-	Note that input entities (events + sdfluents) should appear as nodes with no incoming edges (they are defined by rules with empty body).
-	*Construct the dependency graph in graphviz (http://www.graphviz.org/)
+12) (IN PROGRESS) Write the MARITIME, CAVIAR and CTM action descriptions in the simplified language of the compiler
+13) (DONE) Automatically construct the dependency graph of the action description
 14) Produce a log file of the compilation, reporting syntax errors (if any) in the input provided by the user
+15) (DONE) Simplify BNF: add more Event-Calculus jargon
+16) Make dependency graphs pretty (Use caching-order-like layers and colours)

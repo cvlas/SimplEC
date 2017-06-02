@@ -1,26 +1,24 @@
 space 		::= 	spaceChar, space
 		|	"".
 
-goal		::= 	space, ceDefinition, space, goal
+goal		::= 	space, rule, space, goal
 		|	"".
 
-ceDefinition	::=	initially
-		|	durative
-		|	instantaneous.
+rule		::=	initially
+		|	holdsFor
+		|	initiatedAt
+		|	terminatedAt
+		|	happensAt.
 
 initially	::=	"initially", space, fluent, ".".
 
-durative	::= 	head, space, sep, space, duraBody, ".".
+holdsFor	::= 	fluent, space, "iff", space, forBody, ".".
 
-instantaneous	::=	head, space, sep, space, instaBody, ".".
+initiatedAt	::=	"initiate", space, fluent, space, "if", space, atBody, "."
 
-sep		::= 	"iff"
-		|	"if".
+terminatedAt	::=	"terminate", space, fluent, space, "if", space, atBody, "."
 
-head		::= 	fluent
-		|	"initiate", space, fluent
-		|	"terminate", space, fluent
-		|	"happens", space, event.
+happensAt	::=	"happens", space, event, space, "if", space, atBody, ".".
 
 fluent		::= 	functor, "(", argumentsList, ")", value.
 
@@ -43,7 +41,7 @@ argument 	::= 	functor
 moreArguments	::=	",", space, argument, moreArguments
 		|	"".
 
-duraBody	::=	expression.
+forBody		::=	expression.
 
 expression	::=	component, moreComponents.
 
@@ -55,7 +53,7 @@ moreComponents	::=	",", space, expression
 		|	space, "or", space, expression
 		|	"".
 
-instaBody	::=	"happens", space, event, moreConditions
+atBody		::=	"happens", space, event, moreConditions
 		|	"not happens", space, event, moreConditions
 		|	"start", space, fluent, moreConditions
 		|	"end", space, fluent, moreConditions.
