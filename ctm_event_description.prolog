@@ -13,8 +13,8 @@ terminatedAt(punctuality(Id,VehicleType)=punctual, T) :-
 	happensAt(stop_leave(Id,VehicleType,_,early), T).
 
 holdsFor(punctuality(Id,VehicleType)=non_punctual, I) :-
-	holdsFor(punctuality(Id,VehicleType)=punctual,I13),
-	complement_all([I13],I).
+	holdsFor(punctuality(Id,VehicleType)=punctual,I11),
+	complement_all([I11],I).
 
 happensAt(punctuality_change(Id,VehicleType,punctual), T) :-
 	happensAt(end(punctuality(Id,VehicleType)=non_punctual), T).
@@ -40,10 +40,10 @@ holdsFor(driving_style(Id,VehicleType)=uncomfortable, I) :-
 
 holdsFor(driving_quality(Id,VehicleType)=high, I) :-
 	holdsFor(punctuality(Id,VehicleType)=punctual,I1),
-	holdsFor(driving_style(Id,VehicleType)=unsafe,I115),
-	holdsFor(driving_style(Id,VehicleType)=uncomfortable,I118),
-	union_all([I115,I118],I119),
-	relative_complement_all(I1,[I119],I).
+	holdsFor(driving_style(Id,VehicleType)=unsafe,I61),
+	holdsFor(driving_style(Id,VehicleType)=uncomfortable,I64),
+	union_all([I61,I64],I65),
+	relative_complement_all(I1,[I65],I).
 
 holdsFor(driving_quality(Id,VehicleType)=medium, I) :-
 	holdsFor(punctuality(Id,VehicleType)=punctual,I1),

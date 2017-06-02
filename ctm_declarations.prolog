@@ -43,10 +43,10 @@ cachingOrder(passenger_density(_,_)=high).	%1
 cachingOrder(passenger_density(_,_)=low).	%1
 cachingOrder(punctuality(_,_)=punctual).	%1
 cachingOrder(punctuality(_,_)=non_punctual).	%2
-cachingOrder(driver_comfort(_,_)=reducing).	%3
 cachingOrder(driving_quality(_,_)=medium).	%3
 cachingOrder(punctuality_change(_,_,_)).	%3
 cachingOrder(driving_quality(_,_)=high).	%4
 cachingOrder(driving_quality(_,_)=low).	%4
-cachingOrder(passenger_satisfaction(_,_)=reducing).	%6
-cachingOrder(passenger_comfort(_,_)=reducing).	%9
+cachingOrder(driver_comfort(_,_)=reducing).	%6
+cachingOrder(passenger_comfort(_,_)=reducing).	%7
+cachingOrder(passenger_satisfaction(_,_)=reducing).	%10

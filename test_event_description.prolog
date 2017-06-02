@@ -32,21 +32,21 @@ holdsFor(happy(X)=true, I) :-
 
 holdsFor(sad(X)=true, I) :-
 	holdsFor(poor(X)=true,I1),
-	holdsFor(working(X)=true,I97),
-	holdsFor(loc(X)=home,I112),
-	holdsFor(changingDiapers(X)=true,I115),
-	intersect_all([I112,I115],I116),
-	union_all([I97,I116],I117),
-	intersect_all([I1,I117],I).
+	holdsFor(working(X)=true,I53),
+	holdsFor(loc(X)=home,I68),
+	holdsFor(changingDiapers(X)=true,I71),
+	intersect_all([I68,I71],I72),
+	union_all([I53,I72],I73),
+	intersect_all([I1,I73],I).
 
 holdsFor(friends(X,Y)=true, I) :-
 	holdsFor(loc(X)=pub,I1),
 	holdsFor(loc(Y)=pub,I4),
 	intersect_all([I1,I4],I5),
-	holdsFor(rich(X)=true,I114),
-	holdsFor(rich(Y)=true,I117),
-	union_all([I114,I117],I118),
-	relative_complement_all(I5,[I118],I).
+	holdsFor(rich(X)=true,I65),
+	holdsFor(rich(Y)=true,I68),
+	union_all([I65,I68],I69),
+	relative_complement_all(I5,[I69],I).
 
 holdsFor(fighting(X,Y)=true, I) :-
 	holdsFor(abrupt(X)=true,I2),
@@ -54,10 +54,10 @@ holdsFor(fighting(X,Y)=true, I) :-
 	union_all([I2,I5],I6),
 	holdsFor(close(X,Y)=true,I9),
 	intersect_all([I6,I9],I10),
-	holdsFor(inactive(X)=true,I119),
-	holdsFor(inactive(Y)=true,I122),
-	union_all([I119,I122],I123),
-	relative_complement_all(I10,[I123],I).
+	holdsFor(inactive(X)=true,I70),
+	holdsFor(inactive(Y)=true,I73),
+	union_all([I70,I73],I74),
+	relative_complement_all(I10,[I74],I).
 
 initiatedAt(moving(P1,P2)=true, T) :-
 	happensAt(start(walking(P1)=true), T),

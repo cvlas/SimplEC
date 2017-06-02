@@ -20,25 +20,32 @@ addToTail([H|T], E, [H|L]) :- addToTail(T, E, L).
 % Update the caching priority of an element and propagate this update to all output entities that depend on it
 
 propagatePriority(E, P) :-
-	% The priority of E is P 
+	%sleep(1),
+	%write("\n\nLook, as far as I know, the priority of "), write(E), write(" is "), write(P), 
 	assertz(finalCachingPriority(E, P)), 
-	% Propagate this to all dependants...
-	(\+ defines(E, _, _) -> true % There are no dependants. Exiting...
+	%write(". I am going to propagate this to all dependants...\n"),
+	(\+ defines(E, _, _) -> true %write("There are no dependants. Exiting...\n\n")
 	;
-	defines(E, E, _) -> true % Self-dependency. Exiting...
+	defines(E, E, _) -> true %write("Self-dependency. Exiting...\n\n")
 	;
-	% Sort dependants
 	findall(H, defines(E, H, _), Heads), Heads \= [], sort(Heads, HeadsSorted),
+	%write("Dependants Unsorted: "), write(Heads), write("\tDependants Sorted: "), write(HeadsSorted), nl,
 	findall((E, B, C), (defines(E, B, C), retract(defines(E, B, C))), _),
-	% Assert new dependency for rule H
 	forall(member(H, HeadsSorted), (assertz(defines(E, H, P)), 
-	calculatePriority(H, Q),
-	assertz(finalCachingPriority(H, Q)), 
-	% Repeat procedure...
+	%write("Asserted new dependency for rule "), write(H), write(". Now the new priority of "), write(H), 
+	calculatePriority(H, Q), 
+	%write(" is "), write(Q), 
+	assertz(finalCachingPriority(H, Q)),
+	assertz(cachingPriority(H, Q)),
+	%write("! Repeating procedure...\n\n"), 
 	propagatePriority(H, Q)))).
 
 calculatePriority(H, Q) :-
-	findall(P, defines(_, H, P), PS),
+	findall(dddt(O,P), defines(O, H, P), OPS),
+	sort(2, @>=, OPS, OOPS),
+	sort(1, @<, OOPS, OOPSS),
+	findall(P, member(dddt(_, P), OOPSS), PS),
+	%write("\n"),write(OOPSS),nl,
 	sum_list(PS, TmpQ),
 	Q is TmpQ + 1.
 
@@ -194,7 +201,7 @@ starAt			-->	head(Head, HeadDeclRepr), space, sep("if"), space, atBody(Body, Bod
 					
 					HeadPriority is BodyPriority + 1,
 					
-					% Duplicate handling???
+					% Duplicate handling
 					findall(P, cachingPriority(HeadDeclRepr, P), PS), max_list(PS, OldPriority),
 					findall((HeadDeclRepr, P), (cachingPriority(HeadDeclRepr, P), retract(cachingPriority(HeadDeclRepr, P))), _),
 					assertz(cachingPriority(HeadDeclRepr, OldPriority)),
@@ -266,10 +273,11 @@ fluent(Type, Etype, CTStr, DeclRepr, Priority, I, HeadDeclRepr)	--> 	functawr(Fn
 									;
 									(VType = var -> true
 									;
-									assertz(declared(DeclRepr, IndRepr, Type, Etype))),
-									assertz(cachingPriority(DeclRepr, 0))),
+									assertz(declared(DeclRepr, IndRepr, Type, Etype)))),
 									
-									cachingPriority(DeclRepr, Priority),
+									(cachingPriority(DeclRepr, _) -> (findall(P, cachingPriority(DeclRepr, P), PS), max_list(PS, Priority))
+									;
+									assertz(cachingPriority(DeclRepr, 0)), Priority = 0),
 									
 									(HeadDeclRepr = null -> assertz(head(DeclRepr))
 									;
@@ -284,10 +292,11 @@ event(Etype, EvStr, DeclRepr, Priority, HeadDeclRepr)		-->	functawr(FncStr), "("
 									
 									(declared(DeclRepr, IndRepr, "event", Etype) -> true
 									;
-									assertz(declared(DeclRepr, IndRepr, "event", Etype)),
-									assertz(cachingPriority(DeclRepr, 0))),
+									assertz(declared(DeclRepr, IndRepr, "event", Etype))),
 									
-									cachingPriority(DeclRepr, Priority),
+									(cachingPriority(DeclRepr, _) -> (findall(P, cachingPriority(DeclRepr, P), PS), max_list(PS, Priority))
+									;
+									assertz(cachingPriority(DeclRepr, 0)), Priority = 0),
 									
 									(HeadDeclRepr = null -> assertz(head(DeclRepr))
 									;
