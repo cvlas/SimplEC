@@ -21,8 +21,7 @@ addToTail([H|T], E, [H|L]) :- addToTail(T, E, L).
 
 propagatePriority(E, P) :-
 	%sleep(1),
-	%write("\n\nLook, as far as I know, the priority of "), write(E), write(" is "), write(P), 
-	assertz(finalCachingPriority(E, P)), 
+	%write("\n\nLook, as far as I know, the priority of "), write(E), write(" is "), write(P),
 	%write(". I am going to propagate this to all dependants...\n"),
 	(\+ defines(E, _, _) -> true %write("There are no dependants. Exiting...\n\n")
 	;
@@ -34,8 +33,7 @@ propagatePriority(E, P) :-
 	forall(member(H, HeadsSorted), (assertz(defines(E, H, P)), 
 	%write("Asserted new dependency for rule "), write(H), write(". Now the new priority of "), write(H), 
 	calculatePriority(H, Q), 
-	%write(" is "), write(Q), 
-	assertz(finalCachingPriority(H, Q)),
+	%write(" is "), write(Q),
 	assertz(cachingPriority(H, Q)),
 	%write("! Repeating procedure...\n\n"), 
 	propagatePriority(H, Q)))).
@@ -105,9 +103,7 @@ simplEC(InputFile, OutputFile, DeclarationsFile) :-
 		_), nl(DeclStream),
 	
 	% Caching order only applies to output entities
-	% Priority > 0 <=> Output Entity
-	%findall(H, head(H), HP), write(HP),
-	findall((H, Q), (head(H), \+ noCaching(H), findall(Pr, finalCachingPriority(H, Pr), Prs), max_list(Prs, Q)), CachingUnordered),
+	findall((H, Q), (head(H), \+ noCaching(H), findall(Pr, cachingPriority(H, Pr), Prs), max_list(Prs, Q)), CachingUnordered),
 	sort(1, @<, CachingUnordered, CachingSorted),
 	sort(2, @=<, CachingSorted, CachingOrdered),
 	findall(H,
