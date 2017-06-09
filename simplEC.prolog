@@ -226,308 +226,357 @@ starAt			-->	head(Head, HeadDeclRepr), space, sep("if"), space, atBody(Body, Bod
 sep("iff")		--> 	"iff".
 sep("if")		--> 	"if".
 
-head(HeadStr, DeclRepr)		--> 	fluent("sD", "output", CTStr, DeclRepr, _, _, null),
-					{
-						atomics_to_string(["holdsFor(", CTStr, ", I)"], "", HeadStr),
-						(\+ head(DeclRepr) -> assertz(head(DeclRepr))
-						;
-						true)
-					}.
-head(HeadStr, DeclRepr)		--> 	"initiate", space, fluent("simple", "output", CTStr, DeclRepr, _, _, null),
-					{
-						atomics_to_string(["initiatedAt(", CTStr, ", T)"], "", HeadStr),
-						(\+ head(DeclRepr) -> assertz(head(DeclRepr))
-						;
-						true)
-					}.
-head(HeadStr, DeclRepr)		--> 	"terminate", space, fluent("simple", "output", CTStr, DeclRepr, _, _, null),
-					{
-						atomics_to_string(["terminatedAt(", CTStr, ", T)"], "", HeadStr)
-					}.
-head(HeadStr, DeclRepr)		--> 	"happens", space, event("output", EvStr, DeclRepr, _, null),
-					{
-						atomics_to_string(["happensAt(", EvStr, ", T)"], "", HeadStr)
-					}.
+head(HeadStr, DeclRepr)						--> 	"holds", space, fluent("sD", "output", CTStr, DeclRepr, _, _, null),
+									{
+										atomics_to_string(["holdsFor(", CTStr, ", I)"], "", HeadStr),
+										(\+ head(DeclRepr) -> assertz(head(DeclRepr))
+										;
+										true)
+									}.
+head(HeadStr, DeclRepr)						--> 	"initiate", space, fluent("simple", "output", CTStr, DeclRepr, _, _, null),
+									{
+										atomics_to_string(["initiatedAt(", CTStr, ", T)"], "", HeadStr),
+										(\+ head(DeclRepr) -> assertz(head(DeclRepr))
+										;
+										true)
+									}.
+head(HeadStr, DeclRepr)						--> 	"terminate", space, fluent("simple", "output", CTStr, DeclRepr, _, _, null),
+									{
+										atomics_to_string(["terminatedAt(", CTStr, ", T)"], "", HeadStr)
+									}.
+head(HeadStr, DeclRepr)						--> 	"happens", space, event("output", EvStr, DeclRepr, _, null),
+									{
+										atomics_to_string(["happensAt(", EvStr, ", T)"], "", HeadStr)
+									}.
 
 fluent(Type, Etype, CTStr, DeclRepr, Priority, I, HeadDeclRepr)	--> 	functawr(FncStr), "(", argumentsList(ArgLStr, UArgLStr, IndArgLStr, Index), ")", value(ValStr, VType), !,
-								{
-									atomics_to_string([FncStr, "(", ArgLStr, ")", ValStr], "", CTStr),
-									atomics_to_string([FncStr, "(", UArgLStr, ")"], "", DeclRePrefix),
-									atomics_to_string([DeclRePrefix, ValStr], "", DeclRepr),
-									atomics_to_string([FncStr, "(", IndArgLStr, ")", ValStr, ", ", Index], "", IndRepr),
-									
-									(VType = val -> true
-									;
-									findall((D, I, T, E), (declared(D, I, T, E), sub_string(D, 0, _, _, DeclRePrefix), assertz(declared(D, I, Type, Etype))), _)),
-									
-									nb_getval(intervalNo, Int),
-									string_concat("I", Int, I),
-									NewInt is Int + 1,
-									nb_setval(intervalNo, NewInt),
-									
-									(declared(DeclRepr, IndRepr, Type, Etype) -> true
-									;
-									(VType = var -> true
-									;
-									assertz(declared(DeclRepr, IndRepr, Type, Etype)))),
-									
-									(cachingPriority(DeclRepr, _) -> (findall(P, cachingPriority(DeclRepr, P), PS), max_list(PS, Priority))
-									;
-									assertz(cachingPriority(DeclRepr, 0)), Priority = 0),
-									
-									(HeadDeclRepr = null -> assertz(head(DeclRepr))
-									;
-									assertz(defines(DeclRepr, HeadDeclRepr, Priority)))
-								}.
+									{
+										atomics_to_string([FncStr, "(", ArgLStr, ")", ValStr], "", CTStr),
+										atomics_to_string([FncStr, "(", UArgLStr, ")"], "", DeclRePrefix),
+										atomics_to_string([DeclRePrefix, ValStr], "", DeclRepr),
+										atomics_to_string([FncStr, "(", IndArgLStr, ")", ValStr, ", ", Index], "", IndRepr),
+										
+										(VType = val -> true
+										;
+										findall((D, I, T, E), (declared(D, I, T, E), sub_string(D, 0, _, _, DeclRePrefix), assertz(declared(D, I, Type, Etype))), _)),
+										
+										nb_getval(intervalNo, Int),
+										string_concat("I", Int, I),
+										NewInt is Int + 1,
+										nb_setval(intervalNo, NewInt),
+										
+										(declared(DeclRepr, IndRepr, Type, Etype) -> true
+										;
+										(VType = var -> true
+										;
+										assertz(declared(DeclRepr, IndRepr, Type, Etype)))),
+										
+										(cachingPriority(DeclRepr, _) -> (findall(P, cachingPriority(DeclRepr, P), PS), max_list(PS, Priority))
+										;
+										assertz(cachingPriority(DeclRepr, 0)), Priority = 0),
+										
+										(HeadDeclRepr = null -> assertz(head(DeclRepr))
+										;
+										assertz(defines(DeclRepr, HeadDeclRepr, Priority)))
+									}.
 
 event(Etype, EvStr, DeclRepr, Priority, HeadDeclRepr)		-->	functawr(FncStr), "(", argumentsList(ArgLStr, UArgLStr, IndArgLStr, Index), ")",
-								{
-									atomics_to_string([FncStr, "(", ArgLStr, ")"], "", EvStr),
-									atomics_to_string([FncStr, "(", UArgLStr, ")"], "", DeclRepr),
-									atomics_to_string([FncStr, "(", IndArgLStr, "), ", Index], "", IndRepr),
+									{
+										atomics_to_string([FncStr, "(", ArgLStr, ")"], "", EvStr),
+										atomics_to_string([FncStr, "(", UArgLStr, ")"], "", DeclRepr),
+										atomics_to_string([FncStr, "(", IndArgLStr, "), ", Index], "", IndRepr),
 									
-									(declared(DeclRepr, IndRepr, "event", Etype) -> true
-									;
-									assertz(declared(DeclRepr, IndRepr, "event", Etype))),
-									
-									(cachingPriority(DeclRepr, _) -> (findall(P, cachingPriority(DeclRepr, P), PS), max_list(PS, Priority))
-									;
-									assertz(cachingPriority(DeclRepr, 0)), Priority = 0),
-									
-									(HeadDeclRepr = null -> assertz(head(DeclRepr))
-									;
-									assertz(defines(DeclRepr, HeadDeclRepr, Priority)))
-								}.
+										(declared(DeclRepr, IndRepr, "event", Etype) -> true
+										;
+										assertz(declared(DeclRepr, IndRepr, "event", Etype))),
+										
+										(cachingPriority(DeclRepr, _) -> (findall(P, cachingPriority(DeclRepr, P), PS), max_list(PS, Priority))
+										;
+										assertz(cachingPriority(DeclRepr, 0)), Priority = 0),
+										
+										(HeadDeclRepr = null -> assertz(head(DeclRepr))
+										;
+										assertz(defines(DeclRepr, HeadDeclRepr, Priority)))
+									}.
 
-functawr(FncStr) 					--> 	[Lower], { char_type(Lower, lower) }, restChars(RCList),
-								{
-									string_codes(FncStr, [Lower|RCList])
-								}.
+functawr(FncStr)	 					--> 	[Lower], { char_type(Lower, lower) }, restChars(RCList),
+									{
+										string_codes(FncStr, [Lower|RCList])
+									}.
+	
+variable(VarStr)						-->	[Upper], { char_type(Upper, upper) }, restChars(RCList),
+									{
+										string_codes(VarStr, [Upper|RCList])
+									}.
+variable(VarStr)						-->	"_", restChars(RCList),
+									{
+										string_codes(RCStr, RCList),
+										string_concat("_", RCStr, VarStr)
+									}.
 
-value(ValStr, val)						-->	"=", [Lower], { char_type(Lower, lower) }, restChars(RCList),
-								{
-									string_codes(Str, [Lower|RCList]),
-									string_concat("=", Str, ValStr)
-								}.
-value(ValStr, var)						-->	"=", [Upper], { char_type(Upper, upper) }, restChars(RCList),
-								{
-									string_codes(Str, [Upper|RCList]),
-									string_concat("=", Str, ValStr)
-								}.
+value(ValStr, val)						-->	"=", argument(ArgStr),
+									{
+										string_concat("=", ArgStr, ValStr)
+									}.
 value("=true", val)						-->	[].
 
-restChars(Chars)					--> 	string_without([9, 10, 13, 32, 40, 41, 44, 46], Chars).
+restChars(Chars)						--> 	string_without([9, 10, 13, 32, 40, 41, 44, 46], Chars).
 
-argumentsList(ArgLStr, UArgLStr, IndArgLStr, ArgStr)	--> 	argument(ArgStr), moreArguments(MArgStr, UMArgStr),
-								{
-									string_concat(ArgStr, MArgStr, ArgLStr),
-									string_concat("_", UMArgStr, UArgLStr),
-									string_concat(ArgStr, UMArgStr, IndArgLStr)
-								}.
-argumentsList(ArgLStr, UArgLStr, IndArgLStr, "X")	--> 	"_", moreArguments(MArgStr, UMArgStr),
-								{
-									string_concat("_", MArgStr, ArgLStr),
-									string_concat("_", UMArgStr, UArgLStr),
-									string_concat("X", UMArgStr, IndArgLStr)
-								}.
+argumentsList(ArgLStr, UArgLStr, IndArgLStr, ArgStr)		--> 	argument(ArgStr), moreArguments(MArgStr, UMArgStr),
+									{
+										string_concat(ArgStr, MArgStr, ArgLStr),
+										string_concat("_", UMArgStr, UArgLStr),
+										string_concat(ArgStr, UMArgStr, IndArgLStr)
+									}.
+argumentsList(ArgLStr, UArgLStr, IndArgLStr, "X")		--> 	"_", moreArguments(MArgStr, UMArgStr),
+									{
+										string_concat("_", MArgStr, ArgLStr),
+										string_concat("_", UMArgStr, UArgLStr),
+										string_concat("X", UMArgStr, IndArgLStr)
+									}.
 
-argument(ArgStr) 					--> 	[Alpha], { char_type(Alpha, alnum) }, restChars(RCList),
-								{
-									string_codes(ArgStr, [Alpha|RCList])
-								}.
+argument(ArgStr) 						--> 	functawr(ArgStr).
+argument(ArgStr) 						--> 	variable(ArgStr).
+argument(ArgStr) 						--> 	number(ArgStr).
+argument(ArgStr) 						--> 	list(ArgStr).
 
-moreArguments(MArgStr, MArgStr)				--> 	[],
-								{
-									string_codes(MArgStr, [])
-								}.
-moreArguments(MArgStr, UMArgStr)			-->	",", space, argument(ArgStr), moreArguments(MMArgStr, UMMArgStr),
-								{
-									string_concat(",", ArgStr, MArgPending),
-									string_concat(MArgPending, MMArgStr, MArgStr),
-									string_concat(",_", UMMArgStr, UMArgStr)
-								}.
-moreArguments(MArgStr, UMArgStr)			-->	",", space, "_", moreArguments(MMArgStr, UMMArgStr),
-								{
-									string_concat(",_", MMArgStr, MArgStr),
-									string_concat(",_", UMMArgStr, UMArgStr)
-								}.
+moreArguments(MArgStr, MArgStr)					--> 	[],
+									{
+										string_codes(MArgStr, [])
+									}.
+moreArguments(MArgStr, UMArgStr)				-->	",", space, argument(ArgStr), moreArguments(MMArgStr, UMMArgStr),
+									{
+										atomics_to_string([",", ArgStr, MMArgStr], "", MArgStr),
+										string_concat(",_", UMMArgStr, UMArgStr)
+									}.
+moreArguments(MArgStr, UMArgStr)				-->	",", space, "_", moreArguments(MMArgStr, UMMArgStr),
+									{
+										string_concat(",_", MMArgStr, MArgStr),
+										string_concat(",_", UMMArgStr, UMArgStr)
+									}.
 
-forBody(BodyStr, Priority, HeadDeclRepr)			-->	expression(BodyStr, _, Priority, HeadDeclRepr).
+forBody(BodyStr, Priority, HeadDeclRepr)			-->	expression(ExprStr, _, Priority, HeadDeclRepr), ",", space, constraints(ConStr),
+									{
+										atomics_to_string([ExprStr, ConStr], ",\n\t", BodyStr)
+									}.
 
-expression(ExprStr, I, Priority, HeadDeclRepr)		-->	component(CompStr, T1, Priority1, HeadDeclRepr), moreComponents(MCompStr, T2, and, Priority2, HeadDeclRepr),
-								{
-									nb_getval(intervalNo, Int),
-									string_concat("I", Int, I),
-									NewInt is Int + 1,
-									nb_setval(intervalNo, NewInt),
+expression(ExprStr, I, Priority, HeadDeclRepr)			-->	component(CompStr, T1, Priority1, HeadDeclRepr), moreComponents(MCompStr, T2, and, Priority2, HeadDeclRepr),
+									{
+										nb_getval(intervalNo, Int),
+										string_concat("I", Int, I),
+										NewInt is Int + 1,
+										nb_setval(intervalNo, NewInt),
+										
+										atom_string(T1Atom, T1),
+										atom_string(T2Atom, T2),
+										atom_string(IAtom, I),
 									
-									atom_string(T1Atom, T1),
-									atom_string(T2Atom, T2),
-									atom_string(IAtom, I),
-									
-									atomics_to_string([CompStr, MCompStr], ",\n\t", ExprStrPending),
-									split_string(ExprStrPending, "\n", ",\t\n", SubStrings),
-									findall((Term, VNames), (member(Sub, SubStrings), term_string(Term, Sub, [variable_names(VNames)])), Terms),
-									(
-										(member((complement_all(List, SomeI), Vars), Terms), last(Vars, T2Atom=SomeI)) ->
-										delete(Terms, (complement_all(List, SomeI), Vars), TermsPending1),
-										delete(Vars, T2Atom=SomeI, VarsPending1),
-										addToHead(VarsPending1, T1Atom=Anon1, VarsPending2),
-										addToTail(VarsPending2, IAtom=AnonI, NewVars),
-										addToTail(TermsPending1, (relative_complement_all(Anon1, List, AnonI), NewVars), NewTerms)
-										;
-										(member((intersect_all(List, SomeI), Vars), Terms), last(Vars, T1Atom=SomeI)) ->
-										delete(Terms, (intersect_all(List, SomeI), Vars), TermsPending1),
-										delete(Vars, T1Atom=SomeI, VarsPending1),
-										addToHead(VarsPending1, T2Atom=Anon2, VarsPending2),
-										addToTail(VarsPending2, IAtom=AnonI, NewVars),
-										addToHead(List, Anon2, NewList),
-										addToTail(TermsPending1, (intersect_all(NewList, AnonI), NewVars), NewTerms)
-										;
-										(member((intersect_all(List, SomeI), Vars), Terms), last(Vars, T2Atom=SomeI)) ->
-										delete(Terms, (intersect_all(List, SomeI), Vars), TermsPending1),
-										delete(Vars, T2Atom=SomeI, VarsPending1),
-										addToHead(VarsPending1, T1Atom=Anon1, VarsPending2),
-										addToTail(VarsPending2, IAtom=AnonI, NewVars),
-										addToHead(List, Anon1, NewList),
-										addToTail(TermsPending1, (intersect_all(NewList, AnonI), NewVars), NewTerms)
-										;
-										addToTail(Terms, (intersect_all([Anon1, Anon2], AnonI), [T1Atom=Anon1, T2Atom=Anon2, IAtom=AnonI]), NewTerms)
-									),
-									findall(S, (member((T, V), NewTerms), term_string(T, S, [variable_names(V)])), ExprStrSplit),
-									atomics_to_string(ExprStrSplit, ",\n\t", ExprStr),
-	
-									Priority is Priority1 + Priority2
-								}.
-expression(ExprStr, I, Priority, HeadDeclRepr)		-->	component(CompStr, T1, Priority1, HeadDeclRepr), moreComponents(MCompStr, T2, or, Priority2, HeadDeclRepr),
-								{
-									nb_getval(intervalNo, Int),
-									string_concat("I", Int, I),
-									NewInt is Int + 1,
-									nb_setval(intervalNo, NewInt),
-									
-									atom_string(T1Atom, T1),
-									atom_string(T2Atom, T2),
-									atom_string(IAtom, I),
-									
-									atomics_to_string([CompStr, MCompStr], ",\n\t", ExprStrPending),
-									split_string(ExprStrPending, "\n", ",\t\n", SubStrings),
-									findall((Term, VNames), (member(Sub, SubStrings), term_string(Term, Sub, [variable_names(VNames)])), Terms),
-									(
-										(member((union_all(List, SomeI), Vars), Terms), last(Vars, T1Atom=SomeI)) ->
-										delete(Terms, (union_all(List, SomeI), Vars), TermsPending1),
-										delete(Vars, T1Atom=SomeI, VarsPending1),
-										addToHead(VarsPending1, T2Atom=Anon2, VarsPending2),
-										addToTail(VarsPending2, IAtom=AnonI, NewVars),
-										addToTail(List, Anon2, NewList),
-										addToTail(TermsPending1, (union_all(NewList, AnonI), NewVars), NewTerms)
-										;
-										(member((union_all(List, SomeI), Vars), Terms), last(Vars, T2Atom=SomeI)) ->
-										delete(Terms, (union_all(List, SomeI), Vars), TermsPending1),
-										delete(Vars, T2Atom=SomeI, VarsPending1),
-										addToHead(VarsPending1, T1Atom=Anon1, VarsPending2),
-										addToTail(VarsPending2, IAtom=AnonI, NewVars),
-										addToTail(List, Anon1, NewList),
-										addToTail(TermsPending1, (union_all(NewList, AnonI), NewVars), NewTerms)
-										;
-										addToTail(Terms, (union_all([Anon1, Anon2], AnonI), [T1Atom=Anon1, T2Atom=Anon2, IAtom=AnonI]), NewTerms)
-									),
-									findall(S, (member((T, V), NewTerms), term_string(T, S, [variable_names(V)])), ExprStrSplit),
-									atomics_to_string(ExprStrSplit, ",\n\t", ExprStr),
-	
-									Priority is Priority1 + Priority2
-								}.
-expression(ExprStr, I, Priority, HeadDeclRepr)		-->	component(ExprStr, I, Priority, HeadDeclRepr), moreComponents(null).
+										atomics_to_string([CompStr, MCompStr], ",\n\t", ExprStrPending),
+										split_string(ExprStrPending, "\n", ",\t\n", SubStrings),
+										findall((Term, VNames), (member(Sub, SubStrings), term_string(Term, Sub, [variable_names(VNames)])), Terms),
+										(
+											(member((complement_all(List, SomeI), Vars), Terms), last(Vars, T2Atom=SomeI)) ->
+											delete(Terms, (complement_all(List, SomeI), Vars), TermsPending1),
+											delete(Vars, T2Atom=SomeI, VarsPending1),
+											addToHead(VarsPending1, T1Atom=Anon1, VarsPending2),
+											addToTail(VarsPending2, IAtom=AnonI, NewVars),
+											addToTail(TermsPending1, (relative_complement_all(Anon1, List, AnonI), NewVars), NewTerms)
+											;
+											(member((intersect_all(List, SomeI), Vars), Terms), last(Vars, T1Atom=SomeI)) ->
+											delete(Terms, (intersect_all(List, SomeI), Vars), TermsPending1),
+											delete(Vars, T1Atom=SomeI, VarsPending1),
+											addToHead(VarsPending1, T2Atom=Anon2, VarsPending2),
+											addToTail(VarsPending2, IAtom=AnonI, NewVars),
+											addToHead(List, Anon2, NewList),
+											addToTail(TermsPending1, (intersect_all(NewList, AnonI), NewVars), NewTerms)
+											;
+											(member((intersect_all(List, SomeI), Vars), Terms), last(Vars, T2Atom=SomeI)) ->
+											delete(Terms, (intersect_all(List, SomeI), Vars), TermsPending1),
+											delete(Vars, T2Atom=SomeI, VarsPending1),
+											addToHead(VarsPending1, T1Atom=Anon1, VarsPending2),
+											addToTail(VarsPending2, IAtom=AnonI, NewVars),
+											addToHead(List, Anon1, NewList),
+											addToTail(TermsPending1, (intersect_all(NewList, AnonI), NewVars), NewTerms)
+											;
+											addToTail(Terms, (intersect_all([Anon1, Anon2], AnonI), [T1Atom=Anon1, T2Atom=Anon2, IAtom=AnonI]), NewTerms)
+										),
+										findall(S, (member((T, V), NewTerms), term_string(T, S, [variable_names(V)])), ExprStrSplit),
+										atomics_to_string(ExprStrSplit, ",\n\t", ExprStr),
+		
+										Priority is Priority1 + Priority2
+									}.
+expression(ExprStr, I, Priority, HeadDeclRepr)			-->	component(CompStr, T1, Priority1, HeadDeclRepr), moreComponents(MCompStr, T2, or, Priority2, HeadDeclRepr),
+									{
+										nb_getval(intervalNo, Int),
+										string_concat("I", Int, I),
+										NewInt is Int + 1,
+										nb_setval(intervalNo, NewInt),
+										
+										atom_string(T1Atom, T1),
+										atom_string(T2Atom, T2),
+										atom_string(IAtom, I),
+										
+										atomics_to_string([CompStr, MCompStr], ",\n\t", ExprStrPending),
+										split_string(ExprStrPending, "\n", ",\t\n", SubStrings),
+										findall((Term, VNames), (member(Sub, SubStrings), term_string(Term, Sub, [variable_names(VNames)])), Terms),
+										(
+											(member((union_all(List, SomeI), Vars), Terms), last(Vars, T1Atom=SomeI)) ->
+											delete(Terms, (union_all(List, SomeI), Vars), TermsPending1),
+											delete(Vars, T1Atom=SomeI, VarsPending1),
+											addToHead(VarsPending1, T2Atom=Anon2, VarsPending2),
+											addToTail(VarsPending2, IAtom=AnonI, NewVars),
+											addToTail(List, Anon2, NewList),
+											addToTail(TermsPending1, (union_all(NewList, AnonI), NewVars), NewTerms)
+											;
+											(member((union_all(List, SomeI), Vars), Terms), last(Vars, T2Atom=SomeI)) ->
+											delete(Terms, (union_all(List, SomeI), Vars), TermsPending1),
+											delete(Vars, T2Atom=SomeI, VarsPending1),
+											addToHead(VarsPending1, T1Atom=Anon1, VarsPending2),
+											addToTail(VarsPending2, IAtom=AnonI, NewVars),
+											addToTail(List, Anon1, NewList),
+											addToTail(TermsPending1, (union_all(NewList, AnonI), NewVars), NewTerms)
+											;
+											addToTail(Terms, (union_all([Anon1, Anon2], AnonI), [T1Atom=Anon1, T2Atom=Anon2, IAtom=AnonI]), NewTerms)
+										),
+										findall(S, (member((T, V), NewTerms), term_string(T, S, [variable_names(V)])), ExprStrSplit),
+										atomics_to_string(ExprStrSplit, ",\n\t", ExprStr),
+		
+										Priority is Priority1 + Priority2
+									}.
+expression(ExprStr, I, Priority, HeadDeclRepr)			-->	component(ExprStr, I, Priority, HeadDeclRepr), moreComponents(null).
 
 moreComponents(MCompStr, I, and, Priority, HeadDeclRepr)	-->	",", space, expression(MCompStr, I, Priority, HeadDeclRepr).
-moreComponents(MCompStr, I, or, Priority, HeadDeclRepr)	-->	space, "or", space, expression(MCompStr, I, Priority, HeadDeclRepr).
-moreComponents(null)					-->	[].
+moreComponents(MCompStr, I, or, Priority, HeadDeclRepr)		-->	space, "or", space, expression(MCompStr, I, Priority, HeadDeclRepr).
+moreComponents(null)						-->	[].
 
-component(CompStr, T, Priority, HeadDeclRepr)		-->	fluent("sD", "input", Str, _, Priority, T, HeadDeclRepr),
-								{
-									string_concat(",\n\tholdsFor(", Str, CompStrPending1),
-									string_concat(CompStrPending1, ", ", CompStrPending2),
-									string_concat(CompStrPending2, T, CompStrPending3),
-									string_concat(CompStrPending3, ")", CompStr)
-								}.
-component(CompStr, T, Priority, HeadDeclRepr)		-->	"(", space, expression(CompStr, T, Priority, HeadDeclRepr), space, ")".
-component(CompStr, T, Priority, HeadDeclRepr)		-->	"not", space, expression(Str, ExpT, Priority, HeadDeclRepr),
-								{
-									string_concat(Str, ",\n\tcomplement_all([", CompStrPending3),
-									string_concat(CompStrPending3, ExpT, CompStrPending4),
-									string_concat(CompStrPending4, "], ", CompStrPending5),
-									nb_getval(intervalNo, Int),
-									string_concat("I", Int, T),
-									NewInt is Int + 1,
-									nb_setval(intervalNo, NewInt),
-									string_concat(CompStrPending5, T, CompStrPending6),
-									string_concat(CompStrPending6, ")", CompStr)
-								}.
+component(CompStr, T, Priority, HeadDeclRepr)			-->	fluent("sD", "input", Str, _, Priority, T, HeadDeclRepr),
+									{
+										atomics_to_string([",\n\tholdsFor(", Str, ", ", T, ")"], "", CompStr)
+									}.
+component(CompStr, T, Priority, HeadDeclRepr)			-->	"(", space, expression(CompStr, T, Priority, HeadDeclRepr), space, ")".
+component(CompStr, T, Priority, HeadDeclRepr)			-->	"not", space, expression(Str, ExpT, Priority, HeadDeclRepr),
+									{
+										nb_getval(intervalNo, Int),
+										NewInt is Int + 1,
+										nb_setval(intervalNo, NewInt),
+										string_concat("I", Int, T),
+										atomics_to_string([Str, ",\n\tcomplement_all([", ExpT, "], ", T, ")"], "", CompStr)
+									}.
+
+constraints(ConStr)						-->	durationConstraint(DCStr), space, ",", space, constraints(MConStr),
+									{
+										atomics_to_string([DCStr, MConStr], ",\n\t", ConStr)
+									}.
+constraints(ConStr)						-->	atemporalConstraint(ACStr), space, ",", space, constraints(MConStr),
+									{
+										atomics_to_string([ACStr, MConStr], ",\n\t", ConStr)
+									}.
+constraints("")							-->	[].
+
+durationConstraint(DCStr)					-->	"duration", space, operator(OpStr), space, variable(VarStr),
+									{
+										nb_getval(intervalNo, Int),
+										NewInt is Int + 1,
+										NewNewInt is NewInt + 1,
+										nb_setval(intervalNo, NewNewInt),
+										atomics_to_string([",\n\tfindall((S,E), (member((S,E), I", Int, "), Diff is E-S, Diff ", OpStr, " ", VarStr, "), I", NewInt, ")"], "", DCStr)
+									}.
+durationConstraint(DCStr)					-->	"duration", space, operator(OpStr), space, number(NumStr),
+									{
+										nb_getval(intervalNo, Int),
+										NewInt is Int + 1,
+										NewNewInt is NewInt + 1,
+										nb_setval(intervalNo, NewNewInt),
+										atomics_to_string([",\n\tfindall((S,E), (member((S,E), I", Int, "), Diff is E-S, Diff ", OpStr, " ", NumStr, "), I", NewInt, ")"], "", DCStr)
+									}.
 
 atBody(AtBodyStr, Priority, HeadDeclRepr)			-->	"happens", space, event("input", CTStr, _, Priority1, HeadDeclRepr), moreConditions(MCondStr, Priority2, HeadDeclRepr),
-								{
-									string_concat(",\n\thappensAt(", CTStr, CondStrPending1),
-									string_concat(CondStrPending1, ", T)", CondStr),
-									string_concat(CondStr, MCondStr, AtBodyStr),
-									Priority is Priority1 + Priority2
-								}.
+									{
+										atomics_to_string([",\n\thappensAt(", CTStr, ", T)", MCondStr], "", AtBodyStr),
+										Priority is Priority1 + Priority2
+									}.
 atBody(AtBodyStr, Priority, HeadDeclRepr)			-->	"not happens", space, event("input", CTStr, _, Priority1, HeadDeclRepr), moreConditions(MCondStr, Priority2, HeadDeclRepr),
-								{
-									string_concat(",\n\t\\+ happensAt(", CTStr, CondStrPending1),
-									string_concat(CondStrPending1, ", T)", CondStr),
-									string_concat(CondStr, MCondStr, AtBodyStr),
-									Priority is Priority1 + Priority2
-								}.
+									{
+										atomics_to_string([",\n\t\\+ happensAt(", CTStr, ", T)", MCondStr], "", AtBodyStr),
+										Priority is Priority1 + Priority2
+									}.
 atBody(AtBodyStr, Priority, HeadDeclRepr)			-->	"start", space, fluent("sD", "input", CTStr, _, Priority1, _, HeadDeclRepr), moreConditions(MCondStr, Priority2, HeadDeclRepr),
-								{
-									string_concat(",\n\thappensAt(start(", CTStr, CondStrPending1),
-									string_concat(CondStrPending1, "), T)", CondStr),
-									string_concat(CondStr, MCondStr, AtBodyStr),
-									Priority is Priority1 + Priority2
-								}.
+									{
+										atomics_to_string([",\n\thappensAt(start(", CTStr, "), T)", MCondStr], "", AtBodyStr),
+										Priority is Priority1 + Priority2
+									}.
 atBody(AtBodyStr, Priority, HeadDeclRepr)			-->	"end", space, fluent("sD", "input", CTStr, _, Priority1, _, HeadDeclRepr), moreConditions(MCondStr, Priority2, HeadDeclRepr),
-								{
-									string_concat(",\n\thappensAt(end(", CTStr, CondStrPending1),
-									string_concat(CondStrPending1, "), T)", CondStr),
-									string_concat(CondStr, MCondStr, AtBodyStr),
-									Priority is Priority1 + Priority2
-								}.
+									{
+										atomics_to_string([",\n\thappensAt(end(", CTStr, "), T)", MCondStr], "", AtBodyStr),
+										Priority is Priority1 + Priority2
+									}.
 
-condition(CondStr, Priority, HeadDeclRepr)		-->	"start", space, fluent("sD", "input", CTStr, _, Priority, _, HeadDeclRepr),
-								{
-									string_concat(",\n\thappensAt(start(", CTStr, CondStrPending1),
-									string_concat(CondStrPending1, "), T)", CondStr)
-								}.
-condition(CondStr, Priority, HeadDeclRepr)		-->	"end", space, fluent("sD", "input", CTStr, _, Priority, _, HeadDeclRepr),
-								{
-									string_concat(",\n\thappensAt(end(", CTStr, CondStrPending1),
-									string_concat(CondStrPending1, "), T)", CondStr)
-								}.
-condition(CondStr, Priority, HeadDeclRepr)		-->	"happens", space, event("input", CTStr, _, Priority, HeadDeclRepr),
-								{
-									string_concat(",\n\thappensAt(", CTStr, CondStrPending1),
-									string_concat(CondStrPending1, ", T)", CondStr)
-								}.
-condition(CondStr, Priority, HeadDeclRepr)		-->	"not happens", space, event("input", CTStr, _, Priority, HeadDeclRepr),
-								{
-									string_concat(",\n\t\\+ happensAt(", CTStr, CondStrPending1),
-									string_concat(CondStrPending1, ", T)", CondStr)
-								}.
-condition(CondStr, Priority, HeadDeclRepr)		-->	fluent("sD", "input", CTStr, _, Priority, _, HeadDeclRepr),
-								{
-									string_concat(",\n\tholdsAt(", CTStr, CondStrPending1),
-									string_concat(CondStrPending1, ", T)", CondStr)
-								}.
-condition(CondStr, Priority, HeadDeclRepr)		-->	"not", space, fluent("sD", "input", CTStr, _, Priority, _, HeadDeclRepr),
-								{
-									string_concat(",\n\t\\+ holdsAt(", CTStr, CondStrPending1),
-									string_concat(CondStrPending1, ", T)", CondStr)
-								}.
-
+condition(CondStr, Priority, HeadDeclRepr)			-->	"start", space, fluent("sD", "input", CTStr, _, Priority, _, HeadDeclRepr),
+									{
+										atomics_to_string([",\n\thappensAt(start(", CTStr, "), T)"], "", CondStr)
+									}.
+condition(CondStr, Priority, HeadDeclRepr)			-->	"end", space, fluent("sD", "input", CTStr, _, Priority, _, HeadDeclRepr),
+									{
+										atomics_to_string([",\n\thappensAt(end(", CTStr, "), T)"], "", CondStr)
+									}.
+condition(CondStr, Priority, HeadDeclRepr)			-->	"happens", space, event("input", CTStr, _, Priority, HeadDeclRepr),
+									{
+										atomics_to_string([",\n\thappensAt(", CTStr, ", T)"], "", CondStr)
+									}.
+condition(CondStr, Priority, HeadDeclRepr)			-->	"not happens", space, event("input", CTStr, _, Priority, HeadDeclRepr),
+									{
+										atomics_to_string([",\n\t\\+ happensAt(", CTStr, ", T)"], "", CondStr)
+									}.
+condition(CondStr, Priority, HeadDeclRepr)			-->	"holds", space, fluent("sD", "input", CTStr, _, Priority, _, HeadDeclRepr),
+									{
+										atomics_to_string([",\n\tholdsAt(", CTStr, ", T)"], "", CondStr)
+									}.
+condition(CondStr, Priority, HeadDeclRepr)			-->	"not holds", space, fluent("sD", "input", CTStr, _, Priority, _, HeadDeclRepr),
+									{
+										atomics_to_string([",\n\t\\+ holdsAt(", CTStr, ", T)"], "", CondStr)
+									}.
+condition(ACStr, 0, _)						-->	atemporalConstraint(ACStr).
+	
 moreConditions(MCondStr, Priority, HeadDeclRepr)		-->	",", space, condition(CondStr, Priority1, HeadDeclRepr), moreConditions(MMCondStr, Priority2, HeadDeclRepr),
-								{
-									string_concat(CondStr, MMCondStr, MCondStr),
-									Priority is Priority1 + Priority2
-								}.
-moreConditions("", 0, _)				-->	[].
+									{
+										string_concat(CondStr, MMCondStr, MCondStr),
+										Priority is Priority1 + Priority2
+									}.
+moreConditions("", 0, _)					-->	[].
+
+atemporalConstraint(ACStr)					-->	fact(ACStr).
+atemporalConstraint(ACStr)					-->	math(ACStr).
+
+fact(FStr)							-->	functawr(FncStr), "(", argumentsList(ArgLStr, _, _, _), ")",
+									{
+										atomics_to_string([FncStr, "(", ArgLStr, ")"], "", FStr)
+									}.
+
+math(MStr)							-->	variable(Var1Str), space, operator(OpStr), space, variable(Var2Str),
+									{
+										atomics_to_string([Var1Str, " ", OpStr, " ", Var2Str], "", MStr)
+									}.
+math(MStr)							-->	variable(Var1Str), space, operator(OpStr), space, number(NumStr),
+									{
+										atomics_to_string([Var1Str, " ", OpStr, " ", NumStr], "", MStr)
+									}.
+
+operator(">")							-->	">".
+operator(">=")							-->	">=".
+operator("<")							-->	"<".
+operator("=<")							-->	"=<".
+operator("=")							-->	"=".
+
+list(LStr)							-->	"[", space, argumentsList(ArgLStr, _, _, _), space, "]",
+									{
+										atomics_to_string(["[", ArgLStr, "]"], "", LStr)
+									}.
+list("[]")							-->	"[]".
+
+
+
+
+
+
+
 

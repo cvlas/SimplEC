@@ -50,7 +50,7 @@ terminate highSpeedIn(Vessel, AreaName) if
 	happens leavesArea(Vessel, AreaName).
 
 terminate highSpeedIn(Vessel, AreaName) if
-	happens gap_start(Vessel), T).
+	happens gap_start(Vessel).
 
 holds loitering(Vessel) iff
 	((lowSpeed(Vessel) or stopped(Vessel)),
