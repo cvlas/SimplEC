@@ -314,7 +314,15 @@ variable(VarStr)						-->	"_", restChars(RCList),
 										string_concat("_", RCStr, VarStr)
 									}.
 
-value(ValStr, val)						-->	"=", argument(ArgStr),
+value(ValStr, var)						-->	"=", variable(ArgStr),
+									{
+										string_concat("=", ArgStr, ValStr)
+									}.
+value(ValStr, val)						-->	"=", functawr(ArgStr),
+									{
+										string_concat("=", ArgStr, ValStr)
+									}.
+value(ValStr, val)						-->	"=", number(ArgStr),
 									{
 										string_concat("=", ArgStr, ValStr)
 									}.
