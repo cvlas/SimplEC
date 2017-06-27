@@ -355,6 +355,7 @@ moreArguments(MArgStr, UMArgStr)				-->	",", space, "_", moreArguments(MMArgStr,
 										string_concat(",_", UMMArgStr, UMArgStr)
 									}.
 
+forBody(BodyStr, Priority, HeadDeclRepr)			-->	expression(BodyStr, _, Priority, HeadDeclRepr).
 forBody(BodyStr, Priority, HeadDeclRepr)			-->	expression(ExprStr, _, Priority, HeadDeclRepr), ",", space, constraints(ConStr),
 									{
 										atomics_to_string([ExprStr, ConStr], ",\n\t", BodyStr)
@@ -463,31 +464,34 @@ component(CompStr, T, Priority, HeadDeclRepr)			-->	"not", space, expression(Str
 										atomics_to_string([Str, ",\n\tcomplement_all([", ExpT, "], ", T, ")"], "", CompStr)
 									}.
 
-constraints(ConStr)						-->	durationConstraint(DCStr), space, ",", space, constraints(MConStr),
+constraints(ConStr)						-->	durationConstraint(DCStr), moreConstraints(MConStr),
 									{
 										atomics_to_string([DCStr, MConStr], ",\n\t", ConStr)
 									}.
-constraints(ConStr)						-->	atemporalConstraint(ACStr), space, ",", space, constraints(MConStr),
+constraints(ConStr)						-->	atemporalConstraint(ACStr), moreConstraints(MConStr),
 									{
 										atomics_to_string([ACStr, MConStr], ",\n\t", ConStr)
 									}.
 constraints("")							-->	[].
 
+moreConstraints(MConStr)					-->	",", space, constraints(MConStr).
+moreConstraints("")						-->	[].
+
 durationConstraint(DCStr)					-->	"duration", space, operator(OpStr), space, variable(VarStr),
 									{
 										nb_getval(intervalNo, Int),
+										PrevInt is Int - 1,
 										NewInt is Int + 1,
-										NewNewInt is NewInt + 1,
-										nb_setval(intervalNo, NewNewInt),
-										atomics_to_string([",\n\tfindall((S,E), (member((S,E), I", Int, "), Diff is E-S, Diff ", OpStr, " ", VarStr, "), I", NewInt, ")"], "", DCStr)
+										nb_setval(intervalNo, NewInt),
+										atomics_to_string([",\n\tfindall((S,E), (member((S,E), I", PrevInt, "), Diff is E-S, Diff ", OpStr, " ", VarStr, "), I", Int, ")"], "", DCStr)
 									}.
 durationConstraint(DCStr)					-->	"duration", space, operator(OpStr), space, number(NumStr),
 									{
 										nb_getval(intervalNo, Int),
+										PrevInt is Int - 1,
 										NewInt is Int + 1,
-										NewNewInt is NewInt + 1,
-										nb_setval(intervalNo, NewNewInt),
-										atomics_to_string([",\n\tfindall((S,E), (member((S,E), I", Int, "), Diff is E-S, Diff ", OpStr, " ", NumStr, "), I", NewInt, ")"], "", DCStr)
+										nb_setval(intervalNo, NewInt),
+										atomics_to_string([",\n\tfindall((S,E), (member((S,E), I", PrevInt, "), Diff is E-S, Diff ", OpStr, " ", NumStr, "), I", Int, ")"], "", DCStr)
 									}.
 
 atBody(AtBodyStr, Priority, HeadDeclRepr)			-->	"happens", space, event("input", CTStr, _, Priority1, HeadDeclRepr), moreConditions(MCondStr, Priority2, HeadDeclRepr),
@@ -549,16 +553,16 @@ atemporalConstraint(ACStr)					-->	math(ACStr).
 
 fact(FStr)							-->	functawr(FncStr), "(", argumentsList(ArgLStr, _, _, _), ")",
 									{
-										atomics_to_string([FncStr, "(", ArgLStr, ")"], "", FStr)
+										atomics_to_string([",\n\t", FncStr, "(", ArgLStr, ")"], "", FStr)
 									}.
 
 math(MStr)							-->	variable(Var1Str), space, operator(OpStr), space, variable(Var2Str),
 									{
-										atomics_to_string([Var1Str, " ", OpStr, " ", Var2Str], "", MStr)
+										atomics_to_string([",\n\t", Var1Str, " ", OpStr, " ", Var2Str], "", MStr)
 									}.
 math(MStr)							-->	variable(Var1Str), space, operator(OpStr), space, number(NumStr),
 									{
-										atomics_to_string([Var1Str, " ", OpStr, " ", NumStr], "", MStr)
+										atomics_to_string([",\n\t", Var1Str, " ", OpStr, " ", NumStr], "", MStr)
 									}.
 
 operator(">")							-->	">".

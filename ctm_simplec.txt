@@ -12,7 +12,7 @@ terminate punctuality(Id, VehicleType)=punctual if
 terminate punctuality(Id, VehicleType)=punctual if
 	happens stop_leave(Id, VehicleType, _, early).
 
-punctuality(Id, VehicleType)=non_punctual iff
+holds punctuality(Id, VehicleType)=non_punctual iff
 	not punctuality(Id, VehicleType)=punctual.
 
 happens punctuality_change(Id, VehicleType, punctual) if
@@ -25,12 +25,12 @@ happens punctuality_change(Id, VehicleType, non_punctual) if
 	
 	
 
-driving_style(Id, VehicleType)=unsafe iff
+holds driving_style(Id, VehicleType)=unsafe iff
 	sharp_turn(Id, VehicleType)=very_sharp or
 	abrupt_acceleration(Id, VehicleType)=very_abrupt or
 	abrupt_deceleration(Id, VehicleType)=very_abrupt.
 
-driving_style(Id, VehicleType)=uncomfortable iff
+holds driving_style(Id, VehicleType)=uncomfortable iff
 	(sharp_turn(Id, VehicleType)=sharp,
 	not(abrupt_acceleration(Id, VehicleType)=very_abrupt or abrupt_deceleration(Id, VehicleType)=very_abrupt)) or
 	abrupt_acceleration(Id, VehicleType)=abrupt or
@@ -40,15 +40,15 @@ driving_style(Id, VehicleType)=uncomfortable iff
 
 
 
-driving_quality(Id, VehicleType)=high iff
+holds driving_quality(Id, VehicleType)=high iff
 	punctuality(Id, VehicleType)=punctual,
 	not(driving_style(Id, VehicleType)=unsafe or driving_style(Id, VehicleType)=uncomfortable).
 
-driving_quality(Id, VehicleType)=medium iff
+holds driving_quality(Id, VehicleType)=medium iff
 	punctuality(Id, VehicleType)=punctual,
 	driving_style(Id, VehicleType)=uncomfortable.
 
-driving_quality(Id, VehicleType)=low iff
+holds driving_quality(Id, VehicleType)=low iff
 	punctuality(Id, VehicleType)=non_punctual or
 	driving_style(Id, VehicleType)=unsafe.
 
@@ -56,7 +56,7 @@ driving_quality(Id, VehicleType)=low iff
 
 
 
-passenger_comfort(Id, VehicleType)=reducing iff
+holds passenger_comfort(Id, VehicleType)=reducing iff
 	driving_style(Id, VehicleType)=uncomfortable or
 	driving_style(Id, VehicleType)=unsafe or
 	passenger_density(Id, VehicleType)=high or
@@ -95,7 +95,7 @@ initiate internal_temperature(Id, VehicleType)=Value if
 
 
 
-driver_comfort(Id, VehicleType)=reducing iff
+holds driver_comfort(Id, VehicleType)=reducing iff
 	driving_style(Id, VehicleType)=uncomfortable or
 	driving_style(Id, VehicleType)=unsafe or
 	noise_level(Id, VehicleType)=high or
@@ -106,7 +106,7 @@ driver_comfort(Id, VehicleType)=reducing iff
 
 
 
-passenger_satisfaction(Id, VehicleType)=reducing iff
+holds passenger_satisfaction(Id, VehicleType)=reducing iff
 	punctuality(Id, VehicleType)=non_punctual or
 	passenger_comfort(Id, VehicleType)=reducing.
 

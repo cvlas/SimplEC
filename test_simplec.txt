@@ -9,7 +9,7 @@ happens punctuality_change(Id, VehicleType, non_punctual) if
 
 
 
-dddt(A,B) iff
+holds dddt(A,B) iff
 	passenger_density(A,B)=high.
 
 initially passenger_density(_,_)=low.
@@ -22,29 +22,29 @@ initiate passenger_density(Id, VehicleType)=Value if
 
 
 
-working(X) iff
+holds working(X) iff
 	loc(X)=work,
 	not takingBreak(X).
 	
-resting(X) iff
+holds resting(X) iff
 	loc(X)=pub or onHoliday(X) or (loc(X)=work, takingBreak(X)).
 
 
 
-happy(X)=true iff
+holds happy(X)=true iff
 	rich(X)=true or
 	resting(X)=true.
 
-sad(X) iff
+holds sad(X) iff
 	poor(X),
 	(working(X) or (loc(X)=home, changingDiapers(X))).
 
-friends(X,Y) iff
+holds friends(X,Y) iff
 	(loc(X)=pub,
 	loc(Y)=pub),
 	not(rich(X) or rich(Y)).
 
-fighting(X,Y) iff
+holds fighting(X,Y) iff
 	( (abrupt(X) or abrupt(Y)), close(X,Y) ),
 	not(inactive(X) or inactive(Y) ).
 
@@ -55,8 +55,8 @@ fighting(X,Y) iff
 
 initiate moving(P1,P2) if
 	start walking(P1),
-	walking(P2),		
-	close(P1,P2).
+	holds walking(P2),		
+	holds close(P1,P2).
 											
 terminate moving(P1,P2) if
 	end walking(P1).
@@ -72,7 +72,7 @@ terminate moving(P1,P2) if
 
 initiate a(X) if
 	not happens b(X),
-	not c(X).
+	not holds c(X).
 
 initiate c(X) if
 	happens d(X).

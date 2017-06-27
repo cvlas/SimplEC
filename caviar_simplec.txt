@@ -1,22 +1,22 @@
-close(Id1, Id2, 24) iff
+holds close(Id1, Id2, 24) iff
 	distance(Id1, Id2, 24).
 
-close(Id1, Id2, 25) iff
+holds close(Id1, Id2, 25) iff
 	close(Id1, Id2, 24) or
 	distance(Id1, Id2, 25).
 
-close(Id1, Id2, 30) iff 
+holds close(Id1, Id2, 30) iff 
 	close(Id1, Id2, 25) or
 	distance(Id1, Id2, 30).
 
-close(Id1, Id2, 34) iff
+holds close(Id1, Id2, 34) iff
 	close(Id1, Id2, 30) or
 	distance(Id1, Id2, 34).
 
-close(Id1, Id2, Threshold)=false iff
+holds close(Id1, Id2, Threshold)=false iff
 	not close(Id1, Id2, Threshold).
 
-closeSymmetric(Id1, Id2, Threshold) iff
+holds closeSymmetric(Id1, Id2, Threshold) iff
 	close(Id1, Id2, Threshold) or
 	close(Id2, Id1, Threshold).
 
@@ -49,9 +49,9 @@ initiate person(Id)=false if
 
 initiate leaving_object(Person, Object) if
 	happens appear(Object),
-	inactive(Object),
-	person(Person),
-	closeSymmetric(Person, Object, 30).
+	holds inactive(Object),
+	holds person(Person),
+	holds closeSymmetric(Person, Object, 30).
 
 initiate leaving_object(Person, Object)=false if
 	happens disappear(Object).
@@ -70,18 +70,18 @@ initiate meeting(P1, P2) if
 	not happens disappear(P1),
 	not happens disappear(P2).
 
-greeting1(P1, P2) iff
+holds greeting1(P1, P2) iff
 	(activeOrInactivePerson(P1),
 	person(P2),
 	close(P1, P2, 25)),
 	not(running(P2) or abrupt(P2)).
 
-greeting2(P1, P2) iff
+holds greeting2(P1, P2) iff
 	walking(P1),
 	activeOrInactivePerson(P2),
 	close(P2, P1, 25).
 
-activeOrInactivePerson(P) iff
+holds activeOrInactivePerson(P) iff
 	active(P) or (inactive(P), person(P)).
 
 initiate meeting(P1, P2)=false if
@@ -103,7 +103,7 @@ initiate meeting(P1, P2)=false if
 	
 	
 	
-moving(P1, P2) iff
+holds moving(P1, P2) iff
 	walking(P1),
 	walking(P2),
 	close(P1, P2, 34).
@@ -112,7 +112,7 @@ moving(P1, P2) iff
 	
 	
 
-fighting(P1, P2) iff
+holds fighting(P1, P2) iff
 	((abrupt(P1) or abrupt(P2)),
 	close(P1, P2, 24)),
 	not(inactive(P1) or inactive(P2)).

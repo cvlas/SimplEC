@@ -11,6 +11,7 @@ sDFluent(loc(_)=home).	inputEntity(loc(_)=home).	index(loc(X)=home, X).
 sDFluent(loc(_)=pub).	inputEntity(loc(_)=pub).	index(loc(X)=pub, X).
 sDFluent(loc(_)=work).	inputEntity(loc(_)=work).	index(loc(X)=work, X).
 sDFluent(onHoliday(_)=true).	inputEntity(onHoliday(_)=true).	index(onHoliday(X)=true, X).
+sDFluent(passenger_density(_,_)=high).	inputEntity(passenger_density(_,_)=high).	index(passenger_density(A,_)=high, A).
 sDFluent(poor(_)=true).	inputEntity(poor(_)=true).	index(poor(X)=true, X).
 sDFluent(punctuality(_,_)=non_punctual).	inputEntity(punctuality(_,_)=non_punctual).	index(punctuality(Id,_)=non_punctual, Id).
 sDFluent(punctuality(_,_)=punctual).	inputEntity(punctuality(_,_)=punctual).	index(punctuality(Id,_)=punctual, Id).
@@ -23,8 +24,8 @@ event(punctuality_change(_,_,_)).	outputEntity(punctuality_change(_,_,_)).	index
 simpleFluent(a(_)=true).	outputEntity(a(_)=true).	index(a(X)=true, X).
 simpleFluent(c(_)=true).	outputEntity(c(_)=true).	index(c(X)=true, X).
 simpleFluent(moving(_,_)=true).	outputEntity(moving(_,_)=true).	index(moving(P1,_)=true, P1).
-simpleFluent(passenger_density(_,_)=high).	outputEntity(passenger_density(_,_)=high).	index(passenger_density(A,_)=high, A).
-simpleFluent(passenger_density(_,_)=low).	outputEntity(passenger_density(_,_)=low).	index(passenger_density(X,_)=low, X).
+simpleFluent(passenger_density(_,_)=Value).	outputEntity(passenger_density(_,_)=Value).	index(passenger_density(Id,_)=Value, Id).
+simpleFluent(passenger_density(_,_)=low).	outputEntity(passenger_density(_,_)=low).	index(passenger_density(_,_)=low, _).
 
 sDFluent(dddt(_,_)=true).	outputEntity(dddt(_,_)=true).	index(dddt(A,_)=true, A).
 sDFluent(fighting(_,_)=true).	outputEntity(fighting(_,_)=true).	index(fighting(X,_)=true, X).
