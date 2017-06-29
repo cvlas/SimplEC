@@ -1,7 +1,8 @@
 digraph
 {
 	node [shape=Mrecord];
-	rankdir=LR
+	rankdir=LR;
+	ranksep="1.5 equally";
 
 	0 [label="<abrupt(_)=true> abrupt(_)=true|<active(_)=true> active(_)=true|<appear(_)> appear(_)|<disappear(_)> disappear(_)|<distance(_,_,_)=true> distance(_,_,_)=true|<inactive(_)=true> inactive(_)=true|<running(_)=true> running(_)=true|<walking(_)=true> walking(_)=true"];
 	1 [label="<leaving_object(_,_)=false> leaving_object(_,_)=false|<person(_)=false> person(_)=false|<person(_)=true> person(_)=true"];

@@ -1,7 +1,8 @@
 digraph
 {
 	node [shape=Mrecord];
-	rankdir=LR
+	rankdir=LR;
+	ranksep="1.5 equally";
 
 	0 [label="<abrupt_acceleration(_,_)=abrupt> abrupt_acceleration(_,_)=abrupt|<abrupt_acceleration(_,_)=very_abrupt> abrupt_acceleration(_,_)=very_abrupt|<abrupt_deceleration(_,_)=abrupt> abrupt_deceleration(_,_)=abrupt|<abrupt_deceleration(_,_)=very_abrupt> abrupt_deceleration(_,_)=very_abrupt|<internal_temperature_change(_,_,_)> internal_temperature_change(_,_,_)|<noise_level_change(_,_,_)> noise_level_change(_,_,_)|<passenger_density_change(_,_,_)> passenger_density_change(_,_,_)|<sharp_turn(_,_)=sharp> sharp_turn(_,_)=sharp|<sharp_turn(_,_)=very_sharp> sharp_turn(_,_)=very_sharp|<stop_enter(_,_,_,_)> stop_enter(_,_,_,_)|<stop_leave(_,_,_,_)> stop_leave(_,_,_,_)"];
 	1 [label="<driving_style(_,_)=uncomfortable> driving_style(_,_)=uncomfortable|<driving_style(_,_)=unsafe> driving_style(_,_)=unsafe|<internal_temperature(_,_)=normal> internal_temperature(_,_)=normal|<internal_temperature(_,_)=very_cold> internal_temperature(_,_)=very_cold|<internal_temperature(_,_)=very_warm> internal_temperature(_,_)=very_warm|<noise_level(_,_)=high> noise_level(_,_)=high|<noise_level(_,_)=low> noise_level(_,_)=low|<passenger_density(_,_)=high> passenger_density(_,_)=high|<passenger_density(_,_)=low> passenger_density(_,_)=low|<punctuality(_,_)=punctual> punctuality(_,_)=punctual"];
@@ -18,6 +19,13 @@ digraph
 	0:"abrupt_deceleration(_,_)=abrupt" -> 1:"driving_style(_,_)=uncomfortable"
 	0:"abrupt_deceleration(_,_)=very_abrupt" -> 1:"driving_style(_,_)=uncomfortable"
 	0:"abrupt_deceleration(_,_)=very_abrupt" -> 1:"driving_style(_,_)=unsafe"
+	0:"internal_temperature_change(_,_,_)" -> 1:"internal_temperature(_,_)=normal"
+	0:"internal_temperature_change(_,_,_)" -> 1:"internal_temperature(_,_)=very_cold"
+	0:"internal_temperature_change(_,_,_)" -> 1:"internal_temperature(_,_)=very_warm"
+	0:"noise_level_change(_,_,_)" -> 1:"noise_level(_,_)=high"
+	0:"noise_level_change(_,_,_)" -> 1:"noise_level(_,_)=low"
+	0:"passenger_density_change(_,_,_)" -> 1:"passenger_density(_,_)=high"
+	0:"passenger_density_change(_,_,_)" -> 1:"passenger_density(_,_)=low"
 	0:"sharp_turn(_,_)=sharp" -> 1:"driving_style(_,_)=uncomfortable"
 	0:"sharp_turn(_,_)=very_sharp" -> 1:"driving_style(_,_)=unsafe"
 	0:"stop_enter(_,_,_,_)" -> 1:"punctuality(_,_)=punctual"

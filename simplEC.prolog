@@ -127,9 +127,15 @@ simplEC(InputFile, OutputFile, DeclarationsFile, GraphFile) :-
 	
 	% Dependency graph generation
 	tell(GraphFile),
-	write("digraph\n{\n\tnode [shape=Mrecord];\n\trankdir=LR\n\n"),
+	write("digraph\n{\n\tnode [shape=Mrecord];\n\trankdir=LR;\n\tranksep=\"1.5 equally\";\n\n"),
 	
 	forall(member((Q, L), FinalList), (findall(LabelPart, (member(Part, L), atomics_to_string(["<", Part, "> ", Part], LabelPart)), LabelParts), atomics_to_string(LabelParts, "|", Label), atomics_to_string(["\t", Q, " [label=\"", Label, "\"];\n"], Line), write(Line))),nl,
+	
+	%findall((A, B, C), (defines(A, B, C), write("defines "), write(A), write(", "), write(B), write(", "), write(C), write("\n")), _),
+	%findall((A), (noCaching(A), write("noCaching "), write(A), write("\n")), _),
+	findall((A, BPrefix, C), (defines(A, B, C), noCaching(B), retract(defines(A, B, C)), split_string(B, "=", "", BParts), list_head(BParts, BPrefix, _)), DefinesPending),
+	findall(D, (declared(D, _, _, _), split_string(D, "=", "", DParts), list_head(DParts, DPrefix, _), member((A, DPrefix, C), DefinesPending), assertz(defines(A, D, C))), _),
+	%findall((A, B, C), (defines(A, B, C), write("defines "), write(A), write(", "), write(B), write(", "), write(C), write("\n")), _),
 	
 	%findall(edge(CI, I, CJ, J), (defines(I, J, _), member(I, SomeH), member((CI, SomeH), FinalList), member(J, SomeOtherH), member((CJ, SomeOtherH), FinalList)), Edges),
 	findall(edge(CI, I, CJ, J), (defines(I, J, _), member((J, CJ), CachingOrdered), (member((I, CI), CachingOrdered) -> true ; CI is 0)), Edges),
