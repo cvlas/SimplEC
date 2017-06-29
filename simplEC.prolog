@@ -51,7 +51,7 @@ calculatePriority(H, Q) :-
 % SIMPL-EC
 % -----------------------------------------------
 	
-simplEC(InputFile, OutputFile, DeclarationsFile) :-
+simplEC(InputFile, OutputFile, DeclarationsFile, GraphFile) :-
 	split_string(InputFile, ".", "", InputFileTokens),
 	list_head(InputFileTokens, InputName, _),
 	atomics_to_string([InputName, ".log"], LogFile),
@@ -112,16 +112,31 @@ simplEC(InputFile, OutputFile, DeclarationsFile) :-
 		write(DeclStream, Out)),
 		_),
 	told,
-	close(Input), close(DeclStream), close(LogStream), !.
-
-dependencyGraph(GraphFile) :-
+	close(Input), close(DeclStream), close(LogStream),
+	
+	% Dependency graph preparation
+	findall(Q, member((_, Q), CachingOrdered), QS),
+	findall(H, member((H, _), CachingOrdered), HS),
+	findall(H0, (declared(H0, _, _, _), \+ member((H0, _), CachingOrdered)), H0S),
+	pairs_keys_values(QHS, QS, HS),
+	group_pairs_by_key(QHS, QLS),
+	pairs_keys_values(QLS, List1, List2),
+	findall((L1, L2), (member(L1, List1), nth1(Index, List1, L1), nth1(Index, List2, L2)), AlmostFinalList),
+	addToHead(AlmostFinalList, (0, H0S), FinalList),
+	%writeln(FinalList),
+	
+	% Dependency graph generation
 	tell(GraphFile),
-	write("digraph {\n"),
-	findall(edge(I, J), (defines(I, J, _)), Edges),
+	write("digraph\n{\n\tnode [shape=Mrecord];\n\trankdir=LR\n\n"),
+	
+	forall(member((Q, L), FinalList), (findall(LabelPart, (member(Part, L), atomics_to_string(["<", Part, "> ", Part], LabelPart)), LabelParts), atomics_to_string(LabelParts, "|", Label), atomics_to_string(["\t", Q, " [label=\"", Label, "\"];\n"], Line), write(Line))),nl,
+	
+	%findall(edge(CI, I, CJ, J), (defines(I, J, _), member(I, SomeH), member((CI, SomeH), FinalList), member(J, SomeOtherH), member((CJ, SomeOtherH), FinalList)), Edges),
+	findall(edge(CI, I, CJ, J), (defines(I, J, _), member((J, CJ), CachingOrdered), (member((I, CI), CachingOrdered) -> true ; CI is 0)), Edges),
 	sort(Edges, EdgesSorted),
-	forall(member(edge(K, L), EdgesSorted), (write("\""), write(K), write("\" -> \""), write(L), write("\"\n"))),
+	forall(member(edge(CK, K, CL, L), EdgesSorted), (write("\t"), write(CK), write(":\""), write(K), write("\" -> "), write(CL), write(":\""), write(L), writeln("\""))),
 	write("}\n"),
-	told.
+	told, !.
 
 % -----------------------------------------------
 % DEFINITE CLAUSE GRAMMAR
