@@ -14,8 +14,8 @@
 9)  (DONE) First argument of complement_all has to be a List
 10) (DONE) Add full-stops at the end of all rules
 11) (DONE) Setup gitlab project for the compiler with (pending/resolved) issues. Grant access to AA
-12) (IN PROGRESS) Write the MARITIME, CAVIAR and CTM action descriptions in the simplified language of the compiler
+12) (DONE) Write the MARITIME, CAVIAR and CTM action descriptions in the simplified language of the compiler
 13) (DONE) Automatically construct the dependency graph of the action description
 14) Produce a log file of the compilation, reporting syntax errors (if any) in the input provided by the user
 15) (DONE) Simplify BNF: add more Event-Calculus jargon
-16) Make dependency graphs pretty (Use caching-order-like layers and colours)
+16) (IN PROGRESS) Make dependency graphs pretty (Use caching-order-like layers and colours)
