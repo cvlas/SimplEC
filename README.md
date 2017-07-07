@@ -35,8 +35,6 @@ Then, load the compiler source code and call the main routine, as follows:
 	?- simplEC('sample_rules.txt','event_description.prolog','declarations.prolog', 'dependency_graph.txt').
     true.
 
-The above commands produce 3 files as output. RTEC-compatible action descriptions and declarations, along with a text file representing the dependencies between the various actions within the domain. The latter file could be later used as input to GraphViz (http://www.graphviz.org/) to visualize these dependencies.
-
 The main routine simplEC needs 4 arguments as input:
 
 1) The input rules in SimplEC
@@ -45,7 +43,17 @@ The main routine simplEC needs 4 arguments as input:
 
 3) A name for the output Declarations file
 
-4) A name for the output dependency graph text file
+4) A name for the output dependency graph text file. This file will later be used as input to GraphViz (http://www.graphviz.org/) to visualize these dependencies.
+
+If Prolog answers "true." in all commands, then everything went well and the rules have been successfully compiled into RTEC and GraphViz compatible formats.
+4 files are produced as output:
+
+1) RTEC-compatible action descriptions
+
+2) RTEC-compatible declarations
+
+3) Text file representing the dependencies between the various actions within the domain.
+
+4) Log file reporting any compilation errors
 
 
-If Prolog answers "true." in all commands, then everything went well and the rules have been successfully compiled into RTEC rules ("event_description.prolog") and declarations ("declarations.prolog").
