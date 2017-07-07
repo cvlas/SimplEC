@@ -57,11 +57,12 @@ simplEC(InputFile, OutputFile, DeclarationsFile, GraphFile) :-
 	atomics_to_string([InputName, ".log"], LogFile),
 	open(InputFile, read, Input),
 	open(DeclarationsFile, write, DeclStream),
-	open(LogFile, write, LogStream),
+	open(LogFile, write, LogStream), close(LogStream),
 	tell(OutputFile),
 	
 	% Auxiliary global variables
 	nb_setval(intervalNo, 1),
+	nb_setval(logFile, LogFile),
 	
 	% Parse and translate the rules
 	read_stream_to_codes(Input, Codes),
@@ -112,7 +113,7 @@ simplEC(InputFile, OutputFile, DeclarationsFile, GraphFile) :-
 		write(DeclStream, Out)),
 		_),
 	told,
-	close(Input), close(DeclStream), close(LogStream),
+	close(Input), close(DeclStream),
 	
 	% Dependency graph preparation
 	findall(Q, member((_, Q), CachingOrdered), QS),
@@ -160,6 +161,16 @@ goal			--> 	[].
 ceDefinition		-->	initially.
 ceDefinition		-->	holdsFor.
 ceDefinition		-->	starAt.
+ceDefinition		-->	string_without([46], ErrRule), ".",
+				{
+					string_codes(ErrRuleStr, ErrRule),
+					nb_getval(logFile, LogFile),
+					open(LogFile, append, LogStream),
+					write(LogStream, "IN RULE:\n"),
+					write(LogStream, ErrRuleStr),
+					write(LogStream, "\nERROR: Unknown event pattern detected.\nPlease check your syntax.\n\n"),
+					close(LogStream)
+				}.
 
 initially		-->	"initially", space, fluent("simple", "output", CTStr, DeclRepr, _, _, null), ".",
 				{
@@ -168,6 +179,12 @@ initially		-->	"initially", space, fluent("simple", "output", CTStr, DeclRepr, _
 					assertz(cachingPriority(DeclRepr, 1)),
 					propagatePriority(DeclRepr, 1)
 				}.
+%initially		-->	{
+%					nb_getval(logFile, LogFile),
+%					open(LogFile, append, LogStream),
+%					write(LogStream, "WARNING: Event pattern is not a valid \"initially\".\n\n"),
+%					close(LogStream)
+%				}, !.
 					
 holdsFor		--> 	head(Head, HeadDeclRepr), space, sep("iff"), space, {nb_setval(intervalNo, 1)}, forBody(Body, BodyPriority, HeadDeclRepr), ".",
 				{
@@ -207,6 +224,12 @@ holdsFor		--> 	head(Head, HeadDeclRepr), space, sep("iff"), space, {nb_setval(in
 					assertz(noCaching(HeadDeclRepr)),
 					findall((D, P), (cachingPriority(D, P), sub_string(D, 0, _, _, Prefix), assertz(head(D)), HeadPriority > P, assertz(cachingPriority(D, HeadPriority)), propagatePriority(D, HeadPriority)), _))
 				}.
+%holdsFor		-->	{
+%					nb_getval(logFile, LogFile),
+%					open(LogFile, append, LogStream),
+%					write(LogStream, "WARNING: Event pattern is not a valid \"holdsFor\".\n\n"),
+%					close(LogStream)
+%				}, !.
 
 starAt			-->	head(Head, HeadDeclRepr), space, sep("if"), space, atBody(Body, BodyPriority, HeadDeclRepr), ".",
 				{
@@ -243,6 +266,12 @@ starAt			-->	head(Head, HeadDeclRepr), space, sep("if"), space, atBody(Body, Bod
 					;
 					true)
 				}.
+%starAt			-->	{
+%					nb_getval(logFile, LogFile),
+%					open(LogFile, append, LogStream),
+%					write(LogStream, "WARNING: Event pattern is not a valid \"initiatedAt/terminatedAt/happensAt\".\n\n"),
+%					close(LogStream)
+%				}, !.
 	
 sep("iff")		--> 	"iff".
 sep("if")		--> 	"if".

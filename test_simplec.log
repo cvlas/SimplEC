@@ -1,0 +1,5 @@
+IN RULE:
+this is an invalid event pattern
+ERROR: Unknown event pattern detected.
+Please check your syntax.
+
