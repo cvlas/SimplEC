@@ -1,53 +1,32 @@
-goal		::= 	rule*
+Initially	::=	"initially", Fluent
 
-rule		::=	initially
-		|	holdsFor
-		|	initiatedAt
-		|	terminatedAt
-		|	happensAt
+HappensAt	::=	"happens", Event, "if", HappensAtBody
 
-initially	::=	"initially", fluent
+InitiatedAt	::=	"initiate", Fluent, "if", HappensAtBody
 
-holdsFor	::= 	"holds", fluent, "iff", forBody
+TerminatedAt	::=	"terminate", Fluent, "if", HappensAtBody
 
-initiatedAt	::=	"initiate", fluent, "if", atBody
+HoldsFor	::= 	"holds", Fluent, "iff", HoldsForBody
 
-terminatedAt	::=	"terminate", fluent, "if", atBody
+Event		::=	functor, "(", argumentsList, ")"
 
-happensAt	::=	"happens", event, "if", atBody
+Fluent		::= 	functor, "(", argumentsList, ")", (value)?
 
-fluent		::= 	functor, "(", argumentsList, ")", (value)?
+HappensAtBody	::=	"start", Fluent, (",", Condition)*
+		|	"end", Fluent, (",", Condition)*
+		|	"happens", Event, (",", Condition)*
+		|	"not happens", Event, (",", Condition)*
 
-event		::=	functor, "(", argumentsList, ")"
+Condition	::=	"start", Fluent
+		|	"end", Fluent
+		|	"happens", Event
+		|	"not happens", Event
+		|	"holds" Fluent
+		|	"not holds", Fluent
 
-forBody		::=	expression
+HoldsForBody	::=	Expression
 
-expression	::=	component, ([","|"or"], component)*
-
-component	::=	fluent
-		|	"(", expression, ")"
-		|	"not", expression
-
-atBody		::=	"start", fluent, (",", condition)*
-		|	"end", fluent, (",", condition)*
-		|	"happens", event, (",", condition)*
-		|	"not happens", event, (",", condition)*
-
-condition	::=	"start", fluent
-		|	"end", fluent
-		|	"happens", event
-		|	"not happens", event
-		|	"holds" fluent
-		|	"not holds", fluent
-
-functor 	::= 	[a-z], [a-zA-Z0-9_]*
-
-variable	::=	[A-Z_], [a-zA-Z0-9_]*
-
-number		::= 	[0-9]+
-
-argument 	::= 	[a-zA-Z0-9_]+
-
-value		::=	"=", argument
-
-argumentsList	::= 	argument, (",", argument)*
+Expression	::=	Fluent, ([","|"or"], Fluent)*
+		|	"(", Expression, ")"
+		|	"not", Expression
+		|	Expression, ([","|"or"], Expression)*

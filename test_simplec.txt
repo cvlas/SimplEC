@@ -14,12 +14,12 @@ holds dddt(A,B) iff
 
 initially passenger_density(_,_)=low.
 
-initiate passenger_density(Id, VehicleType)=Value if
+inititate passenger_density(Id, VehicleType)=Value if
 	happens passenger_density_change(Id, VehicleType, Value).
 
 
 
-this is an invalid event pattern.
+
 
 
 holds working(X) iff

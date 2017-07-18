@@ -6,52 +6,69 @@
 % AUXILIARY TOOLS
 % -----------------------------------------------
 
-% Split a list into its head and the rest
-
+% Split a list into its head and the rest.
 list_head([H|T], H, T).
 
-% Add an element to the head or the tail of a list
-
+% Add an element to the head or the tail of a list.
 addToHead(L, H, [H|L]).
 
 addToTail([], E, [E]).
 addToTail([H|T], E, [H|L]) :- addToTail(T, E, L).
 
-% Update the caching priority of an element and propagate this update to all output entities that depend on it
-
+% Update the caching priority of an element and propagate this update to all output entities that depend on it.
 propagatePriority(E, P) :-
-	%sleep(1),
-	%write("\n\nLook, as far as I know, the priority of "), write(E), write(" is "), write(P),
-	%write(". I am going to propagate this to all dependants...\n"),
-	(\+ defines(E, _, _) -> true %write("There are no dependants. Exiting...\n\n")
+	
+	% Initially, the caching priority of E is P.
+	% If there are no dependents, exit.
+	(\+ defines(E, _, _) -> true
 	;
-	defines(E, E, _) -> true %write("Self-dependency. Exiting...\n\n")
+	
+	% If E is Self-dependent, exit
+	defines(E, E, _) -> true
 	;
+	
+	% Else, update the caching priorities of all dependants.
+	% Find all direct dependents (list has at least one element). Sort them and remove duplicates.
 	findall(H, defines(E, H, _), Heads), Heads \= [], sort(Heads, HeadsSorted),
-	%write("Dependants Unsorted: "), write(Heads), write("\tDependants Sorted: "), write(HeadsSorted), nl,
+	
+	% Find and remove all dependencies with the old value C (Future work: Do this only if old value C \= P)
 	findall((E, B, C), (defines(E, B, C), retract(defines(E, B, C))), _),
+	
+	% For each direct dependent of E assert new dependency with new value P.
 	forall(member(H, HeadsSorted), (assertz(defines(E, H, P)), 
-	%write("Asserted new dependency for rule "), write(H), write(". Now the new priority of "), write(H), 
-	calculatePriority(H, Q), 
-	%write(" is "), write(Q),
+	
+	% Calculate the new caching priority of dependent H, based on the new dependencies.
+	calculatePriority(H, Q),
 	assertz(cachingPriority(H, Q)),
-	%write("! Repeating procedure...\n\n"), 
+	
+	% Repeat procedure, this time for dependent H.
 	propagatePriority(H, Q)))).
 
+% Caclulate the caching priority of an output entity by looking at its dependencies.
 calculatePriority(H, Q) :-
+	
+	% Find all dependencies of H, along with their caching priority values.
 	findall(dddt(O,P), defines(O, H, P), OPS),
+	
+	% Alphabetically sort dependencies, removing duplicates. (Future work: Are both sortings needed?)
 	sort(2, @>=, OPS, OOPS),
 	sort(1, @<, OOPS, OOPSS),
+	
+	% Gather the caching priorities of the dependencies of H in a list
+	% Take the sum of all values in this list
+	% The updated caching priority of H will be the sum of the caching priorities of its dependencies + 1
+	% Adding 1 to the amount above ensures that H will be higher in the caching hierarchy than all of its dependencies.
 	findall(P, member(dddt(_, P), OOPSS), PS),
-	%write("\n"),write(OOPSS),nl,
 	sum_list(PS, TmpQ),
 	Q is TmpQ + 1.
 
 % -----------------------------------------------
 % SIMPL-EC
 % -----------------------------------------------
-	
+
 simplEC(InputFile, OutputFile, DeclarationsFile, GraphFile) :-
+	
+	% Prepare files for reading and writing
 	split_string(InputFile, ".", "", InputFileTokens),
 	list_head(InputFileTokens, InputName, _),
 	atomics_to_string([InputName, ".log"], LogFile),
@@ -60,50 +77,61 @@ simplEC(InputFile, OutputFile, DeclarationsFile, GraphFile) :-
 	open(LogFile, write, LogStream), close(LogStream),
 	tell(OutputFile),
 	
-	% Auxiliary global variables
+	% Set auxiliary global variables for interval numbering and logfile production
 	nb_setval(intervalNo, 1),
 	nb_setval(logFile, LogFile),
 	
-	% Parse and translate the rules
+	% Parse and translate the rules into RTEC format
 	read_stream_to_codes(Input, Codes),
 	phrase(goal, Codes),
 	
-	findall(looloody(DeclRepr, IndRepr, Type, EType), (declared(DeclRepr, IndRepr, Type, EType), retract(declared(DeclRepr, IndRepr, Type, EType))), Tuples),
+	% Build declarations:
+	% Find all declared entities. Store them in a list and forget everything else about them.
+	% Sort declared entities and remove duplicates.
+	% If an entity appears in the rules both as an input and an output entity, we consider it an output entity.
+	% After having the declared entities filtered, we assert them anew.
+	findall(declFact(DeclRepr, IndRepr, Type, EType), (declared(DeclRepr, IndRepr, Type, EType), retract(declared(DeclRepr, IndRepr, Type, EType))), Tuples),
 	sort(4, @>=, Tuples, TuplesDistorted),
 	sort(1, @<, TuplesDistorted, TuplesSorted),
-	forall(member(looloody(DeclRepr, IndRepr, Type, EType), TuplesSorted), assertz(declared(DeclRepr, IndRepr, Type, EType))),
+	forall(member(declFact(DeclRepr, IndRepr, Type, EType), TuplesSorted), assertz(declared(DeclRepr, IndRepr, Type, EType))),
 	
+	% Find and print all input events.
 	findall((DeclRepr, IndRepr, "event", "input"),
 		(declared(DeclRepr, IndRepr, "event", "input"),
 		atomics_to_string(["event(", DeclRepr, ").\tinputEntity(", DeclRepr, ").\tindex(", IndRepr, ").\n"], "", OutStr),
 		write(DeclStream, OutStr)),
 		_), nl(DeclStream),
 	
+	% Find and print all input SDF's.
 	findall((DeclRepr, IndRepr, "sD", "input"),
 		(declared(DeclRepr, IndRepr, "sD", "input"),
 		atomics_to_string(["sDFluent(", DeclRepr, ").\tinputEntity(", DeclRepr, ").\tindex(", IndRepr, ").\n"], "", OutStr),
 		write(DeclStream, OutStr)),
 		_), nl(DeclStream),
 	
+	% Find and print all output events.
 	findall((DeclRepr, IndRepr, "event", "output"),
 		(declared(DeclRepr, IndRepr, "event", "output"),
 		atomics_to_string(["event(", DeclRepr, ").\toutputEntity(", DeclRepr, ").\tindex(", IndRepr, ").\n"], "", OutStr),
 		write(DeclStream, OutStr)),
 		_), nl(DeclStream),
 	
+	% Find and print all Simple Fluents.
 	findall((DeclRepr, IndRepr, "simple", "output"),
 		(declared(DeclRepr, IndRepr, "simple", "output"),
 		atomics_to_string(["simpleFluent(", DeclRepr, ").\toutputEntity(", DeclRepr, ").\tindex(", IndRepr, ").\n"], "", OutStr),
 		write(DeclStream, OutStr)),
 		_), nl(DeclStream),
 	
+	% Find and print all output SDF's.
 	findall((DeclRepr, IndRepr, "sD", "output"),
 		(declared(DeclRepr, IndRepr, "sD", "output"),
 		atomics_to_string(["sDFluent(", DeclRepr, ").\toutputEntity(", DeclRepr, ").\tindex(", IndRepr, ").\n"], "", OutStr),
 		write(DeclStream, OutStr)),
 		_), nl(DeclStream),
 	
-	% Caching order only applies to output entities
+	% For each output entity (among those that have not been flagged as "noCaching") find its maximal caching priority
+	% Sort by caching priority value, in ascending order and print in the declarations file
 	findall((H, Q), (head(H), \+ noCaching(H), findall(Pr, cachingPriority(H, Pr), Prs), max_list(Prs, Q)), CachingUnordered),
 	sort(1, @<, CachingUnordered, CachingSorted),
 	sort(2, @=<, CachingSorted, CachingOrdered),
@@ -115,7 +143,11 @@ simplEC(InputFile, OutputFile, DeclarationsFile, GraphFile) :-
 	told,
 	close(Input), close(DeclStream),
 	
-	% Dependency graph preparation
+	% Dependency graph preparation:
+	% Create a mapping of the form Q -> {H1, H2, ..., Hn}
+	% where Q is a caching priority value and {H1, H2, ..., Hn} are the entities
+	% that have Q as their caching priority value
+	% (input entities are considered to have Q = 0)
 	findall(Q, member((_, Q), CachingOrdered), QS),
 	findall(H, member((H, _), CachingOrdered), HS),
 	findall(H0, (declared(H0, _, _, _), \+ member((H0, _), CachingOrdered)), H0S),
@@ -124,21 +156,15 @@ simplEC(InputFile, OutputFile, DeclarationsFile, GraphFile) :-
 	pairs_keys_values(QLS, List1, List2),
 	findall((L1, L2), (member(L1, List1), nth1(Index, List1, L1), nth1(Index, List2, L2)), AlmostFinalList),
 	addToHead(AlmostFinalList, (0, H0S), FinalList),
-	%writeln(FinalList),
 	
-	% Dependency graph generation
+	% Dependency graph generation:
+	% Use the mapping above to group entities of the same caching level together in the graph.
+	% Use the existing dependencies to add directed edges to the graph.
 	tell(GraphFile),
 	write("digraph\n{\n\tnode [shape=Mrecord];\n\trankdir=LR;\n\tranksep=\"1.5 equally\";\n\n"),
-	
 	forall(member((Q, L), FinalList), (findall(LabelPart, (member(Part, L), atomics_to_string(["<", Part, "> ", Part], LabelPart)), LabelParts), atomics_to_string(LabelParts, "|", Label), atomics_to_string(["\t", Q, " [label=\"", Label, "\"];\n"], Line), write(Line))),nl,
-	
-	%findall((A, B, C), (defines(A, B, C), write("defines "), write(A), write(", "), write(B), write(", "), write(C), write("\n")), _),
-	%findall((A), (noCaching(A), write("noCaching "), write(A), write("\n")), _),
 	findall((A, BPrefix, C), (defines(A, B, C), noCaching(B), retract(defines(A, B, C)), split_string(B, "=", "", BParts), list_head(BParts, BPrefix, _)), DefinesPending),
 	findall(D, (declared(D, _, _, _), split_string(D, "=", "", DParts), list_head(DParts, DPrefix, _), member((A, DPrefix, C), DefinesPending), assertz(defines(A, D, C))), _),
-	%findall((A, B, C), (defines(A, B, C), write("defines "), write(A), write(", "), write(B), write(", "), write(C), write("\n")), _),
-	
-	%findall(edge(CI, I, CJ, J), (defines(I, J, _), member(I, SomeH), member((CI, SomeH), FinalList), member(J, SomeOtherH), member((CJ, SomeOtherH), FinalList)), Edges),
 	findall(edge(CI, I, CJ, J), (defines(I, J, _), member((J, CJ), CachingOrdered), (member((I, CI), CachingOrdered) -> true ; CI is 0)), Edges),
 	sort(Edges, EdgesSorted),
 	forall(member(edge(CK, K, CL, L), EdgesSorted), (write("\t"), write(CK), write(":\""), write(K), write("\" -> "), write(CL), write(":\""), write(L), writeln("\""))),
@@ -163,6 +189,7 @@ ceDefinition		-->	holdsFor.
 ceDefinition		-->	starAt.
 ceDefinition		-->	string_without([46], ErrRule), ".",
 				{
+					% Write error message in log file
 					string_codes(ErrRuleStr, ErrRule),
 					nb_getval(logFile, LogFile),
 					open(LogFile, append, LogStream),
@@ -179,12 +206,6 @@ initially		-->	"initially", space, fluent("simple", "output", CTStr, DeclRepr, _
 					assertz(cachingPriority(DeclRepr, 1)),
 					propagatePriority(DeclRepr, 1)
 				}.
-%initially		-->	{
-%					nb_getval(logFile, LogFile),
-%					open(LogFile, append, LogStream),
-%					write(LogStream, "WARNING: Event pattern is not a valid \"initially\".\n\n"),
-%					close(LogStream)
-%				}, !.
 					
 holdsFor		--> 	head(Head, HeadDeclRepr), space, sep("iff"), space, {nb_setval(intervalNo, 1)}, forBody(Body, BodyPriority, HeadDeclRepr), ".",
 				{
@@ -224,12 +245,6 @@ holdsFor		--> 	head(Head, HeadDeclRepr), space, sep("iff"), space, {nb_setval(in
 					assertz(noCaching(HeadDeclRepr)),
 					findall((D, P), (cachingPriority(D, P), sub_string(D, 0, _, _, Prefix), assertz(head(D)), HeadPriority > P, assertz(cachingPriority(D, HeadPriority)), propagatePriority(D, HeadPriority)), _))
 				}.
-%holdsFor		-->	{
-%					nb_getval(logFile, LogFile),
-%					open(LogFile, append, LogStream),
-%					write(LogStream, "WARNING: Event pattern is not a valid \"holdsFor\".\n\n"),
-%					close(LogStream)
-%				}, !.
 
 starAt			-->	head(Head, HeadDeclRepr), space, sep("if"), space, atBody(Body, BodyPriority, HeadDeclRepr), ".",
 				{
@@ -266,12 +281,6 @@ starAt			-->	head(Head, HeadDeclRepr), space, sep("if"), space, atBody(Body, Bod
 					;
 					true)
 				}.
-%starAt			-->	{
-%					nb_getval(logFile, LogFile),
-%					open(LogFile, append, LogStream),
-%					write(LogStream, "WARNING: Event pattern is not a valid \"initiatedAt/terminatedAt/happensAt\".\n\n"),
-%					close(LogStream)
-%				}, !.
 	
 sep("iff")		--> 	"iff".
 sep("if")		--> 	"if".
