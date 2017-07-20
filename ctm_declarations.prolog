@@ -32,3 +32,17 @@ sDFluent(passenger_comfort(_,_)=reducing).	outputEntity(passenger_comfort(_,_)=r
 sDFluent(passenger_satisfaction(_,_)=reducing).	outputEntity(passenger_satisfaction(_,_)=reducing).	index(passenger_satisfaction(Id,_)=reducing, Id).
 sDFluent(punctuality(_,_)=non_punctual).	outputEntity(punctuality(_,_)=non_punctual).	index(punctuality(Id,_)=non_punctual, Id).
 
+cachingOrder(driving_style(_,_)=uncomfortable).	%1
+cachingOrder(driving_style(_,_)=unsafe).	%1
+cachingOrder(internal_temperature(_,_)=normal).	%1
+cachingOrder(noise_level(_,_)=low).	%1
+cachingOrder(passenger_density(_,_)=low).	%1
+cachingOrder(punctuality(_,_)=punctual).	%1
+cachingOrder(driver_comfort(_,_)=reducing).	%2
+cachingOrder(driving_quality(_,_)=high).	%2
+cachingOrder(driving_quality(_,_)=medium).	%2
+cachingOrder(passenger_comfort(_,_)=reducing).	%2
+cachingOrder(punctuality(_,_)=non_punctual).	%2
+cachingOrder(driving_quality(_,_)=low).	%3
+cachingOrder(passenger_satisfaction(_,_)=reducing).	%3
+cachingOrder(punctuality_change(_,_,_)).	%3

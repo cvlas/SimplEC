@@ -33,3 +33,15 @@ sDFluent(resting(_)=true).	outputEntity(resting(_)=true).	index(resting(X)=true,
 sDFluent(sad(_)=true).	outputEntity(sad(_)=true).	index(sad(X)=true, X).
 sDFluent(working(_)=true).	outputEntity(working(_)=true).	index(working(X)=true, X).
 
+cachingOrder(passenger_density(_,_)=low).	%0
+cachingOrder(c(_)=true).	%1
+cachingOrder(dddt(_,_)=true).	%1
+cachingOrder(fighting(_,_)=true).	%1
+cachingOrder(friends(_,_)=true).	%1
+cachingOrder(moving(_,_)=true).	%1
+cachingOrder(punctuality_change(_,_,_)).	%1
+cachingOrder(resting(_)=true).	%1
+cachingOrder(working(_)=true).	%1
+cachingOrder(a(_)=true).	%2
+cachingOrder(happy(_)=true).	%2
+cachingOrder(sad(_)=true).	%2

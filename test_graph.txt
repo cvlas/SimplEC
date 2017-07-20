@@ -4,7 +4,10 @@ digraph
 	rankdir=LR;
 	ranksep="1.2 equally";
 
-	0 [label="<a(_)=true> a(_)=true|<abrupt(_)=true> abrupt(_)=true|<b(_)> b(_)|<c(_)=true> c(_)=true|<changingDiapers(_)=true> changingDiapers(_)=true|<close(_,_)=true> close(_,_)=true|<d(_)> d(_)|<dddt(_,_)=true> dddt(_,_)=true|<exit(_)> exit(_)|<fighting(_,_)=true> fighting(_,_)=true|<friends(_,_)=true> friends(_,_)=true|<happy(_)=true> happy(_)=true|<inactive(_)=true> inactive(_)=true|<loc(_)=home> loc(_)=home|<loc(_)=pub> loc(_)=pub|<loc(_)=work> loc(_)=work|<moving(_,_)=true> moving(_,_)=true|<onHoliday(_)=true> onHoliday(_)=true|<passenger_density(_,_)=high> passenger_density(_,_)=high|<passenger_density(_,_)=low> passenger_density(_,_)=low|<poor(_)=true> poor(_)=true|<punctuality(_,_)=non_punctual> punctuality(_,_)=non_punctual|<punctuality(_,_)=punctual> punctuality(_,_)=punctual|<punctuality_change(_,_,_)> punctuality_change(_,_,_)|<resting(_)=true> resting(_)=true|<rich(_)=true> rich(_)=true|<sad(_)=true> sad(_)=true|<takingBreak(_)=true> takingBreak(_)=true|<walking(_)=true> walking(_)=true|<working(_)=true> working(_)=true"];
+	0 [label="<abrupt(_)=true> abrupt(_)=true|<b(_)> b(_)|<changingDiapers(_)=true> changingDiapers(_)=true|<close(_,_)=true> close(_,_)=true|<d(_)> d(_)|<exit(_)> exit(_)|<inactive(_)=true> inactive(_)=true|<loc(_)=home> loc(_)=home|<loc(_)=pub> loc(_)=pub|<loc(_)=work> loc(_)=work|<onHoliday(_)=true> onHoliday(_)=true|<passenger_density(_,_)=high> passenger_density(_,_)=high|<poor(_)=true> poor(_)=true|<punctuality(_,_)=non_punctual> punctuality(_,_)=non_punctual|<punctuality(_,_)=punctual> punctuality(_,_)=punctual|<rich(_)=true> rich(_)=true|<takingBreak(_)=true> takingBreak(_)=true|<walking(_)=true> walking(_)=true"];
+	0 [label="<passenger_density(_,_)=low> passenger_density(_,_)=low"];
+	1 [label="<c(_)=true> c(_)=true|<dddt(_,_)=true> dddt(_,_)=true|<fighting(_,_)=true> fighting(_,_)=true|<friends(_,_)=true> friends(_,_)=true|<moving(_,_)=true> moving(_,_)=true|<punctuality_change(_,_,_)> punctuality_change(_,_,_)|<resting(_)=true> resting(_)=true|<working(_)=true> working(_)=true"];
+	2 [label="<a(_)=true> a(_)=true|<happy(_)=true> happy(_)=true|<sad(_)=true> sad(_)=true"];
 
 	0:"abrupt(_)=true" -> 1:"fighting(_,_)=true"
 	0:"b(_)" -> 2:"a(_)=true"

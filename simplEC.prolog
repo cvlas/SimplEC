@@ -158,10 +158,13 @@ simplEC(InputFile, OutputFile, DeclarationsFile, GraphFile) :-
 	% For each output entity (among those that have not been flagged as "noCaching") find its level in the caching hierarchy
 	% Sort by caching priority value, in ascending order and print in the declarations file
 	findall(cachingHierarchy(Node, Level), (head(Node), \+ noCaching(Node), cachingLevel(Node, Level)), CachingUnordered),
+	%write(CachingUnordered),
 	sort(1, @<, CachingUnordered, CachingSorted),
+	%write(CachingSorted),
 	sort(2, @=<, CachingSorted, CachingOrdered),
+	%write(CachingOrdered),
 	findall(H,
-		(member((H, Q), CachingOrdered),
+		(member(cachingHierarchy(H, Q), CachingOrdered),
 		atomics_to_string(["cachingOrder(", H, ").\t%", Q, "\n"], "", Out),
 		write(DeclStream, Out)),
 		_),
@@ -173,9 +176,9 @@ simplEC(InputFile, OutputFile, DeclarationsFile, GraphFile) :-
 	% where Q is a caching priority value and {H1, H2, ..., Hn} are the entities
 	% that have Q as their caching priority value
 	% (input entities are considered to have Q = 0)
-	findall(Q, member((_, Q), CachingOrdered), QS),
-	findall(H, member((H, _), CachingOrdered), HS),
-	findall(H0, (declared(H0, _, _, _), \+ member((H0, _), CachingOrdered)), H0S),
+	findall(Q, member(cachingHierarchy(_, Q), CachingOrdered), QS),
+	findall(H, member(cachingHierarchy(H, _), CachingOrdered), HS),
+	findall(H0, (declared(H0, _, _, _), \+ member(cachingHierarchy(H0, _), CachingOrdered)), H0S),
 	pairs_keys_values(QHS, QS, HS),
 	group_pairs_by_key(QHS, QLS),
 	pairs_keys_values(QLS, List1, List2),
