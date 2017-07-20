@@ -25,17 +25,3 @@ sDFluent(greeting1(_,_)=true).	outputEntity(greeting1(_,_)=true).	index(greeting
 sDFluent(greeting2(_,_)=true).	outputEntity(greeting2(_,_)=true).	index(greeting2(P1,_)=true, P1).
 sDFluent(moving(_,_)=true).	outputEntity(moving(_,_)=true).	index(moving(P1,_)=true, P1).
 
-cachingOrder(leaving_object(_,_)=false).	%1
-cachingOrder(person(_)=false).	%1
-cachingOrder(person(_)=true).	%1
-cachingOrder(activeOrInactivePerson(_)=true).	%2
-cachingOrder(close(_,_,_)=true).	%4
-cachingOrder(close(_,_,_)=false).	%5
-cachingOrder(fighting(_,_)=true).	%5
-cachingOrder(moving(_,_)=true).	%5
-cachingOrder(meeting(_,_)=false).	%6
-cachingOrder(greeting2(_,_)=true).	%7
-cachingOrder(greeting1(_,_)=true).	%8
-cachingOrder(closeSymmetric(_,_,_)=true).	%9
-cachingOrder(leaving_object(_,_)=true).	%11
-cachingOrder(meeting(_,_)=true).	%16

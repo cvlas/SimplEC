@@ -16,51 +16,59 @@ addToTail([], E, [E]).
 addToTail([H|T], E, [H|L]) :- addToTail(T, E, L).
 
 % Update the caching priority of an element and propagate this update to all output entities that depend on it.
-propagatePriority(E, P) :-
-	
-	% Initially, the caching priority of E is P.
-	% If there are no dependents, exit.
-	(\+ defines(E, _, _) -> true
-	;
-	
-	% If E is Self-dependent, exit
-	defines(E, E, _) -> true
-	;
-	
-	% Else, update the caching priorities of all dependants.
-	% Find all direct dependents (list has at least one element). Sort them and remove duplicates.
-	findall(H, defines(E, H, _), Heads), Heads \= [], sort(Heads, HeadsSorted),
-	
-	% Find and remove all dependencies with the old value C (Future work: Do this only if old value C \= P)
-	findall((E, B, C), (defines(E, B, C), retract(defines(E, B, C))), _),
-	
-	% For each direct dependent of E assert new dependency with new value P.
-	forall(member(H, HeadsSorted), (assertz(defines(E, H, P)), 
-	
-	% Calculate the new caching priority of dependent H, based on the new dependencies.
-	calculatePriority(H, Q),
-	assertz(cachingPriority(H, Q)),
-	
-	% Repeat procedure, this time for dependent H.
-	propagatePriority(H, Q)))).
+%propagatePriority(E, P) :-
+%	
+%	% Initially, the caching priority of E is P.
+%	% If there are no dependents, exit.
+%	(\+ defines(E, _, _) -> true
+%	;
+%	
+%	% If E is Self-dependent, exit
+%	defines(E, E, _) -> true
+%	;
+%	
+%	% Else, update the caching priorities of all dependants.
+%	% Find all direct dependents (list has at least one element). Sort them and remove duplicates.
+%	findall(H, defines(E, H, _), Heads), Heads \= [], sort(Heads, HeadsSorted),
+%	
+%	% Find and remove all dependencies with the old value C (Future work: Do this only if old value C \= P)
+%	findall((E, B, C), (defines(E, B, C), retract(defines(E, B, C))), _),
+%	
+%	% For each direct dependent of E assert new dependency with new value P.
+%	forall(member(H, HeadsSorted), (assertz(defines(E, H, P)), 
+%	
+%	% Calculate the new caching priority of dependent H, based on the new dependencies.
+%	calculatePriority(H, Q),
+%	assertz(cachingPriority(H, Q)),
+%	
+%	% Repeat procedure, this time for dependent H.
+%	propagatePriority(H, Q)))).
 
 % Caclulate the caching priority of an output entity by looking at its dependencies.
-calculatePriority(H, Q) :-
-	
-	% Find all dependencies of H, along with their caching priority values.
-	findall(dddt(O,P), defines(O, H, P), OPS),
-	
-	% Alphabetically sort dependencies, removing duplicates. (Future work: Are both sortings needed?)
-	sort(2, @>=, OPS, OOPS),
-	sort(1, @<, OOPS, OOPSS),
-	
-	% Gather the caching priorities of the dependencies of H in a list
-	% Take the sum of all values in this list
-	% The updated caching priority of H will be the sum of the caching priorities of its dependencies + 1
-	% Adding 1 to the amount above ensures that H will be higher in the caching hierarchy than all of its dependencies.
-	findall(P, member(dddt(_, P), OOPSS), PS),
-	sum_list(PS, TmpQ),
-	Q is TmpQ + 1.
+%calculatePriority(H, Q) :-
+%	
+%	% Find all dependencies of H, along with their caching priority values.
+%	findall(dddt(O,P), defines(O, H, P), OPS),
+%	
+%	% Alphabetically sort dependencies, removing duplicates. (Future work: Are both sortings needed?)
+%	sort(2, @>=, OPS, OOPS),
+%	sort(1, @<, OOPS, OOPSS),
+%	
+%	% Gather the caching priorities of the dependencies of H in a list
+%	% Take the sum of all values in this list
+%	% The updated caching priority of H will be the sum of the caching priorities of its dependencies + 1
+%	% Adding 1 to the amount above ensures that H will be higher in the caching hierarchy than all of its dependencies.
+%	findall(P, member(dddt(_, P), OOPSS), PS),
+%	sum_list(PS, TmpQ),
+%	Q is TmpQ + 1.
+
+cachingLevel(Node, Level) :-
+	findall(Parent, (defines(Parent, Node, _), Parent \= Node), Parents),
+	(length(Parents, 0) -> Level is 0
+	;
+	(findall(L, (member(P, Parents), cachingLevel(P, L)), Levels),
+	max_list(Levels, MaxLevel),
+	Level is MaxLevel + 1)).
 
 % -----------------------------------------------
 % SIMPL-EC
@@ -84,6 +92,10 @@ simplEC(InputFile, OutputFile, DeclarationsFile, GraphFile) :-
 	% Parse and translate the rules into RTEC format
 	read_stream_to_codes(Input, Codes),
 	phrase(goal, Codes),
+	
+	% Finalize dependencies
+	findall((A, BPrefix, C), (defines(A, B, C), noCaching(B), retract(defines(A, B, C)), split_string(B, "=", "", BParts), list_head(BParts, BPrefix, _)), DefinesPending),
+	findall(D, (declared(D, _, _, _), split_string(D, "=", "", DParts), list_head(DParts, DPrefix, _), member((A, DPrefix, C), DefinesPending), assertz(defines(A, D, C))), _),
 	
 	% Build declarations:
 	% Find all declared entities. Store them in a list and forget everything else about them.
@@ -132,7 +144,20 @@ simplEC(InputFile, OutputFile, DeclarationsFile, GraphFile) :-
 	
 	% For each output entity (among those that have not been flagged as "noCaching") find its maximal caching priority
 	% Sort by caching priority value, in ascending order and print in the declarations file
-	findall((H, Q), (head(H), \+ noCaching(H), findall(Pr, cachingPriority(H, Pr), Prs), max_list(Prs, Q)), CachingUnordered),
+	%findall((H, Q), (head(H), \+ noCaching(H), findall(Pr, cachingPriority(H, Pr), Prs), max_list(Prs, Q)), CachingUnordered),
+	%sort(1, @<, CachingUnordered, CachingSorted),
+	%sort(2, @=<, CachingSorted, CachingOrdered),
+	%findall(H,
+	%	(member((H, Q), CachingOrdered),
+	%	atomics_to_string(["cachingOrder(", H, ").\t%", Q, "\n"], "", Out),
+	%	write(DeclStream, Out)),
+	%	_),
+	%told,
+	%close(Input), close(DeclStream),
+	
+	% For each output entity (among those that have not been flagged as "noCaching") find its level in the caching hierarchy
+	% Sort by caching priority value, in ascending order and print in the declarations file
+	findall(cachingHierarchy(Node, Level), (head(Node), \+ noCaching(Node), cachingLevel(Node, Level)), CachingUnordered),
 	sort(1, @<, CachingUnordered, CachingSorted),
 	sort(2, @=<, CachingSorted, CachingOrdered),
 	findall(H,
@@ -161,11 +186,10 @@ simplEC(InputFile, OutputFile, DeclarationsFile, GraphFile) :-
 	% Use the mapping above to group entities of the same caching level together in the graph.
 	% Use the existing dependencies to add directed edges to the graph.
 	tell(GraphFile),
-	write("digraph\n{\n\tnode [shape=Mrecord];\n\trankdir=LR;\n\tranksep=\"1.5 equally\";\n\n"),
+	write("digraph\n{\n\tnode [shape=Mrecord];\n\trankdir=LR;\n\tranksep=\"1.2 equally\";\n\n"),
 	forall(member((Q, L), FinalList), (findall(LabelPart, (member(Part, L), atomics_to_string(["<", Part, "> ", Part], LabelPart)), LabelParts), atomics_to_string(LabelParts, "|", Label), atomics_to_string(["\t", Q, " [label=\"", Label, "\"];\n"], Line), write(Line))),nl,
-	findall((A, BPrefix, C), (defines(A, B, C), noCaching(B), retract(defines(A, B, C)), split_string(B, "=", "", BParts), list_head(BParts, BPrefix, _)), DefinesPending),
-	findall(D, (declared(D, _, _, _), split_string(D, "=", "", DParts), list_head(DParts, DPrefix, _), member((A, DPrefix, C), DefinesPending), assertz(defines(A, D, C))), _),
-	findall(edge(CI, I, CJ, J), (defines(I, J, _), member((J, CJ), CachingOrdered), (member((I, CI), CachingOrdered) -> true ; CI is 0)), Edges),
+	%findall(edge(CI, I, CJ, J), (defines(I, J, _), member((J, CJ), CachingOrdered), (member((I, CI), CachingOrdered) -> true ; CI is 0)), Edges),
+	findall(edge(CI, I, CJ, J), (defines(I, J, _), cachingLevel(I, CI), cachingLevel(J, CJ)), Edges),
 	sort(Edges, EdgesSorted),
 	forall(member(edge(CK, K, CL, L), EdgesSorted), (write("\t"), write(CK), write(":\""), write(K), write("\" -> "), write(CL), write(":\""), write(L), writeln("\""))),
 	write("}\n"),
@@ -199,15 +223,15 @@ ceDefinition		-->	string_without([46], ErrRule), ".",
 					close(LogStream)
 				}.
 
-initially		-->	"initially", space, fluent("simple", "output", CTStr, DeclRepr, _, _, null), ".",
+initially		-->	"initially", space, fluent("simple", "output", CTStr, _, _, _, null), ".",
 				{
 					atomics_to_string(["initially(", CTStr, ").\n\n"], "", InitiallyStr),
-					write(InitiallyStr),
-					assertz(cachingPriority(DeclRepr, 1)),
-					propagatePriority(DeclRepr, 1)
+					write(InitiallyStr)
+					%assertz(cachingPriority(DeclRepr, 1)),
+					%propagatePriority(DeclRepr, 1)
 				}.
 					
-holdsFor		--> 	head(Head, HeadDeclRepr), space, sep("iff"), space, {nb_setval(intervalNo, 1)}, forBody(Body, BodyPriority, HeadDeclRepr), ".",
+holdsFor		--> 	head(Head, HeadDeclRepr), space, sep("iff"), space, {nb_setval(intervalNo, 1)}, forBody(Body, _, HeadDeclRepr), ".",
 				{
 					split_string(Body, "\n", ",\t\n", BodySubs),
 					findall((Term, VNames), (member(Sub, BodySubs), term_string(Term, Sub, [variable_names(VNames)])), Terms),
@@ -222,31 +246,31 @@ holdsFor		--> 	head(Head, HeadDeclRepr), space, sep("iff"), space, {nb_setval(in
 					
 					write(Head), write(" :-\n\t"), write(BodyFinal), write(".\n\n"),
 					
-					HeadPriority is BodyPriority + 1,
+					%HeadPriority is BodyPriority + 1,
+					%
+					%% Duplicate handling
+					%findall(P, cachingPriority(HeadDeclRepr, P), PS), max_list(PS, OldPriority),
+					%findall((HeadDeclRepr, P), (cachingPriority(HeadDeclRepr, P), retract(cachingPriority(HeadDeclRepr, P))), _),
+					%assertz(cachingPriority(HeadDeclRepr, OldPriority)),
 					
-					% Duplicate handling
-					findall(P, cachingPriority(HeadDeclRepr, P), PS), max_list(PS, OldPriority),
-					findall((HeadDeclRepr, P), (cachingPriority(HeadDeclRepr, P), retract(cachingPriority(HeadDeclRepr, P))), _),
-					assertz(cachingPriority(HeadDeclRepr, OldPriority)),
-					
-					% On multiple definitions, we keep the max priority.
-					(OldPriority >= HeadPriority -> true
-					;
-					retract(cachingPriority(HeadDeclRepr, OldPriority)),
-					assertz(cachingPriority(HeadDeclRepr, HeadPriority)),
-					propagatePriority(HeadDeclRepr, HeadPriority)),
+					%% On multiple definitions, we keep the max priority.
+					%(OldPriority >= HeadPriority -> true
+					%;
+					%retract(cachingPriority(HeadDeclRepr, OldPriority)),
+					%assertz(cachingPriority(HeadDeclRepr, HeadPriority)),
+					%propagatePriority(HeadDeclRepr, HeadPriority)),
 					
 					split_string(HeadDeclRepr, "=", "", Parts),
-					list_head(Parts, Prefix, [Value]),
+					list_head(Parts, _, [Value]),
 					string_codes(Value, ValueCodes),
 					list_head(ValueCodes, First, _),
 					(char_type(First, lower) -> true
 					;
-					assertz(noCaching(HeadDeclRepr)),
-					findall((D, P), (cachingPriority(D, P), sub_string(D, 0, _, _, Prefix), assertz(head(D)), HeadPriority > P, assertz(cachingPriority(D, HeadPriority)), propagatePriority(D, HeadPriority)), _))
+					assertz(noCaching(HeadDeclRepr)))
+					%findall((D, P), (cachingPriority(D, P), sub_string(D, 0, _, _, Prefix), assertz(head(D)), HeadPriority > P, assertz(cachingPriority(D, HeadPriority)), propagatePriority(D, HeadPriority)), _))
 				}.
 
-starAt			-->	head(Head, HeadDeclRepr), space, sep("if"), space, atBody(Body, BodyPriority, HeadDeclRepr), ".",
+starAt			-->	head(Head, HeadDeclRepr), space, sep("if"), space, atBody(Body, _, HeadDeclRepr), ".",
 				{
 					string_codes(Body, BodyCodes),
 					list_head(BodyCodes, _, CommaFreeBodyCodes),
@@ -254,30 +278,30 @@ starAt			-->	head(Head, HeadDeclRepr), space, sep("if"), space, atBody(Body, Bod
 					
 					write(Head), write(" :-"), write(CommaFreeBody), write(".\n\n"),
 					
-					HeadPriority is BodyPriority + 1,
+					%HeadPriority is BodyPriority + 1,
+					%
+					%% Duplicate handling
+					%findall(P, cachingPriority(HeadDeclRepr, P), PS), max_list(PS, OldPriority),
+					%findall((HeadDeclRepr, P), (cachingPriority(HeadDeclRepr, P), retract(cachingPriority(HeadDeclRepr, P))), _),
+					%assertz(cachingPriority(HeadDeclRepr, OldPriority)),
 					
-					% Duplicate handling
-					findall(P, cachingPriority(HeadDeclRepr, P), PS), max_list(PS, OldPriority),
-					findall((HeadDeclRepr, P), (cachingPriority(HeadDeclRepr, P), retract(cachingPriority(HeadDeclRepr, P))), _),
-					assertz(cachingPriority(HeadDeclRepr, OldPriority)),
-					
-					% On multiple definitions, we keep the max priority.
-					(OldPriority >= HeadPriority -> true
-					;
-					retract(cachingPriority(HeadDeclRepr, OldPriority)),
-					assertz(cachingPriority(HeadDeclRepr, HeadPriority)),
-					propagatePriority(HeadDeclRepr, HeadPriority)),
+					%% On multiple definitions, we keep the max priority.
+					%(OldPriority >= HeadPriority -> true
+					%;
+					%retract(cachingPriority(HeadDeclRepr, OldPriority)),
+					%assertz(cachingPriority(HeadDeclRepr, HeadPriority)),
+					%propagatePriority(HeadDeclRepr, HeadPriority)),
 					
 					split_string(HeadDeclRepr, "=", "", Parts),
 					length(Parts, Length),
 					(Length = 2 ->
-					(list_head(Parts, Prefix, [Value]),
+					(list_head(Parts, _, [Value]),
 					string_codes(Value, ValueCodes),
 					list_head(ValueCodes, First, _),
 					(char_type(First, lower) -> true
 					;
-					assertz(noCaching(HeadDeclRepr)),
-					findall((D, P), (cachingPriority(D, P), sub_string(D, 0, _, _, Prefix), assertz(head(D)), HeadPriority > P, assertz(cachingPriority(D, HeadPriority)), propagatePriority(D, HeadPriority)), _)))
+					assertz(noCaching(HeadDeclRepr))))
+					%findall((D, P), (cachingPriority(D, P), sub_string(D, 0, _, _, Prefix), assertz(head(D)), HeadPriority > P, assertz(cachingPriority(D, HeadPriority)), propagatePriority(D, HeadPriority)), _)))
 					;
 					true)
 				}.
@@ -330,9 +354,9 @@ fluent(Type, Etype, CTStr, DeclRepr, Priority, I, HeadDeclRepr)	--> 	functawr(Fn
 										;
 										assertz(declared(DeclRepr, IndRepr, Type, Etype)))),
 										
-										(cachingPriority(DeclRepr, _) -> (findall(P, cachingPriority(DeclRepr, P), PS), max_list(PS, Priority))
-										;
-										assertz(cachingPriority(DeclRepr, 0)), Priority = 0),
+										%(cachingPriority(DeclRepr, _) -> (findall(P, cachingPriority(DeclRepr, P), PS), max_list(PS, Priority))
+										%;
+										%assertz(cachingPriority(DeclRepr, 0)), Priority = 0),
 										
 										(HeadDeclRepr = null -> assertz(head(DeclRepr))
 										;
@@ -349,9 +373,9 @@ event(Etype, EvStr, DeclRepr, Priority, HeadDeclRepr)		-->	functawr(FncStr), "("
 										;
 										assertz(declared(DeclRepr, IndRepr, "event", Etype))),
 										
-										(cachingPriority(DeclRepr, _) -> (findall(P, cachingPriority(DeclRepr, P), PS), max_list(PS, Priority))
-										;
-										assertz(cachingPriority(DeclRepr, 0)), Priority = 0),
+										%(cachingPriority(DeclRepr, _) -> (findall(P, cachingPriority(DeclRepr, P), PS), max_list(PS, Priority))
+										%;
+										%assertz(cachingPriority(DeclRepr, 0)), Priority = 0),
 										
 										(HeadDeclRepr = null -> assertz(head(DeclRepr))
 										;
@@ -428,7 +452,7 @@ forBody(BodyStr, Priority, HeadDeclRepr)			-->	expression(ExprStr, _, Priority, 
 										atomics_to_string([ExprStr, ConStr], ",\n\t", BodyStr)
 									}.
 
-expression(ExprStr, I, Priority, HeadDeclRepr)			-->	component(CompStr, T1, Priority1, HeadDeclRepr), moreComponents(MCompStr, T2, and, Priority2, HeadDeclRepr),
+expression(ExprStr, I, _, HeadDeclRepr)			-->	component(CompStr, T1, _, HeadDeclRepr), moreComponents(MCompStr, T2, and, _, HeadDeclRepr),
 									{
 										nb_getval(intervalNo, Int),
 										string_concat("I", Int, I),
@@ -469,11 +493,11 @@ expression(ExprStr, I, Priority, HeadDeclRepr)			-->	component(CompStr, T1, Prio
 											addToTail(Terms, (intersect_all([Anon1, Anon2], AnonI), [T1Atom=Anon1, T2Atom=Anon2, IAtom=AnonI]), NewTerms)
 										),
 										findall(S, (member((T, V), NewTerms), term_string(T, S, [variable_names(V)])), ExprStrSplit),
-										atomics_to_string(ExprStrSplit, ",\n\t", ExprStr),
+										atomics_to_string(ExprStrSplit, ",\n\t", ExprStr)
 		
-										Priority is Priority1 + Priority2
+										%Priority is Priority1 + Priority2
 									}.
-expression(ExprStr, I, Priority, HeadDeclRepr)			-->	component(CompStr, T1, Priority1, HeadDeclRepr), moreComponents(MCompStr, T2, or, Priority2, HeadDeclRepr),
+expression(ExprStr, I, _, HeadDeclRepr)			-->	component(CompStr, T1, _, HeadDeclRepr), moreComponents(MCompStr, T2, or, _, HeadDeclRepr),
 									{
 										nb_getval(intervalNo, Int),
 										string_concat("I", Int, I),
@@ -507,9 +531,9 @@ expression(ExprStr, I, Priority, HeadDeclRepr)			-->	component(CompStr, T1, Prio
 											addToTail(Terms, (union_all([Anon1, Anon2], AnonI), [T1Atom=Anon1, T2Atom=Anon2, IAtom=AnonI]), NewTerms)
 										),
 										findall(S, (member((T, V), NewTerms), term_string(T, S, [variable_names(V)])), ExprStrSplit),
-										atomics_to_string(ExprStrSplit, ",\n\t", ExprStr),
+										atomics_to_string(ExprStrSplit, ",\n\t", ExprStr)
 		
-										Priority is Priority1 + Priority2
+										%Priority is Priority1 + Priority2
 									}.
 expression(ExprStr, I, Priority, HeadDeclRepr)			-->	component(ExprStr, I, Priority, HeadDeclRepr), moreComponents(null).
 
@@ -561,25 +585,25 @@ durationConstraint(DCStr)					-->	"duration", space, operator(OpStr), space, num
 										atomics_to_string([",\n\tfindall((S,E), (member((S,E), I", PrevInt, "), Diff is E-S, Diff ", OpStr, " ", NumStr, "), I", Int, ")"], "", DCStr)
 									}.
 
-atBody(AtBodyStr, Priority, HeadDeclRepr)			-->	"happens", space, event("input", CTStr, _, Priority1, HeadDeclRepr), moreConditions(MCondStr, Priority2, HeadDeclRepr),
+atBody(AtBodyStr, _, HeadDeclRepr)			-->	"happens", space, event("input", CTStr, _, _, HeadDeclRepr), moreConditions(MCondStr, _, HeadDeclRepr),
 									{
-										atomics_to_string([",\n\thappensAt(", CTStr, ", T)", MCondStr], "", AtBodyStr),
-										Priority is Priority1 + Priority2
+										atomics_to_string([",\n\thappensAt(", CTStr, ", T)", MCondStr], "", AtBodyStr)
+										%Priority is Priority1 + Priority2
 									}.
-atBody(AtBodyStr, Priority, HeadDeclRepr)			-->	"not happens", space, event("input", CTStr, _, Priority1, HeadDeclRepr), moreConditions(MCondStr, Priority2, HeadDeclRepr),
+atBody(AtBodyStr, _, HeadDeclRepr)			-->	"not happens", space, event("input", CTStr, _, _, HeadDeclRepr), moreConditions(MCondStr, _, HeadDeclRepr),
 									{
-										atomics_to_string([",\n\t\\+ happensAt(", CTStr, ", T)", MCondStr], "", AtBodyStr),
-										Priority is Priority1 + Priority2
+										atomics_to_string([",\n\t\\+ happensAt(", CTStr, ", T)", MCondStr], "", AtBodyStr)
+										%Priority is Priority1 + Priority2
 									}.
-atBody(AtBodyStr, Priority, HeadDeclRepr)			-->	"start", space, fluent("sD", "input", CTStr, _, Priority1, _, HeadDeclRepr), moreConditions(MCondStr, Priority2, HeadDeclRepr),
+atBody(AtBodyStr, _, HeadDeclRepr)			-->	"start", space, fluent("sD", "input", CTStr, _, _, _, HeadDeclRepr), moreConditions(MCondStr, _, HeadDeclRepr),
 									{
-										atomics_to_string([",\n\thappensAt(start(", CTStr, "), T)", MCondStr], "", AtBodyStr),
-										Priority is Priority1 + Priority2
+										atomics_to_string([",\n\thappensAt(start(", CTStr, "), T)", MCondStr], "", AtBodyStr)
+										%Priority is Priority1 + Priority2
 									}.
-atBody(AtBodyStr, Priority, HeadDeclRepr)			-->	"end", space, fluent("sD", "input", CTStr, _, Priority1, _, HeadDeclRepr), moreConditions(MCondStr, Priority2, HeadDeclRepr),
+atBody(AtBodyStr, _, HeadDeclRepr)			-->	"end", space, fluent("sD", "input", CTStr, _, _, _, HeadDeclRepr), moreConditions(MCondStr, _, HeadDeclRepr),
 									{
-										atomics_to_string([",\n\thappensAt(end(", CTStr, "), T)", MCondStr], "", AtBodyStr),
-										Priority is Priority1 + Priority2
+										atomics_to_string([",\n\thappensAt(end(", CTStr, "), T)", MCondStr], "", AtBodyStr)
+										%Priority is Priority1 + Priority2
 									}.
 
 condition(CondStr, Priority, HeadDeclRepr)			-->	"start", space, fluent("sD", "input", CTStr, _, Priority, _, HeadDeclRepr),
@@ -608,10 +632,10 @@ condition(CondStr, Priority, HeadDeclRepr)			-->	"not holds", space, fluent("sD"
 									}.
 condition(ACStr, 0, _)						-->	atemporalConstraint(ACStr).
 	
-moreConditions(MCondStr, Priority, HeadDeclRepr)		-->	",", space, condition(CondStr, Priority1, HeadDeclRepr), moreConditions(MMCondStr, Priority2, HeadDeclRepr),
+moreConditions(MCondStr, _, HeadDeclRepr)		-->	",", space, condition(CondStr, _, HeadDeclRepr), moreConditions(MMCondStr, _, HeadDeclRepr),
 									{
-										string_concat(CondStr, MMCondStr, MCondStr),
-										Priority is Priority1 + Priority2
+										string_concat(CondStr, MMCondStr, MCondStr)
+										%Priority is Priority1 + Priority2
 									}.
 moreConditions("", 0, _)					-->	[].
 
