@@ -1,6 +1,0 @@
-IN RULE:
-inititate passenger_density(Id, VehicleType)=Value if
-	happens passenger_density_change(Id, VehicleType, Value)
-ERROR: Unknown event pattern detected.
-Please check your syntax.
-

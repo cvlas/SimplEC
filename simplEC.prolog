@@ -176,14 +176,21 @@ simplEC(InputFile, OutputFile, DeclarationsFile, GraphFile) :-
 	% where Q is a caching priority value and {H1, H2, ..., Hn} are the entities
 	% that have Q as their caching priority value
 	% (input entities are considered to have Q = 0)
-	findall(Q, member(cachingHierarchy(_, Q), CachingOrdered), QS),
-	findall(H, member(cachingHierarchy(H, _), CachingOrdered), HS),
-	findall(H0, (declared(H0, _, _, _), \+ member(cachingHierarchy(H0, _), CachingOrdered)), H0S),
+	findall((A, B), (declared(A, _, _, _), \+ noCaching(A), cachingLevel(A, B)), AllCachingLevels),
+	%forall(member(ACL, AllCachingLevels), writeln(ACL)), nl,
+	findall(Q, member((_, Q), AllCachingLevels), QS),
+	findall(H, member((H, _), AllCachingLevels), HS),
+	%findall(H0, (declared(H0, _, _, _), \+ member(cachingHierarchy(H0, _), CachingOrdered)), H0S),
 	pairs_keys_values(QHS, QS, HS),
-	group_pairs_by_key(QHS, QLS),
-	pairs_keys_values(QLS, List1, List2),
-	findall((L1, L2), (member(L1, List1), nth1(Index, List1, L1), nth1(Index, List2, L2)), AlmostFinalList),
-	addToHead(AlmostFinalList, (0, H0S), FinalList),
+	%forall(member(Pair, QHS), writeln(Pair)), nl,
+	sort(QHS, QHSS),
+	%forall(member(PairS, QHSS), writeln(PairS)), nl,
+	group_pairs_by_key(QHSS, QLSS),
+	%forall(member(PairL, QLSS), writeln(PairL)), nl,
+	pairs_keys_values(QLSS, List1, List2),
+	findall((L1, L2), (member(L1, List1), nth1(Index, List1, L1), nth1(Index, List2, L2)), FinalList),
+	%forall(member(PairF, FinalList), writeln(PairF)), nl,
+	%addToHead(AlmostFinalList, (0, H0S), FinalList),
 	
 	% Dependency graph generation:
 	% Use the mapping above to group entities of the same caching level together in the graph.
