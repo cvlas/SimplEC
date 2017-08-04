@@ -439,7 +439,7 @@ value(ValStr, val)						-->	"=", number(ArgStr),
 									{
 										string_concat("=", ArgStr, ValStr)
 									}.
-value("=true", val)						-->	[].
+%value("=true", val)						-->	[].
 
 restChars(Chars)						--> 	string_without([9, 10, 13, 32, 40, 41, 44, 46], Chars).
 

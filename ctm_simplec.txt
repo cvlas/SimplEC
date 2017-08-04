@@ -95,7 +95,7 @@ initiate internal_temperature(Id, VehicleType)=Value if
 
 
 
-holds driver_comfort(Id, VehicleType)=reducing iff
+driver_comfort(Id, VehicleType)=reducing iff
 	driving_style(Id, VehicleType)=uncomfortable or
 	driving_style(Id, VehicleType)=unsafe or
 	noise_level(Id, VehicleType)=high or
@@ -106,7 +106,7 @@ holds driver_comfort(Id, VehicleType)=reducing iff
 
 
 
-holds passenger_satisfaction(Id, VehicleType)=reducing iff
+passenger_satisfaction(Id, VehicleType)=reducing iff
 	punctuality(Id, VehicleType)=non_punctual or
 	passenger_comfort(Id, VehicleType)=reducing.
 
