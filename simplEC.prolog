@@ -321,7 +321,7 @@ starAt			-->	head(Head, HeadDeclRepr, HeadGraphRepr), space, sep("if"), space, a
 sep("iff")		--> 	"iff".
 sep("if")		--> 	"if".
 
-head(HeadStr, DeclRepr, GraphRepr)						--> 	"holds", space, fluent("sD", "output", CTStr, DeclRepr, GraphRepr, _, _, null, null),
+head(HeadStr, DeclRepr, GraphRepr)						--> 	fluent("sD", "output", CTStr, DeclRepr, GraphRepr, _, _, null, null),
 									{
 										atomics_to_string(["holdsFor(", CTStr, ", I)"], "", HeadStr),
 										(\+ head(DeclRepr) -> assertz(head(DeclRepr))
@@ -671,11 +671,11 @@ condition(CondStr, Priority, HeadDeclRepr, HeadGraphRepr)			-->	"not happens", s
 									{
 										atomics_to_string([",\n\t\\+ happensAt(", CTStr, ", T)"], "", CondStr)
 									}.
-condition(CondStr, Priority, HeadDeclRepr, HeadGraphRepr)			-->	"holds", space, fluent("sD", "input", CTStr, _, _, Priority, _, HeadDeclRepr, HeadGraphRepr),
+condition(CondStr, Priority, HeadDeclRepr, HeadGraphRepr)			-->	fluent("sD", "input", CTStr, _, _, Priority, _, HeadDeclRepr, HeadGraphRepr),
 									{
 										atomics_to_string([",\n\tholdsAt(", CTStr, ", T)"], "", CondStr)
 									}.
-condition(CondStr, Priority, HeadDeclRepr, HeadGraphRepr)			-->	"not holds", space, fluent("sD", "input", CTStr, _, _, Priority, _, HeadDeclRepr, HeadGraphRepr),
+condition(CondStr, Priority, HeadDeclRepr, HeadGraphRepr)			-->	"not", space, fluent("sD", "input", CTStr, _, _, Priority, _, HeadDeclRepr, HeadGraphRepr),
 									{
 										atomics_to_string([",\n\t\\+ holdsAt(", CTStr, ", T)"], "", CondStr)
 									}.
