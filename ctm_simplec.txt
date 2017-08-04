@@ -12,7 +12,7 @@ terminate punctuality(Id, VehicleType)=punctual if
 terminate punctuality(Id, VehicleType)=punctual if
 	happens stop_leave(Id, VehicleType, _, early).
 
-holds punctuality(Id, VehicleType)=non_punctual iff
+punctuality(Id, VehicleType)=non_punctual iff
 	not punctuality(Id, VehicleType)=punctual.
 
 happens punctuality_change(Id, VehicleType, punctual) if
@@ -25,12 +25,12 @@ happens punctuality_change(Id, VehicleType, non_punctual) if
 	
 	
 
-holds driving_style(Id, VehicleType)=unsafe iff
+driving_style(Id, VehicleType)=unsafe iff
 	sharp_turn(Id, VehicleType)=very_sharp or
 	abrupt_acceleration(Id, VehicleType)=very_abrupt or
 	abrupt_deceleration(Id, VehicleType)=very_abrupt.
 
-holds driving_style(Id, VehicleType)=uncomfortable iff
+driving_style(Id, VehicleType)=uncomfortable iff
 	(sharp_turn(Id, VehicleType)=sharp,
 	not(abrupt_acceleration(Id, VehicleType)=very_abrupt or abrupt_deceleration(Id, VehicleType)=very_abrupt)) or
 	abrupt_acceleration(Id, VehicleType)=abrupt or
@@ -40,15 +40,15 @@ holds driving_style(Id, VehicleType)=uncomfortable iff
 
 
 
-holds driving_quality(Id, VehicleType)=high iff
+driving_quality(Id, VehicleType)=high iff
 	punctuality(Id, VehicleType)=punctual,
 	not(driving_style(Id, VehicleType)=unsafe or driving_style(Id, VehicleType)=uncomfortable).
 
-holds driving_quality(Id, VehicleType)=medium iff
+driving_quality(Id, VehicleType)=medium iff
 	punctuality(Id, VehicleType)=punctual,
 	driving_style(Id, VehicleType)=uncomfortable.
 
-holds driving_quality(Id, VehicleType)=low iff
+driving_quality(Id, VehicleType)=low iff
 	punctuality(Id, VehicleType)=non_punctual or
 	driving_style(Id, VehicleType)=unsafe.
 
@@ -56,7 +56,7 @@ holds driving_quality(Id, VehicleType)=low iff
 
 
 
-holds passenger_comfort(Id, VehicleType)=reducing iff
+passenger_comfort(Id, VehicleType)=reducing iff
 	driving_style(Id, VehicleType)=uncomfortable or
 	driving_style(Id, VehicleType)=unsafe or
 	passenger_density(Id, VehicleType)=high or
