@@ -20,10 +20,6 @@ closeSymmetric(Id1, Id2, Threshold)=true iff
 	close(Id1, Id2, Threshold)=true or
 	close(Id2, Id1, Threshold)=true.
 
-
-
-
-
 initiate person(Id)=true if
 	start walking(Id)=true,
 	not happens disappear(Id).
@@ -43,10 +39,6 @@ initiate person(Id)=true if
 initiate person(Id)=false if
 	happens disappear(Id).
 
-
-
-
-
 initiate leaving_object(Person, Object)=true if
 	happens appear(Object),
 	inactive(Object)=true,
@@ -55,10 +47,6 @@ initiate leaving_object(Person, Object)=true if
 
 initiate leaving_object(Person, Object)=false if
 	happens disappear(Object).
-
-
-
-
 
 initiate meeting(P1, P2)=true if
 	start greeting1(P1, P2)=true,
@@ -99,18 +87,10 @@ initiate meeting(P1, P2)=false if
 initiate meeting(P1, P2)=false if
 	start close(P1, P2, 34)=false.
 
-
-	
-	
-	
 moving(P1, P2)=true iff
 	walking(P1)=true,
 	walking(P2)=true,
 	close(P1, P2, 34)=true.
-
-	
-	
-	
 
 fighting(P1, P2)=true iff
 	((abrupt(P1)=true or abrupt(P2)=true),

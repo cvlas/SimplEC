@@ -21,10 +21,6 @@ happens punctuality_change(Id, VehicleType, punctual) if
 happens punctuality_change(Id, VehicleType, non_punctual) if
 	end punctuality(Id, VehicleType)=punctual.
 
-	
-	
-	
-
 driving_style(Id, VehicleType)=unsafe iff
 	sharp_turn(Id, VehicleType)=very_sharp or
 	abrupt_acceleration(Id, VehicleType)=very_abrupt or
@@ -35,10 +31,6 @@ driving_style(Id, VehicleType)=uncomfortable iff
 	not(abrupt_acceleration(Id, VehicleType)=very_abrupt or abrupt_deceleration(Id, VehicleType)=very_abrupt)) or
 	abrupt_acceleration(Id, VehicleType)=abrupt or
 	abrupt_deceleration(Id, VehicleType)=abrupt.
-
-
-
-
 
 driving_quality(Id, VehicleType)=high iff
 	punctuality(Id, VehicleType)=punctual,
@@ -52,10 +44,6 @@ driving_quality(Id, VehicleType)=low iff
 	punctuality(Id, VehicleType)=non_punctual or
 	driving_style(Id, VehicleType)=unsafe.
 
-
-
-
-
 passenger_comfort(Id, VehicleType)=reducing iff
 	driving_style(Id, VehicleType)=uncomfortable or
 	driving_style(Id, VehicleType)=unsafe or
@@ -64,36 +52,20 @@ passenger_comfort(Id, VehicleType)=reducing iff
 	internal_temperature(Id, VehicleType)=very_warm or
 	internal_temperature(Id, VehicleType)=very_cold.
 
-
-
-
-
 initially passenger_density(_,_)=low.
 
 initiate passenger_density(Id, VehicleType)=Value if
 	happens passenger_density_change(Id, VehicleType, Value).
-
-
-
-
 
 initially noise_level(_,_)=low.
 
 initiate noise_level(Id, VehicleType)=Value if
 	happens noise_level_change(Id, VehicleType, Value).
 
-
-
-
-
 initially internal_temperature(_,_)=normal.
 
 initiate internal_temperature(Id, VehicleType)=Value if
 	happens internal_temperature_change(Id, VehicleType, Value).
-
-
-
-
 
 driver_comfort(Id, VehicleType)=reducing iff
 	driving_style(Id, VehicleType)=uncomfortable or
@@ -101,10 +73,6 @@ driver_comfort(Id, VehicleType)=reducing iff
 	noise_level(Id, VehicleType)=high or
 	internal_temperature(Id, VehicleType)=very_warm or
 	internal_temperature(Id, VehicleType)=very_cold.
-
-
-
-
 
 passenger_satisfaction(Id, VehicleType)=reducing iff
 	punctuality(Id, VehicleType)=non_punctual or
