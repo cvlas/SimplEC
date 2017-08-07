@@ -22,18 +22,12 @@ closeSymmetric(Id1, Id2, Threshold)=true iff
 
 initiate person(Id)=true if
 	start walking(Id)=true,
-	not happens disappear(Id).
-
-initiate person(Id)=true if
-	start running(Id)=true,
-	not happens disappear(Id).
-
-initiate person(Id)=true if
-	start active(Id)=true,
-	not happens disappear(Id).
-
-initiate person(Id)=true if
-	start abrupt(Id)=true,
+	not happens disappear(Id)
+or	start running(Id)=true,
+	not happens disappear(Id)
+or	start active(Id)=true,
+	not happens disappear(Id)
+or	start abrupt(Id)=true,
 	not happens disappear(Id).
 
 initiate person(Id)=false if
@@ -51,10 +45,8 @@ initiate leaving_object(Person, Object)=false if
 initiate meeting(P1, P2)=true if
 	start greeting1(P1, P2)=true,
 	not happens disappear(P1),
-	not happens disappear(P2).
-
-initiate meeting(P1, P2)=true if
-	start greeting2(P1, P2)=true,
+	not happens disappear(P2)
+or	start greeting2(P1, P2)=true,
 	not happens disappear(P1),
 	not happens disappear(P2).
 
@@ -73,19 +65,11 @@ activeOrInactivePerson(P)=true iff
 	active(P)=true or (inactive(P)=true, person(P)=true).
 
 initiate meeting(P1, P2)=false if
-	start running(P1)=true.
-
-initiate meeting(P1, P2)=false if
-	start running(P2)=true.
-
-initiate meeting(P1, P2)=false if
-	start abrupt(P1)=true.
-
-initiate meeting(P1, P2)=false if
-	start abrupt(P2)=true.
-
-initiate meeting(P1, P2)=false if
-	start close(P1, P2, 34)=false.
+	start running(P1)=true
+or	start running(P2)=true
+or	start abrupt(P1)=true
+or	start abrupt(P2)=true
+or	start close(P1, P2, 34)=false.
 
 moving(P1, P2)=true iff
 	walking(P1)=true,

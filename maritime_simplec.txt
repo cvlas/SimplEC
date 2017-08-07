@@ -12,10 +12,8 @@ initiate lowSpeed(Vessel)=true if
 	nearPorts(Lon,Lat,[]).
 
 terminate lowSpeed(Vessel)=true if
-	happens slow_motion_end(Vessel).
-
-terminate lowSpeed(Vessel)=true if
-	start stopped(Vessel)=true.
+	happens slow_motion_end(Vessel)
+or	start stopped(Vessel)=true.
 
 initiate withinArea(Vessel, AreaName)=true if
 	happens isInArea(Vessel, AreaName).
@@ -29,10 +27,8 @@ initiate sailing(Vessel)=true if
 
 terminate sailing(Vessel)=true if
 	happens velocity(Vessel, Speed, Heading),
-	Speed < 2.0.
-
-terminate sailing(Vessel)=true if
-	happens gap_start(Vessel).
+	Speed < 2.0
+or	happens gap_start(Vessel).
 
 initiate highSpeedIn(Vessel, AreaName)=true if
 	happens isInArea(Vessel, AreaName),
@@ -44,13 +40,9 @@ terminate highSpeedIn(Vessel, AreaName)=true if
 	happens isInArea(Vessel, AreaName),
 	happens velocity(Vessel, Speed, Heading),
 	speedArea(AreaName,SpeedArea),
-	Speed < SpeedArea.
-
-terminate highSpeedIn(Vessel, AreaName)=true if
-	happens leavesArea(Vessel, AreaName).
-
-terminate highSpeedIn(Vessel, AreaName)=true if
-	happens gap_start(Vessel).
+	Speed < SpeedArea
+or	happens leavesArea(Vessel, AreaName)
+or	happens gap_start(Vessel).
 
 loitering(Vessel)=true iff
 	((lowSpeed(Vessel)=true or stopped(Vessel)=true),
