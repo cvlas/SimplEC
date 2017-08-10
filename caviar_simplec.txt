@@ -31,16 +31,16 @@ or	start abrupt(Id)=true,
 	not happens disappear(Id).
 
 initiate person(Id)=false if
-	happens disappear(Id).
+	disappear(Id).
 
 initiate leaving_object(Person, Object)=true if
-	happens appear(Object),
+	appear(Object),
 	inactive(Object)=true,
 	person(Person)=true,
 	closeSymmetric(Person, Object, 30)=true.
 
 initiate leaving_object(Person, Object)=false if
-	happens disappear(Object).
+	disappear(Object).
 
 initiate meeting(P1, P2)=true if
 	start greeting1(P1, P2)=true,

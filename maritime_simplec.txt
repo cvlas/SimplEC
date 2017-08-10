@@ -1,48 +1,48 @@
 initiate stopped(Vessel)=true if
-	happens stop_start(Vessel),
+	stop_start(Vessel),
 	happens coord(Vessel, Lon, Lat),
 	nearPorts(Lon,Lat,[]).
 
 terminate stopped(Vessel)=true if
-	happens stop_end(Vessel).
+	stop_end(Vessel).
 
 initiate lowSpeed(Vessel)=true if
-	happens slow_motion_start(Vessel),
+	slow_motion_start(Vessel),
 	happens coord(Vessel, Lon, Lat),
 	nearPorts(Lon,Lat,[]).
 
 terminate lowSpeed(Vessel)=true if
-	happens slow_motion_end(Vessel)
+	slow_motion_end(Vessel)
 or	start stopped(Vessel)=true.
 
 initiate withinArea(Vessel, AreaName)=true if
-	happens isInArea(Vessel, AreaName).
+	isInArea(Vessel, AreaName).
 
 terminate withinArea(Vessel, AreaName)=true if
-	happens leavesArea(Vessel, AreaName).
+	leavesArea(Vessel, AreaName).
 
 initiate sailing(Vessel)=true if
-	happens velocity(Vessel, Speed, Heading),
+	velocity(Vessel, Speed, Heading),
 	Speed > 2.0.
 
 terminate sailing(Vessel)=true if
-	happens velocity(Vessel, Speed, Heading),
+	velocity(Vessel, Speed, Heading),
 	Speed < 2.0
-or	happens gap_start(Vessel).
+or	gap_start(Vessel).
 
 initiate highSpeedIn(Vessel, AreaName)=true if
-	happens isInArea(Vessel, AreaName),
+	isInArea(Vessel, AreaName),
 	happens velocity(Vessel, Speed, Heading),
 	speedArea(AreaName,SpeedArea),
 	Speed > SpeedArea.
 
 terminate highSpeedIn(Vessel, AreaName)=true if
-	happens isInArea(Vessel, AreaName),
+	isInArea(Vessel, AreaName),
 	happens velocity(Vessel, Speed, Heading),
 	speedArea(AreaName,SpeedArea),
 	Speed < SpeedArea
-or	happens leavesArea(Vessel, AreaName)
-or	happens gap_start(Vessel).
+or	leavesArea(Vessel, AreaName)
+or	gap_start(Vessel).
 
 loitering(Vessel)=true iff
 	((lowSpeed(Vessel)=true or stopped(Vessel)=true),
