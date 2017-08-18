@@ -46,9 +46,9 @@ initiatedAt(person(Id)=false, T) :-
 
 initiatedAt(leaving_object(Person,Object)=true, T) :-
 	happensAt(appear(Object), T),
-	holdsAt(inactive(Object)=true, T),
-	holdsAt(person(Person)=true, T),
-	holdsAt(closeSymmetric(Person,Object,30)=true, T).
+	inactive(Object),
+	person(Person),
+	closeSymmetric(Person,Object,30).
 
 initiatedAt(leaving_object(Person,Object)=false, T) :-
 	happensAt(disappear(Object), T).
@@ -74,10 +74,10 @@ holdsFor(greeting1(P1,P2)=true, I) :-
 	relative_complement_all(I110,[I174],I).
 
 holdsFor(greeting2(P1,P2)=true, I) :-
-	holdsFor(walking(P1)=true,I13),
-	holdsFor(activeOrInactivePerson(P2)=true,I14),
-	holdsFor(close(P2,P1,25)=true,I17),
-	intersect_all([I13,I14,I17],I).
+	holdsFor(walking(P1)=true,I1),
+	holdsFor(activeOrInactivePerson(P2)=true,I9),
+	intersect_all([I1,I9],I10),
+	close(P2,I,25).
 
 holdsFor(activeOrInactivePerson(P)=true, I) :-
 	holdsFor(active(P)=true,I27),
@@ -102,10 +102,10 @@ initiatedAt(meeting(P1,P2)=false, T) :-
 	happensAt(start(close(P1,P2,34)=false), T).
 
 holdsFor(moving(P1,P2)=true, I) :-
-	holdsFor(walking(P1)=true,I13),
-	holdsFor(walking(P2)=true,I14),
-	holdsFor(close(P1,P2,34)=true,I17),
-	intersect_all([I13,I14,I17],I).
+	holdsFor(walking(P1)=true,I1),
+	holdsFor(walking(P2)=true,I9),
+	intersect_all([I1,I9],I10),
+	close(P1,I,34).
 
 holdsFor(fighting(P1,P2)=true, I) :-
 	holdsFor(abrupt(P1)=true,I144),
