@@ -53,21 +53,21 @@ terminatedAt(highSpeedIn(Vessel,AreaName)=true, T) :-
 	happensAt(gap_start(Vessel), T).
 
 holdsFor(loitering(Vessel)=true, I) :-
-	holdsFor(lowSpeed(Vessel)=true,I127),
-	holdsFor(stopped(Vessel)=true,I130),
-	union_all([I127,I130],I131),
-	holdsFor(withinArea(Vessel,AreaName)=true,I134),
-	intersect_all([I131,I134],I135),
-	findall((S,E),(member((S,E),I135),Diff is E-S,Diff>600),I).
+	holdsFor(lowSpeed(Vessel)=true,I52),
+	holdsFor(stopped(Vessel)=true,I55),
+	union_all([I52,I55],I56),
+	holdsFor(withinArea(Vessel,AreaName)=true,I59),
+	intersect_all([I56,I59],I60),
+	findall((S,E),(member((S,E),I60),Diff is E-S,Diff>600),I).
 
 holdsFor(rendezVouz(Vessel1,Vessel2)=true, I) :-
-	holdsFor(proximity(Vessel1,Vessel2)=true,I241),
-	holdsFor(lowSpeed(Vessel1)=true,I243),
-	holdsFor(stopped(Vessel1)=true,I246),
-	union_all([I243,I246],I247),
-	holdsFor(lowSpeed(Vessel2)=true,I263),
-	holdsFor(stopped(Vessel2)=true,I266),
-	union_all([I263,I266],I267),
-	intersect_all([I241,I247,I267],I269),
-	findall((S,E),(member((S,E),I269),Diff is E-S,Diff>600),I).
+	holdsFor(proximity(Vessel1,Vessel2)=true,I97),
+	holdsFor(lowSpeed(Vessel1)=true,I99),
+	holdsFor(stopped(Vessel1)=true,I102),
+	union_all([I99,I102],I103),
+	holdsFor(lowSpeed(Vessel2)=true,I119),
+	holdsFor(stopped(Vessel2)=true,I122),
+	union_all([I119,I122],I123),
+	intersect_all([I97,I103,I123],I125),
+	findall((S,E),(member((S,E),I125),Diff is E-S,Diff>600),I).
 

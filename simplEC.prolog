@@ -446,7 +446,7 @@ value(ValStr, val)						-->	"=", number(ArgStr),
 									{
 										string_concat("=", ArgStr, ValStr)
 									}.
-%value("=true", val)						-->	[].
+value("=true", val)						-->	[].
 
 restChars(Chars)						--> 	string_without([9, 10, 13, 32, 40, 41, 44, 46], Chars).
 
@@ -502,11 +502,11 @@ moreArguments(MArgStr, UMArgStr, GMArgStr)				-->	",", space, "_", moreArguments
 										string_concat(",_", GMMArgStr, GMArgStr)
 									}.
 
-forBody(BodyStr, Priority, HeadDeclRepr, HeadGraphRepr)			-->	expression(BodyStr, _, Priority, HeadDeclRepr, HeadGraphRepr).
 forBody(BodyStr, Priority, HeadDeclRepr, HeadGraphRepr)			-->	expression(ExprStr, _, Priority, HeadDeclRepr, HeadGraphRepr), ",", space, constraints(ConStr),
 									{
 										atomics_to_string([ExprStr, ConStr], ",\n\t", BodyStr)
 									}.
+forBody(BodyStr, Priority, HeadDeclRepr, HeadGraphRepr)			-->	expression(BodyStr, _, Priority, HeadDeclRepr, HeadGraphRepr).
 
 expression(ExprStr, I, _, HeadDeclRepr, HeadGraphRepr)			-->	component(CompStr, T1, _, HeadDeclRepr, HeadGraphRepr), moreComponents(MCompStr, T2, and, _, HeadDeclRepr, HeadGraphRepr),
 									{
@@ -673,6 +673,7 @@ moreAtBodyParts(MoreAtBodyPartsStr, _, HeadDeclRepr, HeadGraphRepr)		--> space, 
 									}.
 moreAtBodyParts("", _, _, _)		--> [].
 
+condition(ACStr, 0, _, _)						-->	atemporalConstraint(ACStr).
 condition(CondStr, Priority, HeadDeclRepr, HeadGraphRepr)			-->	"start", space, fluent("sD", "input", CTStr, _, _, Priority, _, HeadDeclRepr, HeadGraphRepr),
 									{
 										atomics_to_string([",\n\thappensAt(start(", CTStr, "), T)"], "", CondStr)
@@ -697,7 +698,6 @@ condition(CondStr, Priority, HeadDeclRepr, HeadGraphRepr)			-->	"not", space, fl
 									{
 										atomics_to_string([",\n\t\\+ holdsAt(", CTStr, ", T)"], "", CondStr)
 									}.
-condition(ACStr, 0, _, _)						-->	atemporalConstraint(ACStr).
 	
 moreConditions(MCondStr, _, HeadDeclRepr, HeadGraphRepr)		-->	",", space, condition(CondStr, _, HeadDeclRepr, HeadGraphRepr), moreConditions(MMCondStr, _, HeadDeclRepr, HeadGraphRepr),
 									{
