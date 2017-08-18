@@ -8,7 +8,9 @@ event(stop_end(_)).	inputEntity(stop_end(_)).	index(stop_end(Vessel), Vessel).
 event(stop_start(_)).	inputEntity(stop_start(_)).	index(stop_start(Vessel), Vessel).
 event(velocity(_,_,_)).	inputEntity(velocity(_,_,_)).	index(velocity(Vessel,_,_), Vessel).
 
+sDFluent(nearPorts(_,_,_)=true).	inputEntity(nearPorts(_,_,_)=true).	index(nearPorts(Lon,_,_)=true, Lon).
 sDFluent(proximity(_,_)=true).	inputEntity(proximity(_,_)=true).	index(proximity(Vessel1,_)=true, Vessel1).
+sDFluent(speedArea(_,_)=true).	inputEntity(speedArea(_,_)=true).	index(speedArea(AreaName,_)=true, AreaName).
 
 
 simpleFluent(highSpeedIn(_,_)=true).	outputEntity(highSpeedIn(_,_)=true).	index(highSpeedIn(Vessel,_)=true, Vessel).

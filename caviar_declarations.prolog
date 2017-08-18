@@ -4,7 +4,7 @@ event(disappear(_)).	inputEntity(disappear(_)).	index(disappear(Id), Id).
 sDFluent(abrupt(_)=true).	inputEntity(abrupt(_)=true).	index(abrupt(Id)=true, Id).
 sDFluent(active(_)=true).	inputEntity(active(_)=true).	index(active(Id)=true, Id).
 sDFluent(distance(_,_,_)=true).	inputEntity(distance(_,_,_)=true).	index(distance(Id1,_,_)=true, Id1).
-sDFluent(inactive(_)=true).	inputEntity(inactive(_)=true).	index(inactive(P)=true, P).
+sDFluent(inactive(_)=true).	inputEntity(inactive(_)=true).	index(inactive(Object)=true, Object).
 sDFluent(running(_)=true).	inputEntity(running(_)=true).	index(running(Id)=true, Id).
 sDFluent(walking(_)=true).	inputEntity(walking(_)=true).	index(walking(Id)=true, Id).
 
@@ -27,7 +27,6 @@ sDFluent(moving(_,_)=true).	outputEntity(moving(_,_)=true).	index(moving(P1,_)=t
 
 cachingOrder(close(_,_,_)=true).	%1
 cachingOrder(leaving_object(_,_)=false).	%1
-cachingOrder(leaving_object(_,_)=true).	%1
 cachingOrder(person(_)=false).	%1
 cachingOrder(person(_)=true).	%1
 cachingOrder(activeOrInactivePerson(_)=true).	%2
@@ -37,5 +36,6 @@ cachingOrder(fighting(_,_)=true).	%2
 cachingOrder(moving(_,_)=true).	%2
 cachingOrder(greeting1(_,_)=true).	%3
 cachingOrder(greeting2(_,_)=true).	%3
+cachingOrder(leaving_object(_,_)=true).	%3
 cachingOrder(meeting(_,_)=false).	%3
 cachingOrder(meeting(_,_)=true).	%4
