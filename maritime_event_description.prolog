@@ -1,7 +1,7 @@
 initiatedAt(stopped(Vessel)=true, T) :-
 	happensAt(stop_start(Vessel), T),
 	happensAt(coord(Vessel,Lon,Lat), T),
-	holdsAt(nearPorts(Lon,Lat,[])=true, T).
+	nearPorts(Lon,Lat,[]).
 
 terminatedAt(stopped(Vessel)=true, T) :-
 	happensAt(stop_end(Vessel), T).
@@ -9,7 +9,7 @@ terminatedAt(stopped(Vessel)=true, T) :-
 initiatedAt(lowSpeed(Vessel)=true, T) :-
 	happensAt(slow_motion_start(Vessel), T),
 	happensAt(coord(Vessel,Lon,Lat), T),
-	holdsAt(nearPorts(Lon,Lat,[])=true, T).
+	nearPorts(Lon,Lat,[]).
 
 terminatedAt(lowSpeed(Vessel)=true, T) :-
 	happensAt(slow_motion_end(Vessel), T).
@@ -37,13 +37,13 @@ terminatedAt(sailing(Vessel)=true, T) :-
 initiatedAt(highSpeedIn(Vessel,AreaName)=true, T) :-
 	happensAt(isInArea(Vessel,AreaName), T),
 	happensAt(velocity(Vessel,Speed,Heading), T),
-	holdsAt(speedArea(AreaName,SpeedArea)=true, T),
+	speedArea(AreaName,SpeedArea),
 	Speed > SpeedArea.
 
 terminatedAt(highSpeedIn(Vessel,AreaName)=true, T) :-
 	happensAt(isInArea(Vessel,AreaName), T),
 	happensAt(velocity(Vessel,Speed,Heading), T),
-	holdsAt(speedArea(AreaName,SpeedArea)=true, T),
+	speedArea(AreaName,SpeedArea),
 	Speed < SpeedArea.
 
 terminatedAt(highSpeedIn(Vessel,AreaName)=true, T) :-

@@ -1,3 +1,5 @@
+atemporal: nearPorts, speedArea.
+
 initiate stopped(Vessel) if
 	stop_start(Vessel),
 	happens coord(Vessel, Lon, Lat),
