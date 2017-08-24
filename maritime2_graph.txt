@@ -1,0 +1,12 @@
+digraph
+{
+	node [shape=Mrecord];
+	rankdir=LR;
+	ranksep="1.2 equally";
+
+	0 [label="<coord(_)=(Lon,Lat)> coord(_)=(Lon,Lat)|<speed_change(_,_)> speed_change(_,_)"];
+	1 [label="<fastApproach(_)> fastApproach(_)"];
+
+	0:"coord(_)=(Lon,Lat)" -> 1:"fastApproach(_)"
+	0:"speed_change(_,_)" -> 1:"fastApproach(_)"
+}

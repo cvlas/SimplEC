@@ -1,0 +1,8 @@
+atemporal: nearPorts, speedArea.
+
+happens fastApproach(Vessel) if	
+	speed_change(Vessel, NewSpeed),
+	velocity(Vessel) > 20 knots,
+	coord(Vessel) = (Lon, Lat),
+	not nearPorts(Lon, Lat),
+	headingToVessels(Vessel).

@@ -15,6 +15,11 @@ addToHead(L, H, [H|L]).
 addToTail([], E, [E]).
 addToTail([H|T], E, [H|L]) :- addToTail(T, E, L).
 
+% Find the Cartesian product of the elements within a list of lists.
+prod([],[[]]).
+prod([L|Ls],Out) :-
+	bagof([X|R],(prod(Ls,O), member(X,L), member(R,O)),Out).
+
 % Update the caching priority of an element and propagate this update to all output entities that depend on it.
 %propagatePriority(E, P) :-
 %	
@@ -105,8 +110,11 @@ simplEC(InputFile, OutputFile, DeclarationsFile, GraphFile) :-
 	% If an entity appears in the rules both as an input and an output entity, we consider it an output entity.
 	% After having the declared entities filtered, we assert them anew.
 	findall(declFact(DeclRepr, GraphRepr, IndRepr, Type, EType), (declared(DeclRepr, GraphRepr, IndRepr, Type, EType), retract(declared(DeclRepr, GraphRepr, IndRepr, Type, EType))), Tuples),
+	forall(member(Tuple, Tuples), (writeln(Tuple))), nl, nl, 
 	sort(5, @>=, Tuples, TuplesDistorted),
+	forall(member(TupleD, TuplesDistorted), (writeln(TupleD))), nl, nl,
 	sort(1, @<, TuplesDistorted, TuplesSorted),
+	forall(member(TupleS, TuplesSorted), (writeln(TupleS))), nl, nl,
 	forall(member(declFact(DeclRepr, GraphRepr, IndRepr, Type, EType), TuplesSorted), assertz(declared(DeclRepr, GraphRepr, IndRepr, Type, EType))),
 	
 	% Find and print all input events.
@@ -709,6 +717,11 @@ condition(CondStr, Priority, HeadDeclRepr, HeadGraphRepr)			-->	"not happens", s
 									{
 										atomics_to_string([",\n\t\\+ happensAt(", CTStr, ", T)"], "", CondStr)
 									}.
+condition(ACStr, 0, _, _)						-->	atemporalConstraint(ACStr).
+condition(CondStr, Priority, HeadDeclRepr, HeadGraphRepr)		-->	fluaint("sD", "input", FluentStr, ConstraintStr, Priority, HeadDeclRepr, HeadGraphRepr),
+									{
+										atomics_to_string([",\n\tholdsAt(", FluentStr, ", T),\n\t", ConstraintStr], "", CondStr)
+									}.
 condition(CondStr, Priority, HeadDeclRepr, HeadGraphRepr)			-->	fluent("sD", "input", CTStr, _, _, Priority, _, HeadDeclRepr, HeadGraphRepr),
 									{
 										atomics_to_string([",\n\tholdsAt(", CTStr, ", T)"], "", CondStr)
@@ -716,11 +729,6 @@ condition(CondStr, Priority, HeadDeclRepr, HeadGraphRepr)			-->	fluent("sD", "in
 condition(CondStr, Priority, HeadDeclRepr, HeadGraphRepr)			-->	"not", space, fluent("sD", "input", CTStr, _, _, Priority, _, HeadDeclRepr, HeadGraphRepr),
 									{
 										atomics_to_string([",\n\t\\+ holdsAt(", CTStr, ", T)"], "", CondStr)
-									}.
-condition(ACStr, 0, _, _)						-->	atemporalConstraint(ACStr).
-condition(CondStr, Priority, HeadDeclRepr, HeadGraphRepr)		-->	fluaint("sD", "input", FluentStr, ConstraintStr, Priority, HeadDeclRepr, HeadGraphRepr),
-									{
-										atomics_to_string([",\n\tholdsAt(", FluentStr, ", T),\n\t", ConstraintStr], "", CondStr)
 									}.
 	
 moreConditions(MCondStr, _, HeadDeclRepr, HeadGraphRepr)		-->	",", space, condition(CondStr, _, HeadDeclRepr, HeadGraphRepr), moreConditions(MMCondStr, _, HeadDeclRepr, HeadGraphRepr),
@@ -732,11 +740,11 @@ moreConditions("", 0, _, _)					-->	[].
 
 atemporalConstraint(ACStr)					-->	fact(FStr),
 									{
-										atomics_to_string([",\n\t ", FStr], "", ACStr)
+										atomics_to_string([",\n\t", FStr], "", ACStr)
 									}.
 atemporalConstraint(ACStr)					-->	math(MStr),
 									{
-										atomics_to_string([",\n\t ", MStr], "", ACStr)
+										atomics_to_string([",\n\t", MStr], "", ACStr)
 									}.
 atemporalConstraint(ACStr)					-->	"not", space, fact(FStr),
 									{
@@ -747,7 +755,7 @@ atemporalConstraint(ACStr)					-->	"not", space, math(MStr),
 										atomics_to_string([",\n\t\\+ ", MStr], "", ACStr)
 									}.
 
-fluaint(Type, EType, CTStr, MStr, Priority, HeadDeclRepr, HeadGraphRepr)	-->	functawr(FncStr), "(", argumentsList(ArgLStr, UArgLStr, GArgLStr, IndArgLStr, Index), ")", space, operator(OpStr), space, variable(Var2Str),
+fluaint("sD", "input", CTStr, MStr, Priority, HeadDeclRepr, HeadGraphRepr)	-->	functawr(FncStr), "(", argumentsList(ArgLStr, UArgLStr, GArgLStr, IndArgLStr, Index), ")", space, operator(OpStr), space, variable(Var2Str),
 									{
 										\+ atem(FncStr),
 										atomics_to_string([FncStr, "(", ArgLStr, ")"], "", FStr),
@@ -757,7 +765,7 @@ fluaint(Type, EType, CTStr, MStr, Priority, HeadDeclRepr, HeadGraphRepr)	-->	fun
 										atomics_to_string([FncStr, "(", GArgLStr, ")=", "Value"], "", GraphRepr),
 										atomics_to_string([FncStr, "(", IndArgLStr, ")=", "Value", ", ", Index], "", IndRepr),
 										
-										findall((D, I, T, E), (declared(D, G, I, T, E), sub_string(D, 0, _, _, DeclRePrefix), assertz(declared(D, G, I, Type, Etype))), _),
+										findall((D, I, T, E), (declared(D, G, I, T, E), sub_string(D, 0, _, _, DeclRePrefix), assertz(declared(D, G, I, Type, Etype)), nl, nl, writeln("I just declared: "), writeln(D)), _),
 										
 										assertz(defines(DeclRepr, HeadDeclRepr, Priority)),
 										
@@ -765,7 +773,7 @@ fluaint(Type, EType, CTStr, MStr, Priority, HeadDeclRepr, HeadGraphRepr)	-->	fun
 										
 										atomics_to_string(["Value", " ", OpStr, " ", Var2Str], "", MStr)
 									}.
-fluaint(Type, EType, CTStr, MStr, Priority, HeadDeclRepr, HeadGraphRepr)	-->	functawr(FncStr), "(", argumentsList(ArgLStr, UArgLStr, GArgLStr, IndArgLStr, Index), ")", space, operator(OpStr), space, number(NumStr),
+fluaint("sD", "input", CTStr, MStr, Priority, HeadDeclRepr, HeadGraphRepr)	-->	functawr(FncStr), "(", argumentsList(ArgLStr, UArgLStr, GArgLStr, IndArgLStr, Index), ")", space, operator(OpStr), space, number(NumStr),
 									{
 										\+ atem(FncStr),
 										atomics_to_string([FncStr, "(", ArgLStr, ")"], "", FStr),
@@ -775,7 +783,7 @@ fluaint(Type, EType, CTStr, MStr, Priority, HeadDeclRepr, HeadGraphRepr)	-->	fun
 										atomics_to_string([FncStr, "(", GArgLStr, ")=", "Value"], "", GraphRepr),
 										atomics_to_string([FncStr, "(", IndArgLStr, ")=", "Value", ", ", Index], "", IndRepr),
 										
-										findall((D, I, T, E), (declared(D, G, I, T, E), sub_string(D, 0, _, _, DeclRePrefix), assertz(declared(D, G, I, Type, Etype))), _),
+										findall((D, I, T, E), (declared(D, G, I, T, E), sub_string(D, 0, _, _, DeclRePrefix), assertz(declared(D, G, I, Type, Etype)), nl, nl, writeln("I just declared: "), writeln(D)), _),
 										
 										assertz(defines(DeclRepr, HeadDeclRepr, Priority)),
 										
@@ -783,7 +791,7 @@ fluaint(Type, EType, CTStr, MStr, Priority, HeadDeclRepr, HeadGraphRepr)	-->	fun
 										
 										atomics_to_string(["Value", " ", OpStr, " ", NumStr], "", MStr)
 									}.
-fluaint(Type, EType, CTStr, MStr, Priority, HeadDeclRepr, HeadGraphRepr)	-->	functawr(FncStr), "(", argumentsList(ArgLStr, UArgLStr, GArgLStr, IndArgLStr, Index), ")", space, operator(OpStr), space, numUnit(NUStr),
+fluaint("sD", "input", CTStr, MStr, Priority, HeadDeclRepr, HeadGraphRepr)	-->	functawr(FncStr), "(", argumentsList(ArgLStr, UArgLStr, GArgLStr, IndArgLStr, Index), ")", space, operator(OpStr), space, numUnit(NUStr),
 									{
 										\+ atem(FncStr),
 										atomics_to_string([FncStr, "(", ArgLStr, ")"], "", FStr),
@@ -793,7 +801,7 @@ fluaint(Type, EType, CTStr, MStr, Priority, HeadDeclRepr, HeadGraphRepr)	-->	fun
 										atomics_to_string([FncStr, "(", GArgLStr, ")=", "Value"], "", GraphRepr),
 										atomics_to_string([FncStr, "(", IndArgLStr, ")=", "Value", ", ", Index], "", IndRepr),
 										
-										findall((D, I, T, E), (declared(D, G, I, T, E), sub_string(D, 0, _, _, DeclRePrefix), assertz(declared(D, G, I, Type, Etype))), _),
+										findall((D, I, T, E), (declared(D, G, I, T, E), sub_string(D, 0, _, _, DeclRePrefix), assertz(declared(D, G, I, Type, Etype)), nl, nl, writeln("I just declared: "), writeln(D)), _),
 										
 										assertz(defines(DeclRepr, HeadDeclRepr, Priority)),
 										

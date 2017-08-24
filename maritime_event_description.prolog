@@ -1,7 +1,7 @@
 initiatedAt(stopped(Vessel)=true, T) :-
 	happensAt(stop_start(Vessel), T),
 	happensAt(coord(Vessel,Lon,Lat), T),
-	 nearPorts(Lon,Lat,[]).
+	nearPorts(Lon,Lat,[]).
 
 terminatedAt(stopped(Vessel)=true, T) :-
 	happensAt(stop_end(Vessel), T).
@@ -9,7 +9,7 @@ terminatedAt(stopped(Vessel)=true, T) :-
 initiatedAt(lowSpeed(Vessel)=true, T) :-
 	happensAt(slow_motion_start(Vessel), T),
 	happensAt(coord(Vessel,Lon,Lat), T),
-	 nearPorts(Lon,Lat,[]).
+	nearPorts(Lon,Lat,[]).
 
 terminatedAt(lowSpeed(Vessel)=true, T) :-
 	happensAt(slow_motion_end(Vessel), T).
@@ -25,11 +25,11 @@ terminatedAt(withinArea(Vessel,AreaName)=true, T) :-
 
 initiatedAt(sailing(Vessel)=true, T) :-
 	happensAt(velocity(Vessel,Speed,Heading), T),
-	 Speed > 2.0.
+	Speed > 2.0.
 
 terminatedAt(sailing(Vessel)=true, T) :-
 	happensAt(velocity(Vessel,Speed,Heading), T),
-	 Speed < 2.0.
+	Speed < 2.0.
 
 terminatedAt(sailing(Vessel)=true, T) :-
 	happensAt(gap_start(Vessel), T).
@@ -37,14 +37,14 @@ terminatedAt(sailing(Vessel)=true, T) :-
 initiatedAt(highSpeedIn(Vessel,AreaName)=true, T) :-
 	happensAt(isInArea(Vessel,AreaName), T),
 	happensAt(velocity(Vessel,Speed,Heading), T),
-	 speedArea(AreaName,SpeedArea),
-	 Speed > SpeedArea.
+	speedArea(AreaName,SpeedArea),
+	Speed > SpeedArea.
 
 terminatedAt(highSpeedIn(Vessel,AreaName)=true, T) :-
 	happensAt(isInArea(Vessel,AreaName), T),
 	happensAt(velocity(Vessel,Speed,Heading), T),
-	 speedArea(AreaName,SpeedArea),
-	 Speed < SpeedArea.
+	speedArea(AreaName,SpeedArea),
+	Speed < SpeedArea.
 
 terminatedAt(highSpeedIn(Vessel,AreaName)=true, T) :-
 	happensAt(leavesArea(Vessel,AreaName), T).
@@ -71,6 +71,18 @@ holdsFor(rendezVouz(Vessel1,Vessel2)=true, I) :-
 	intersect_all([I241,I247,I267],I269),
 	findall((S,E),(member((S,E),I269),Diff is E-S,Diff>600),I).
 
+
+
+I just declared: 
+velocity(_)=true
+
+
+I just declared: 
+velocity(_)=true
+
+
+I just declared: 
+velocity(_)=true
 happensAt(fastApproach(Vessel), T) :-
 	happensAt(speedChange(Vessel), T),
 	holdsAt(velocity(Vessel)=Value, T),
