@@ -57,7 +57,7 @@ rendezVouz(Vessel1, Vessel2) iff
 	(lowSpeed(Vessel2) or stopped(Vessel2))),
 	duration > 600.
 
-happens fastApproach(Vessel) iff
+happens fastApproach(Vessel) if
 	speedChange(Vessel),
 	velocity(Vessel) > 20 knots,
 	coord(Vessel) = (Lon, Lat),

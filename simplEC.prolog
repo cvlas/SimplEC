@@ -724,6 +724,14 @@ moreConditions("", 0, _, _)					-->	[].
 
 atemporalConstraint(ACStr)					-->	fact(ACStr).
 atemporalConstraint(ACStr)					-->	math(ACStr).
+atemporalConstraint(ACStr)					-->	"not", space, fact(FStr),
+									{
+										atomics_to_string([",\n\t\\+ ", FStr], "", ACStr)
+									}.
+atemporalConstraint(ACStr)					-->	"not", space, math(MStr),
+									{
+										atomics_to_string([",\n\t\\+ ", MStr], "", ACStr)
+									}.
 
 fluaint(Type, EType, FStr, MStr, Priority, HeadDeclRepr, HeadGraphRepr)	-->	functawr(FncStr), "(", argumentsList(ArgLStr, UArgLStr, GArgLStr, IndArgLStr, Index), ")", space, operator(OpStr), space, variable(Var2Str),
 									{
