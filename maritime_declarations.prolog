@@ -4,12 +4,17 @@ event(isInArea(_,_)).	inputEntity(isInArea(_,_)).	index(isInArea(Vessel,_), Vess
 event(leavesArea(_,_)).	inputEntity(leavesArea(_,_)).	index(leavesArea(Vessel,_), Vessel).
 event(slow_motion_end(_)).	inputEntity(slow_motion_end(_)).	index(slow_motion_end(Vessel), Vessel).
 event(slow_motion_start(_)).	inputEntity(slow_motion_start(_)).	index(slow_motion_start(Vessel), Vessel).
+event(speedChange(_)).	inputEntity(speedChange(_)).	index(speedChange(Vessel), Vessel).
 event(stop_end(_)).	inputEntity(stop_end(_)).	index(stop_end(Vessel), Vessel).
 event(stop_start(_)).	inputEntity(stop_start(_)).	index(stop_start(Vessel), Vessel).
 event(velocity(_,_,_)).	inputEntity(velocity(_,_,_)).	index(velocity(Vessel,_,_), Vessel).
 
+sDFluent(coord(_)=(Lon,Lat)).	inputEntity(coord(_)=(Lon,Lat)).	index(coord(Vessel)=(Lon,Lat), Vessel).
+sDFluent(headingToVessels(_)=true).	inputEntity(headingToVessels(_)=true).	index(headingToVessels(Vessel)=true, Vessel).
 sDFluent(proximity(_,_)=true).	inputEntity(proximity(_,_)=true).	index(proximity(Vessel1,_)=true, Vessel1).
+sDFluent(velocity(_)=true).	inputEntity(velocity(_)=true).	index(velocity(Vessel)=true, Vessel).
 
+event(fastApproach(_)).	outputEntity(fastApproach(_)).	index(fastApproach(Vessel), Vessel).
 
 simpleFluent(highSpeedIn(_,_)=true).	outputEntity(highSpeedIn(_,_)=true).	index(highSpeedIn(Vessel,_)=true, Vessel).
 simpleFluent(lowSpeed(_)=true).	outputEntity(lowSpeed(_)=true).	index(lowSpeed(Vessel)=true, Vessel).
@@ -20,6 +25,7 @@ simpleFluent(withinArea(_,_)=true).	outputEntity(withinArea(_,_)=true).	index(wi
 sDFluent(loitering(_)=true).	outputEntity(loitering(_)=true).	index(loitering(Vessel)=true, Vessel).
 sDFluent(rendezVouz(_,_)=true).	outputEntity(rendezVouz(_,_)=true).	index(rendezVouz(Vessel1,_)=true, Vessel1).
 
+cachingOrder(fastApproach(_)).	%1
 cachingOrder(highSpeedIn(_,_)=true).	%1
 cachingOrder(sailing(_)=true).	%1
 cachingOrder(stopped(_)=true).	%1
