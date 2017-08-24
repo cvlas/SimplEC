@@ -1,19 +1,27 @@
-atBody					-->	atBodyAlternatives(List1), moreAtBodyAlternatives(ListOfLists),
+atBody(AtBodyStr)			-->	atBodyAlternatives(List1), moreAtBodyAlternatives(ListOfLists),
 						{
 							addToHead(ListOfLists, List1, List),
 							
 							prod(List, AltBodyLists),
-							forall(member(AltBodyList, AltBodyLists), (atomics_to_string(AltBodyList, ",\n\t", AltBodyStr), writeln(AltBodyStr)))
+							findall(AltBodyStr, (member(AltBodyList, AltBodyLists), atomics_to_string(AltBodyList, ",\n\t", AltBodyStr)), AltBodyStrs),
+							atomics_to_string(AltBodyStrs, "^", AtBodyStr)
 						}.
 
 moreAtBodyAlternatives(List)		-->	",", space, atBodyAlternatives(List1), moreAtBodyAlternatives(ListOfLists),
 						{
 							addToHead(ListOfLists, List1, List)
 						}.
-moreAtBodyAlternatives			-->	[].
+moreAtBodyAlternatives([])		-->	[].
 
-atBodyAlternatives			-->	atBodyPart.
-atBodyAlternatives			-->	"(", atBodyPart, space, "or", space, atBodyPart, moreAtBodyParts, ")".
+atBodyAlternatives([BPStr])		-->	atBodyPart(BPStr).
+atBodyAlternatives(List)		-->	"(", atBodyPart(BPStr1), space, "or", space, atBodyPart(BPStr2), moreAtBodyParts(BPList), ")",
+						{
+							addToHead(BPList, BPStr2, BPTemp),
+							addToHead(BPTemp, BPStr1, List),
+						}.
 
-moreAtBodyParts				-->	space, "or", space, atBodyPart, moreAtBodyParts.
-moreAtBodyParts				-->	[].
+moreAtBodyParts(List)			-->	space, "or", space, atBodyPart(BPStr), moreAtBodyParts(BPList),
+						{
+							addToHead(BPList, BPStr, List)
+						}.
+moreAtBodyParts([])			-->	[].
