@@ -4,11 +4,12 @@ digraph
 	rankdir=LR;
 	ranksep="1.2 equally";
 
-	0 [label="<coord(_)> coord(_)|<coord(_)=(Lon,Lat)> coord(_)=(Lon,Lat)|<speed_change(_,_)> speed_change(_,_)|<velocity(_)> velocity(_)|<velocity(_)=true> velocity(_)=true"];
+	0 [label="<coord(_)> coord(_)|<coord(_)=(Lon,Lat)> coord(_)=(Lon,Lat)|<headingToVessels(_)=true> headingToVessels(_)=true|<speed_change(_,_)> speed_change(_,_)|<velocity(_)> velocity(_)|<velocity(_)=true> velocity(_)=true"];
 	1 [label="<fastApproach(_)> fastApproach(_)"];
 
 	0:"coord(_)" -> 1:"fastApproach(_)"
 	0:"coord(_)=(Lon,Lat)" -> 1:"fastApproach(_)"
+	0:"headingToVessels(_)=true" -> 1:"fastApproach(_)"
 	0:"speed_change(_,_)" -> 1:"fastApproach(_)"
 	0:"velocity(_)" -> 1:"fastApproach(_)"
 	0:"velocity(_)=true" -> 1:"fastApproach(_)"
