@@ -1,6 +1,4 @@
-event(coord(_)).	inputEntity(coord(_)).	index(coord(Vessel), Vessel).
 event(speed_change(_,_)).	inputEntity(speed_change(_,_)).	index(speed_change(Vessel,_), Vessel).
-event(velocity(_)).	inputEntity(velocity(_)).	index(velocity(Vessel), Vessel).
 
 sDFluent(coord(_)=(0,0)).	inputEntity(coord(_)=(0,0)).	index(coord(Vessel)=(0,0), Vessel).
 sDFluent(coord(_)=(1,0)).	inputEntity(coord(_)=(1,0)).	index(coord(Vessel)=(1,0), Vessel).
@@ -13,7 +11,6 @@ sDFluent(coord(_)=(5,2)).	inputEntity(coord(_)=(5,2)).	index(coord(Vessel)=(5,2)
 sDFluent(coord(_)=(5,3)).	inputEntity(coord(_)=(5,3)).	index(coord(Vessel)=(5,3), Vessel).
 sDFluent(coord(_)=(5,4)).	inputEntity(coord(_)=(5,4)).	index(coord(Vessel)=(5,4), Vessel).
 sDFluent(coord(_)=(5,5)).	inputEntity(coord(_)=(5,5)).	index(coord(Vessel)=(5,5), Vessel).
-sDFluent(headingToVessels(_)=true).	inputEntity(headingToVessels(_)=true).	index(headingToVessels(Vessel)=true, Vessel).
 sDFluent(velocity(_)=0).	inputEntity(velocity(_)=0).	index(velocity(Vessel)=0, Vessel).
 sDFluent(velocity(_)=10).	inputEntity(velocity(_)=10).	index(velocity(Vessel)=10, Vessel).
 sDFluent(velocity(_)=15).	inputEntity(velocity(_)=15).	index(velocity(Vessel)=15, Vessel).
@@ -29,7 +26,6 @@ sDFluent(velocity(_)=55).	inputEntity(velocity(_)=55).	index(velocity(Vessel)=55
 sDFluent(velocity(_)=60).	inputEntity(velocity(_)=60).	index(velocity(Vessel)=60, Vessel).
 sDFluent(velocity(_)=65).	inputEntity(velocity(_)=65).	index(velocity(Vessel)=65, Vessel).
 sDFluent(velocity(_)=70).	inputEntity(velocity(_)=70).	index(velocity(Vessel)=70, Vessel).
-sDFluent(velocity(_)=true).	inputEntity(velocity(_)=true).	index(velocity(Vessel)=true, Vessel).
 
 event(fastApproach(_)).	outputEntity(fastApproach(_)).	index(fastApproach(Vessel), Vessel).
 

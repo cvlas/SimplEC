@@ -5,6 +5,4 @@ multivalued: 	velocity(Vessel) = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 
 happens fastApproach(Vessel) if	
 	speed_change(Vessel, NewSpeed),
 	(velocity(Vessel) > 20 or velocity(Vessel) > 30 or velocity(Vessel) > 40 or velocity(Vessel) > 50),
-	coord(Vessel) = (Lon, Lat),
-	not nearPorts(Lon, Lat),
-	headingToVessels(Vessel).
+	coord(Vessel) = (Lon, Lat).
