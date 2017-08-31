@@ -6,3 +6,28 @@ happens fastApproach(Vessel) if
 	speed_change(Vessel, NewSpeed),
 	(velocity(Vessel) > 20 or velocity(Vessel) > 30 or velocity(Vessel) > 40 or velocity(Vessel) > 50),
 	coord(Vessel) = (Lon, Lat).
+
+initiate person(Id) if
+    (start walking(Id) or
+    start running(Id) or
+    start active(Id) or
+    start abrupt(Id)),
+    not happens disappear(Id).
+
+greeting1(P1, P2) iff
+    activeOrInactivePerson(P1),
+    person(P2),
+    close(P1, P2, 25),
+    not (running(P2) or abrupt(P2)).
+
+fighting(P1, P2) iff
+    (abrupt(P1) or abrupt(P2)),
+    close(P1, P2, 24),
+    not (inactive(P1) or inactive(P2)).
+
+initiate meeting(P1, P2)=false if
+    start running(P1)
+or    start running(P2)
+or    start abrupt(P1)
+or    start abrupt(P2)
+or    start close(P1, P2, 34)=false.
