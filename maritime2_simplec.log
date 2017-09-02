@@ -1,0 +1,6 @@
+IN RULE:
+initiate passenger density(ID,VT)=Val iff
+passenger density change(ID,VT,Val)
+ERROR: Unknown event pattern detected.
+Please check your syntax.
+

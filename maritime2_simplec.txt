@@ -1,33 +1,55 @@
-atemporal: nearPorts, speedArea.
-multivalued: 	velocity(Vessel) = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70],
-		coord(Vessel) = [(0,0), (1,0), (2,0), (3,0), (4,0), (5,0), (5,1), (5,2), (5,3), (5,4), (5,5)].
+initiate passenger density(ID,VT)=Val iff
+passenger density change(ID,VT,Val).
 
-happens fastApproach(Vessel) if	
-	speed_change(Vessel, NewSpeed),
-	(velocity(Vessel) > 20 or velocity(Vessel) > 30 or velocity(Vessel) > 40 or velocity(Vessel) > 50),
-	coord(Vessel) = (Lon, Lat).
+initiate moving(P1,P2) if
+start walking(P1),
+walking(P2),
+close(P1,P2).
 
-initiate person(Id) if
-    (start walking(Id) or
-    start running(Id) or
-    start active(Id) or
-    start abrupt(Id)),
-    not happens disappear(Id).
+initiate moving(P1,P2) if
+start walking(P2),
+walking(P1),
+close(P1,P2).
 
-greeting1(P1, P2) iff
-    activeOrInactivePerson(P1),
-    person(P2),
-    close(P1, P2, 25),
-    not (running(P2) or abrupt(P2)).
+initiate moving(P1,P2) if
+start close(P1,P2),
+walking(P1),
+walking(P2).
 
-fighting(P1, P2) iff
-    (abrupt(P1) or abrupt(P2)),
-    close(P1, P2, 24),
-    not (inactive(P1) or inactive(P2)).
+terminate moving(P1,P2) iff
+end walking(P1) or
+end walking(P2) or
+end close(P1,P2).
 
-initiate meeting(P1, P2)=false if
-    start running(P1)
-or    start running(P2)
-or    start abrupt(P1)
-or    start abrupt(P2)
-or    start close(P1, P2, 34)=false.
+initiate person(P) iff
+(start walking(P) or
+start active(P) or
+start running(P) or
+start abrupt(P)),
+not disappear(P).
+
+terminate person(P) iff
+disappear(P).
+
+moving(P1,P2) iff
+walking(P1),
+walking(P2),
+close(P1,P2).
+
+greeting1(P1, P2)=true iff
+    activeOrInactivePerson(P1)=true,
+    person(P2)=true,
+    close(P1, P2, 25)=true,
+    not (running(P2)=true or abrupt(P2)=true).
+
+fighting(P1,P2) iff
+(abrupt(P1) or abrupt(P2)),
+close(P1,P2),
+not (inactive(P1) or inactive(P2)).
+
+happens fastApproach(Vessel) iff
+speedChange(Vessel),
+velocity(Vessel) > 20 knots,
+coord(Vessel) =(Lon, Lat),
+not nearPorts(Lon, Lat),
+headingToVessels(Vessel).
