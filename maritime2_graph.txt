@@ -4,15 +4,15 @@ digraph
 	rankdir=LR;
 	ranksep="1.2 equally";
 
-	0 [label="<abrupt(_)=true> abrupt(_)=true|<active(_)=true> active(_)=true|<activeOrInactivePerson(_)=true> activeOrInactivePerson(_)=true|<close(_,_)=true> close(_,_)=true|<close(_,_,25)=true> close(_,_,25)=true|<coord(_)=(Lon,Lat)> coord(_)=(Lon,Lat)|<disappear(_)> disappear(_)|<disappear(_)=true> disappear(_)=true|<headingToVessels(_)=true> headingToVessels(_)=true|<inactive(_)=true> inactive(_)=true|<nearPorts(_,_)=true> nearPorts(_,_)=true|<running(_)=true> running(_)=true|<speedChange(_)> speedChange(_)|<speedChange(_)=true> speedChange(_)=true|<velocity(_)=true> velocity(_)=true|<walking(_)=true> walking(_)=true"];
-	1 [label="<fastApproach(_)> fastApproach(_)|<fighting(_,_)=true> fighting(_,_)=true|<moving(_,_)=true> moving(_,_)=true|<person(_)=true> person(_)=true"];
+	0 [label="<abrupt(_)=true> abrupt(_)=true|<active(_)=true> active(_)=true|<close(_,_)=true> close(_,_)=true|<close(_,_,25)=true> close(_,_,25)=true|<coord(_)=(Lon,Lat)> coord(_)=(Lon,Lat)|<disappear(_)> disappear(_)|<disappear(_)=true> disappear(_)=true|<headingToVessels(_)=true> headingToVessels(_)=true|<inactive(_)=true> inactive(_)=true|<nearPorts(_,_)=true> nearPorts(_,_)=true|<running(_)=true> running(_)=true|<speedChange(_)> speedChange(_)|<walking(_)=true> walking(_)=true"];
+	1 [label="<activeOrInactivePerson(_)=true> activeOrInactivePerson(_)=true|<fastApproach(_)> fastApproach(_)|<fighting(_,_)=true> fighting(_,_)=true|<moving(_,_)=true> moving(_,_)=true|<person(_)=true> person(_)=true"];
 	2 [label="<greeting1(_,_)=true> greeting1(_,_)=true"];
 
 	0:"abrupt(_)=true" -> 1:"fighting(_,_)=true"
 	0:"abrupt(_)=true" -> 1:"person(_)=true"
 	0:"abrupt(_)=true" -> 2:"greeting1(_,_)=true"
+	0:"active(_)=true" -> 1:"activeOrInactivePerson(_)=true"
 	0:"active(_)=true" -> 1:"person(_)=true"
-	0:"activeOrInactivePerson(_)=true" -> 2:"greeting1(_,_)=true"
 	0:"close(_,_)=true" -> 1:"fighting(_,_)=true"
 	0:"close(_,_)=true" -> 1:"moving(_,_)=true"
 	0:"close(_,_,25)=true" -> 2:"greeting1(_,_)=true"
@@ -25,9 +25,8 @@ digraph
 	0:"running(_)=true" -> 1:"person(_)=true"
 	0:"running(_)=true" -> 2:"greeting1(_,_)=true"
 	0:"speedChange(_)" -> 1:"fastApproach(_)"
-	0:"speedChange(_)=true" -> 1:"fastApproach(_)"
-	0:"velocity(_)=true" -> 1:"fastApproach(_)"
 	0:"walking(_)=true" -> 1:"moving(_,_)=true"
 	0:"walking(_)=true" -> 1:"person(_)=true"
+	1:"activeOrInactivePerson(_)=true" -> 2:"greeting1(_,_)=true"
 	1:"person(_)=true" -> 2:"greeting1(_,_)=true"
 }

@@ -4,21 +4,13 @@ event(passenger_density_change(_,_,_)).	inputEntity(passenger_density_change(_,_
 event(stop_enter(_,_,_,_)).	inputEntity(stop_enter(_,_,_,_)).	index(stop_enter(Id,_,_,_), Id).
 event(stop_leave(_,_,_,_)).	inputEntity(stop_leave(_,_,_,_)).	index(stop_leave(Id,_,_,_), Id).
 
-sDFluent(abrupt_acceleration(_,_)=abrupt).	inputEntity(abrupt_acceleration(_,_)=abrupt).	index(abrupt_acceleration(Id,_)=abrupt, Id).
-sDFluent(abrupt_acceleration(_,_)=very_abrupt).	inputEntity(abrupt_acceleration(_,_)=very_abrupt).	index(abrupt_acceleration(Id,_)=very_abrupt, Id).
-sDFluent(abrupt_deceleration(_,_)=abrupt).	inputEntity(abrupt_deceleration(_,_)=abrupt).	index(abrupt_deceleration(Id,_)=abrupt, Id).
-sDFluent(abrupt_deceleration(_,_)=very_abrupt).	inputEntity(abrupt_deceleration(_,_)=very_abrupt).	index(abrupt_deceleration(Id,_)=very_abrupt, Id).
 sDFluent(sharp_turn(_,_)=sharp).	inputEntity(sharp_turn(_,_)=sharp).	index(sharp_turn(Id,_)=sharp, Id).
 sDFluent(sharp_turn(_,_)=very_sharp).	inputEntity(sharp_turn(_,_)=very_sharp).	index(sharp_turn(Id,_)=very_sharp, Id).
 
 event(punctuality_change(_,_,_)).	outputEntity(punctuality_change(_,_,_)).	index(punctuality_change(Id,_,_), Id).
 
 simpleFluent(internal_temperature(_,_)=normal).	outputEntity(internal_temperature(_,_)=normal).	index(internal_temperature(_,_)=normal, _).
-simpleFluent(internal_temperature(_,_)=very_cold).	outputEntity(internal_temperature(_,_)=very_cold).	index(internal_temperature(Id,_)=very_cold, Id).
-simpleFluent(internal_temperature(_,_)=very_warm).	outputEntity(internal_temperature(_,_)=very_warm).	index(internal_temperature(Id,_)=very_warm, Id).
-simpleFluent(noise_level(_,_)=high).	outputEntity(noise_level(_,_)=high).	index(noise_level(Id,_)=high, Id).
 simpleFluent(noise_level(_,_)=low).	outputEntity(noise_level(_,_)=low).	index(noise_level(_,_)=low, _).
-simpleFluent(passenger_density(_,_)=high).	outputEntity(passenger_density(_,_)=high).	index(passenger_density(Id,_)=high, Id).
 simpleFluent(passenger_density(_,_)=low).	outputEntity(passenger_density(_,_)=low).	index(passenger_density(_,_)=low, _).
 simpleFluent(punctuality(_,_)=punctual).	outputEntity(punctuality(_,_)=punctual).	index(punctuality(_,_)=punctual, _).
 
@@ -32,17 +24,17 @@ sDFluent(passenger_comfort(_,_)=reducing).	outputEntity(passenger_comfort(_,_)=r
 sDFluent(passenger_satisfaction(_,_)=reducing).	outputEntity(passenger_satisfaction(_,_)=reducing).	index(passenger_satisfaction(Id,_)=reducing, Id).
 sDFluent(punctuality(_,_)=non_punctual).	outputEntity(punctuality(_,_)=non_punctual).	index(punctuality(Id,_)=non_punctual, Id).
 
+cachingOrder(punctuality(_,_)=non_punctual).	%0
+cachingOrder(driving_quality(_,_)=low).	%1
 cachingOrder(driving_style(_,_)=uncomfortable).	%1
 cachingOrder(driving_style(_,_)=unsafe).	%1
 cachingOrder(internal_temperature(_,_)=normal).	%1
 cachingOrder(noise_level(_,_)=low).	%1
 cachingOrder(passenger_density(_,_)=low).	%1
+cachingOrder(passenger_satisfaction(_,_)=reducing).	%1
 cachingOrder(punctuality(_,_)=punctual).	%1
 cachingOrder(driver_comfort(_,_)=reducing).	%2
 cachingOrder(driving_quality(_,_)=high).	%2
 cachingOrder(driving_quality(_,_)=medium).	%2
 cachingOrder(passenger_comfort(_,_)=reducing).	%2
-cachingOrder(punctuality(_,_)=non_punctual).	%2
-cachingOrder(driving_quality(_,_)=low).	%3
-cachingOrder(passenger_satisfaction(_,_)=reducing).	%3
-cachingOrder(punctuality_change(_,_,_)).	%3
+cachingOrder(punctuality_change(_,_,_)).	%2

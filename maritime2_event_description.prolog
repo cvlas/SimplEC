@@ -42,30 +42,30 @@ terminatedAt(person(P)=true, T) :-
 	happensAt(disappear(P), T).
 
 holdsFor(moving(P1,P2)=true, I) :-
-	holdsFor(walking(P1)=true,I2),
-	holdsFor(walking(P2)=true,I4),
-	holdsFor(close(P1,P2)=true,I6),
-	intersect_all([I2,I4,I6],I).
+	holdsFor(walking(P1)=true,I1),
+	holdsFor(walking(P2)=true,I2),
+	holdsFor(close(P1,P2)=true,I3),
+	intersect_all([I1,I2,I3],I).
 
 holdsFor(greeting1(P1,P2)=true, I) :-
-	holdsFor(activeOrInactivePerson(P1)=true,I2),
-	holdsFor(person(P2)=true,I4),
-	holdsFor(close(P1,P2,25)=true,I6),
-	holdsFor(running(P2)=true,I7),
-	holdsFor(abrupt(P2)=true,I8),
-	union_all([I7,I8],I9),
-	intersect_all([I2,I4,I6],I11),
-	relative_complement_all(I11,[I9],I).
+	holdsFor(activeOrInactivePerson(P1)=true,I1),
+	holdsFor(person(P2)=true,I2),
+	holdsFor(close(P1,P2,25)=true,I3),
+	holdsFor(running(P2)=true,I5),
+	holdsFor(abrupt(P2)=true,I6),
+	union_all([I5,I6],I7),
+	intersect_all([I1,I2,I3],I9),
+	relative_complement_all(I9,[I7],I).
 
 holdsFor(fighting(P1,P2)=true, I) :-
 	holdsFor(abrupt(P1)=true,I1),
 	holdsFor(abrupt(P2)=true,I2),
 	union_all([I1,I2],I3),
-	holdsFor(close(P1,P2)=true,I5),
+	holdsFor(close(P1,P2)=true,I4),
 	holdsFor(inactive(P1)=true,I6),
 	holdsFor(inactive(P2)=true,I7),
 	union_all([I6,I7],I8),
-	intersect_all([I3,I5],I10),
+	intersect_all([I3,I4],I10),
 	relative_complement_all(I10,[I8],I).
 
 happensAt(fastApproach(Vessel), T) :-

@@ -1,21 +1,21 @@
-forBody(BodyStr, HeadDeclRepr, HeadGraphRepr)	-->	cTerm(CTStr, ICT, HeadDeclRepr, HeadGraphRepr), moreCTerms(MCTStr, IMCT, HeadDeclRepr, HeadGraphRepr).
+forBody(BodyStr, HeadDeclRepr, HeadGraphRepr)	-->	conjunction(BodyStr, _, HeadDeclRepr, HeadGraphRepr).
 
-moreCTerms(MMCTStr, IMMCT, HeadDeclRepr, HeadGraphRepr)	-->	",", space, cTerm(CTStr, ICT, HeadDeclRepr, HeadGraphRepr), moreCTerms(MCTStr, IMCT, HeadDeclRepr, HeadGraphRepr).
+conjunction(CStr, IC, HeadDeclRepr, HeadGraphRepr)	-->	cTerm(CTStr, ICT, HeadDeclRepr, HeadGraphRepr), moreCTerms(MCTStr, IMCT, HeadDeclRepr, HeadGraphRepr).
+
+moreCTerms(MMCTStr, IMMCT, HeadDeclRepr, HeadGraphRepr)	-->	",", space, cTerm(CTStr, ICT, HeadDeclRepr, HeadGraphRepr), moreCTerms(MCTStr, IMCT, HeadDeclRepr, HeadGraphRepr)
 moreCTerms("", [], _, _)	-->	[].
 
-cTerm(CTStr, ICT, HeadDeclRepr, HeadGraphRepr)	-->	fluent("sD", "input", Str, _, _, _, I, HeadDeclRepr, HeadGraphRepr).
-cTerm(CTStr, ICT, HeadDeclRepr, HeadGraphRepr)	-->	disjunction(DStr, ID, HeadDeclRepr, HeadGraphRepr).
-cTerm(CTStr, ICT, HeadDeclRepr, HeadGraphRepr)	-->	"not", conjunction(CStr, IC, HeadDeclRepr, HeadGraphRepr).
-cTerm(CTStr, ICT, HeadDeclRepr, HeadGraphRepr)	-->	"not", disjunction(DStr, ID, HeadDeclRepr, HeadGraphRepr).
+cTerm(CTStr, ICT, HeadDeclRepr, HeadGraphRepr)	-->	fluent("sD", "input", Str, _, _, _, ICT, HeadDeclRepr, HeadGraphRepr)
+cTerm(CTStr, ICT, HeadDeclRepr, HeadGraphRepr)	-->	"(", disjunction(CTStr, ICT, HeadDeclRepr, HeadGraphRepr), ")".
+cTerm(CTStr, ICT, HeadDeclRepr, HeadGraphRepr)	-->	"not", space, "(", conjunction(CStr, IC, HeadDeclRepr, HeadGraphRepr), ")".
+cTerm(CTStr, ICT, HeadDeclRepr, HeadGraphRepr)	-->	"not", space, "(", disjunction(DStr, ID, HeadDeclRepr, HeadGraphRepr), ")".
 
 disjunction(DStr, ID, HeadDeclRepr, HeadGraphRepr)	-->	dTerm(DTStr, IDT, HeadDeclRepr, HeadGraphRepr), moreDTerms(MDTStr, IMDT, HeadDeclRepr, HeadGraphRepr).
 
 moreDTerms(MMDTStr, IMMDT, HeadDeclRepr, HeadGraphRepr)	-->	space, "or", space, dTerm(DTStr, IDT, HeadDeclRepr, HeadGraphRepr), moreDTerms(MDTStr, IMDT, HeadDeclRepr, HeadGraphRepr).
 moreCTerms("", [], _, _)	-->	[].
 
-dTerm(DTStr, IDT, HeadDeclRepr, HeadGraphRepr)	-->	fluent("sD", "input", Str, _, _, _, I, HeadDeclRepr, HeadGraphRepr).
-dTerm(DTStr, IDT, HeadDeclRepr, HeadGraphRepr)	-->	conjunction(CStr, IC, HeadDeclRepr, HeadGraphRepr).
-dTerm(DTStr, IDT, HeadDeclRepr, HeadGraphRepr)	-->	"not", conjunction(CStr, IC, HeadDeclRepr, HeadGraphRepr).
-dTerm(DTStr, IDT, HeadDeclRepr, HeadGraphRepr)	-->	"not", disjunction(DStr, ID, HeadDeclRepr, HeadGraphRepr).
-
-conjunction(CStr, IC, HeadDeclRepr, HeadGraphRepr)	-->	cTerm(CTStr, ICT, HeadDeclRepr, HeadGraphRepr), moreCTerms(MCTStr, IMCT, HeadDeclRepr, HeadGraphRepr).
+dTerm(DTStr, IDT, HeadDeclRepr, HeadGraphRepr)	-->	fluent("sD", "input", Str, _, _, _, IDT, HeadDeclRepr, HeadGraphRepr).
+dTerm(DTStr, IDT, HeadDeclRepr, HeadGraphRepr)	-->	"(", conjunction(DTStr, IDT, HeadDeclRepr, HeadGraphRepr), ")".
+dTerm(DTStr, IDT, HeadDeclRepr, HeadGraphRepr)	-->	"not", space, "(", conjunction(CStr, IC, HeadDeclRepr, HeadGraphRepr), ")".
+dTerm(DTStr, IDT, HeadDeclRepr, HeadGraphRepr)	-->	"not", space, "(", disjunction(DStr, ID, HeadDeclRepr, HeadGraphRepr), ")".

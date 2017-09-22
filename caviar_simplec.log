@@ -1,0 +1,46 @@
+IN RULE:
+close(Id1, Id2, 24) iff
+	distance(Id1, Id2, 24)
+ERROR: Unknown event pattern detected.
+Please check your syntax.
+
+IN RULE:
+close(Id1, Id2, 25) iff
+	close(Id1, Id2, 24) or
+	distance(Id1, Id2, 25)
+ERROR: Unknown event pattern detected.
+Please check your syntax.
+
+IN RULE:
+close(Id1, Id2, 30) iff 
+	close(Id1, Id2, 25) or
+	distance(Id1, Id2, 30)
+ERROR: Unknown event pattern detected.
+Please check your syntax.
+
+IN RULE:
+close(Id1, Id2, 34) iff
+	close(Id1, Id2, 30) or
+	distance(Id1, Id2, 34)
+ERROR: Unknown event pattern detected.
+Please check your syntax.
+
+IN RULE:
+close(Id1, Id2, Threshold)=false iff
+	not close(Id1, Id2, Threshold)
+ERROR: Unknown event pattern detected.
+Please check your syntax.
+
+IN RULE:
+closeSymmetric(Id1, Id2, Threshold) iff
+	close(Id1, Id2, Threshold) or
+	close(Id2, Id1, Threshold)
+ERROR: Unknown event pattern detected.
+Please check your syntax.
+
+IN RULE:
+activeOrInactivePerson(P) iff
+	active(P) or (inactive(P), person(P))
+ERROR: Unknown event pattern detected.
+Please check your syntax.
+

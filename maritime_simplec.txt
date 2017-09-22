@@ -25,11 +25,11 @@ terminate withinArea(Vessel, AreaName) if
 
 initiate sailing(Vessel) if
 	velocity(Vessel, Speed, Heading),
-	Speed > 2.0.
+	Speed > 20.
 
 terminate sailing(Vessel) if
-	velocity(Vessel, Speed, Heading),
-	Speed < 2.0
+	(velocity(Vessel, Speed, Heading),
+	Speed < 20)
 or	gap_start(Vessel).
 
 initiate highSpeedIn(Vessel, AreaName) if
@@ -39,22 +39,22 @@ initiate highSpeedIn(Vessel, AreaName) if
 	Speed > SpeedArea.
 
 terminate highSpeedIn(Vessel, AreaName) if
-	isInArea(Vessel, AreaName),
+	(isInArea(Vessel, AreaName),
 	happens velocity(Vessel, Speed, Heading),
 	speedArea(AreaName,SpeedArea),
-	Speed < SpeedArea
+	Speed < SpeedArea)
 or	leavesArea(Vessel, AreaName)
 or	gap_start(Vessel).
 
 loitering(Vessel) iff
-	((lowSpeed(Vessel) or stopped(Vessel)),
-	withinArea(Vessel, AreaName)),
+	(lowSpeed(Vessel) or stopped(Vessel)),
+	withinArea(Vessel, AreaName),
 	duration > 600.
 
 rendezVouz(Vessel1, Vessel2) iff
-	(proximity(Vessel1, Vessel2),
+	proximity(Vessel1, Vessel2),
 	(lowSpeed(Vessel1) or stopped(Vessel1)),
-	(lowSpeed(Vessel2) or stopped(Vessel2))),
+	(lowSpeed(Vessel2) or stopped(Vessel2)),
 	duration > 600.
 
 happens fastApproach(Vessel) if
