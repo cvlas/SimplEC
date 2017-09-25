@@ -660,13 +660,16 @@ cTerm(CTStr, Int, _, _)	-->	constraint(CTStr, Int).
 
 disjunction(DStr, ID, HeadDeclRepr, HeadGraphRepr)	-->	dTerm(DTStr, IDT, HeadDeclRepr, HeadGraphRepr), moreDTerms(MDTStr, IMDT, HeadDeclRepr, HeadGraphRepr),
 {
-	addToHead(IMDT, IDT, IMMDT),
+	(IMDT \= [] -> 
+	(addToHead(IMDT, IDT, IMMDT),
 	with_output_to(string(IMMDTStr), write(IMMDT)),
 	nb_getval(intervalNo, Int),
 	NewInt is Int + 1,
 	nb_setval(intervalNo, NewInt),
 	string_concat("I", Int, ID),
-	atomics_to_string([DTStr, ",\n\t", MDTStr, ",\n\t", "union_all(", IMMDTStr, ", ", ID, ")"], "", DStr)
+	atomics_to_string([DTStr, ",\n\t", MDTStr, ",\n\t", "union_all(", IMMDTStr, ", ", ID, ")"], "", DStr))
+	;
+	atomics_to_string([DTStr], "", DStr))
 }.
 
 moreDTerms(MMDTStr, IMMDT, HeadDeclRepr, HeadGraphRepr)	-->	space, "or", space, dTerm(DTStr, IDT, HeadDeclRepr, HeadGraphRepr), moreDTerms(MDTStr, IMDT, HeadDeclRepr, HeadGraphRepr),

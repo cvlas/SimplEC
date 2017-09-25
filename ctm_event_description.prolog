@@ -14,8 +14,7 @@ terminatedAt(punctuality(Id,VehicleType)=punctual, T) :-
 
 holdsFor(punctuality(Id,VehicleType)=non_punctual, I) :-
 	holdsFor(punctuality(Id,VehicleType)=punctual,I1),
-	complement_all(I1,I2),
-	union_all([I2],I).
+	complement_all(I1,I).
 
 happensAt(punctuality_change(Id,VehicleType,punctual), T) :-
 	happensAt(end(punctuality(Id,VehicleType)=non_punctual), T).
@@ -30,15 +29,15 @@ holdsFor(driving_style(Id,VehicleType)=unsafe, I) :-
 	union_all([I2,I3,I4],I).
 
 holdsFor(driving_style(Id,VehicleType)=uncomfortable, I) :-
-	holdsFor(sharp_turn(Id,VehicleType)=sharp,I3),
-	holdsFor(abrupt_acceleration(Id,VehicleType)=very_abrupt,I5),
-	holdsFor(abrupt_deceleration(Id,VehicleType)=very_abrupt,I6),
-	union_all([I5,I6],I7),
-	intersect_all([I3],I9),
-	relative_complement_all(I9,[I7],I10),
-	holdsFor(abrupt_acceleration(Id,VehicleType)=abrupt,I11),
-	holdsFor(abrupt_deceleration(Id,VehicleType)=abrupt,I12),
-	union_all([I10,I11,I12],I).
+	holdsFor(sharp_turn(Id,VehicleType)=sharp,I2),
+	holdsFor(abrupt_acceleration(Id,VehicleType)=very_abrupt,I4),
+	holdsFor(abrupt_deceleration(Id,VehicleType)=very_abrupt,I5),
+	union_all([I4,I5],I6),
+	intersect_all([I2],I8),
+	relative_complement_all(I8,[I6],I9),
+	holdsFor(abrupt_acceleration(Id,VehicleType)=abrupt,I10),
+	holdsFor(abrupt_deceleration(Id,VehicleType)=abrupt,I11),
+	union_all([I9,I10,I11],I).
 
 holdsFor(driving_quality(Id,VehicleType)=high, I) :-
 	holdsFor(punctuality(Id,VehicleType)=punctual,I1),
