@@ -7,7 +7,7 @@ holdsFor(activeOrInactivePerson(P)=true, I) :-
 
 holdsFor(close(Id1,Id2,Threshold)=false, I) :-
 	holdsFor(close(Id1,Id2,Threshold)=true,I1),
-	complement_all(I1,I).
+	complement_all([I1],I).
 
 initiatedAt(passenger_density(ID,VT)=Val, T) :-
 	happensAt(passenger_density_change(ID,VT,Val), T).

@@ -18,7 +18,7 @@ holdsFor(close(Id1,Id2,34)=true, I) :-
 
 holdsFor(close(Id1,Id2,Threshold)=false, I) :-
 	holdsFor(close(Id1,Id2,Threshold)=true,I1),
-	complement_all(I1,I).
+	complement_all([I1],I).
 
 holdsFor(closeSymmetric(Id1,Id2,Threshold)=true, I) :-
 	holdsFor(close(Id1,Id2,Threshold)=true,I2),
