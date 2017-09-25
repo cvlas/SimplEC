@@ -5,6 +5,11 @@ holdsFor(activeOrInactivePerson(P)=true, I) :-
 	intersect_all([I3,I4],I5),
 	union_all([I2,I5],I).
 
+holdsFor(close(Id1,Id2,Threshold)=false, I) :-
+	holdsFor(close(Id1,Id2,Threshold)=true,I1),
+	complement_all(I1,I2),
+	union_all([I2],I).
+
 initiatedAt(passenger_density(ID,VT)=Val, T) :-
 	happensAt(passenger_density_change(ID,VT,Val), T).
 

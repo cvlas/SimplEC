@@ -5,7 +5,7 @@ event(speedChange(_)).	inputEntity(speedChange(_)).	index(speedChange(Vessel), V
 sDFluent(abrupt(_)=true).	inputEntity(abrupt(_)=true).	index(abrupt(P)=true, P).
 sDFluent(active(_)=true).	inputEntity(active(_)=true).	index(active(P)=true, P).
 sDFluent(close(_,_)=true).	inputEntity(close(_,_)=true).	index(close(P1,_)=true, P1).
-sDFluent(close(_,_,_)=true).	inputEntity(close(_,_,_)=true).	index(close(P1,_,_)=true, P1).
+sDFluent(close(_,_,_)=true).	inputEntity(close(_,_,_)=true).	index(close(Id1,_,_)=true, Id1).
 sDFluent(disappear(_)=true).	inputEntity(disappear(_)=true).	index(disappear(P)=true, P).
 sDFluent(headingToVessels(_)=true).	inputEntity(headingToVessels(_)=true).	index(headingToVessels(Vessel)=true, Vessel).
 sDFluent(inactive(_)=true).	inputEntity(inactive(_)=true).	index(inactive(P)=true, P).
@@ -23,7 +23,7 @@ sDFluent(close(_,_,_)=false).	outputEntity(close(_,_,_)=false).	index(close(Id1,
 sDFluent(fighting(_,_)=true).	outputEntity(fighting(_,_)=true).	index(fighting(P1,_)=true, P1).
 sDFluent(greeting1(_,_)=true).	outputEntity(greeting1(_,_)=true).	index(greeting1(P1,_)=true, P1).
 
-cachingOrder(close(_,_,_)=false).	%0
+cachingOrder(close(_,_,_)=false).	%1
 cachingOrder(fastApproach(_)).	%1
 cachingOrder(fighting(_,_)=true).	%1
 cachingOrder(moving(_,_)=true).	%1

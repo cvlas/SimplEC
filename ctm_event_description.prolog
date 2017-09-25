@@ -12,6 +12,11 @@ terminatedAt(punctuality(Id,VehicleType)=punctual, T) :-
 terminatedAt(punctuality(Id,VehicleType)=punctual, T) :-
 	happensAt(stop_leave(Id,VehicleType,_,early), T).
 
+holdsFor(punctuality(Id,VehicleType)=non_punctual, I) :-
+	holdsFor(punctuality(Id,VehicleType)=punctual,I1),
+	complement_all(I1,I2),
+	union_all([I2],I).
+
 happensAt(punctuality_change(Id,VehicleType,punctual), T) :-
 	happensAt(end(punctuality(Id,VehicleType)=non_punctual), T).
 

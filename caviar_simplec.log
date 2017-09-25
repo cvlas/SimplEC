@@ -1,6 +1,0 @@
-IN RULE:
-close(Id1, Id2, Threshold)=false iff
-	not close(Id1, Id2, Threshold)
-ERROR: Unknown event pattern detected.
-Please check your syntax.
-

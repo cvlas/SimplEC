@@ -680,6 +680,15 @@ dTerm(DTStr, IDT, HeadDeclRepr, HeadGraphRepr)	-->	fluent("sD", "input", Str, _,
 {
 	atomics_to_string([",\n\t", "holdsFor(", Str, ", ", IDT, ")"], "", DTStr)
 }.
+dTerm(CTStr, ICT, HeadDeclRepr, HeadGraphRepr)	-->	"not", space, fluent("sD", "input", Str, _, _, _, IC, HeadDeclRepr, HeadGraphRepr),
+{
+	atomics_to_string([",\n\t", "holdsFor(", Str, ", ", IC, ")"], "", CStr),
+	nb_getval(intervalNo, Int),
+	NewInt is Int + 1,
+	nb_setval(intervalNo, NewInt),
+	string_concat("I", Int, ICT),
+	atomics_to_string([CStr, ",\n\t", "complement_all(", IC, ", ", ICT, ")"], "", CTStr)
+}.
 dTerm(DTStr, IDT, HeadDeclRepr, HeadGraphRepr)	-->	"(", conjunction(DTStr, IDT, HeadDeclRepr, HeadGraphRepr), ")".
 dTerm(DTStr, IDT, HeadDeclRepr, HeadGraphRepr)	-->	"not", space, "(", conjunction(CStr, IC, HeadDeclRepr, HeadGraphRepr), ")",
 {

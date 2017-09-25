@@ -1,6 +1,0 @@
-IN RULE:
-punctuality(Id, VehicleType)=non_punctual iff
-	not punctuality(Id, VehicleType)=punctual
-ERROR: Unknown event pattern detected.
-Please check your syntax.
-

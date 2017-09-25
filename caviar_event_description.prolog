@@ -17,6 +17,11 @@ holdsFor(close(Id1,Id2,34)=true, I) :-
 	holdsFor(distance(Id1,Id2,34)=true,I3),
 	union_all([I2,I3],I).
 
+holdsFor(close(Id1,Id2,Threshold)=false, I) :-
+	holdsFor(close(Id1,Id2,Threshold)=true,I1),
+	complement_all(I1,I2),
+	union_all([I2],I).
+
 holdsFor(closeSymmetric(Id1,Id2,Threshold)=true, I) :-
 	holdsFor(close(Id1,Id2,Threshold)=true,I2),
 	holdsFor(close(Id2,Id1,Threshold)=true,I3),
