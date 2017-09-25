@@ -1,3 +1,27 @@
+holdsFor(close(Id1,Id2,24)=true, I) :-
+	holdsFor(distance(Id1,Id2,24)=true,I2),
+	union_all([I2],I).
+
+holdsFor(close(Id1,Id2,25)=true, I) :-
+	holdsFor(close(Id1,Id2,24)=true,I2),
+	holdsFor(distance(Id1,Id2,25)=true,I3),
+	union_all([I2,I3],I).
+
+holdsFor(close(Id1,Id2,30)=true, I) :-
+	holdsFor(close(Id1,Id2,25)=true,I2),
+	holdsFor(distance(Id1,Id2,30)=true,I3),
+	union_all([I2,I3],I).
+
+holdsFor(close(Id1,Id2,34)=true, I) :-
+	holdsFor(close(Id1,Id2,30)=true,I2),
+	holdsFor(distance(Id1,Id2,34)=true,I3),
+	union_all([I2,I3],I).
+
+holdsFor(closeSymmetric(Id1,Id2,Threshold)=true, I) :-
+	holdsFor(close(Id1,Id2,Threshold)=true,I2),
+	holdsFor(close(Id2,Id1,Threshold)=true,I3),
+	union_all([I2,I3],I).
+
 initiatedAt(person(Id)=true, T) :-
 	happensAt(start(walking(Id)=true), T),
 	\+ happensAt(disappear(Id), T).
@@ -51,6 +75,13 @@ holdsFor(greeting2(P1,P2)=true, I) :-
 	holdsFor(activeOrInactivePerson(P2)=true,I2),
 	holdsFor(close(P2,P1,25)=true,I3),
 	intersect_all([I1,I2,I3],I).
+
+holdsFor(activeOrInactivePerson(P)=true, I) :-
+	holdsFor(active(P)=true,I2),
+	holdsFor(inactive(P)=true,I3),
+	holdsFor(person(P)=true,I4),
+	intersect_all([I3,I4],I5),
+	union_all([I2,I5],I).
 
 initiatedAt(meeting(P1,P2)=false, T) :-
 	happensAt(start(running(P1)=true), T).

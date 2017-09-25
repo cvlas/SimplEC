@@ -563,7 +563,7 @@ moreArguments(MArgStr, UMArgStr, GMArgStr, MArgList)				-->	",", space, "_", mor
 									}.
 
 forBody(BodyStr, HeadDeclRepr, HeadGraphRepr)	-->	conjunction(BodyStr, _, HeadDeclRepr, HeadGraphRepr).
-%forBody(BodyStr, HeadDeclRepr, HeadGraphRepr)	-->	disjunction(BodyStr, _, HeadDeclRepr, HeadGraphRepr).
+forBody(BodyStr, HeadDeclRepr, HeadGraphRepr)	-->	disjunction(BodyStr, _, HeadDeclRepr, HeadGraphRepr).
 
 conjunction(CStr, IC, HeadDeclRepr, HeadGraphRepr)	-->	cTerm(CTStr, ICT, HeadDeclRepr, HeadGraphRepr), moreCTerms(MCTStr, IMCT, HeadDeclRepr, HeadGraphRepr),
 {
