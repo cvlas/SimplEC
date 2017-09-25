@@ -1,4 +1,5 @@
 event(disappear(_)).	inputEntity(disappear(_)).	index(disappear(P), P).
+event(passenger_density_change(_,_,_)).	inputEntity(passenger_density_change(_,_,_)).	index(passenger_density_change(ID,_,_), ID).
 event(speedChange(_)).	inputEntity(speedChange(_)).	index(speedChange(Vessel), Vessel).
 
 sDFluent(abrupt(_)=true).	inputEntity(abrupt(_)=true).	index(abrupt(P)=true, P).
@@ -18,9 +19,11 @@ simpleFluent(moving(_,_)=true).	outputEntity(moving(_,_)=true).	index(moving(P1,
 simpleFluent(person(_)=true).	outputEntity(person(_)=true).	index(person(P)=true, P).
 
 sDFluent(activeOrInactivePerson(_)=true).	outputEntity(activeOrInactivePerson(_)=true).	index(activeOrInactivePerson(P)=true, P).
+sDFluent(close(_,_,_)=false).	outputEntity(close(_,_,_)=false).	index(close(Id1,_,_)=false, Id1).
 sDFluent(fighting(_,_)=true).	outputEntity(fighting(_,_)=true).	index(fighting(P1,_)=true, P1).
 sDFluent(greeting1(_,_)=true).	outputEntity(greeting1(_,_)=true).	index(greeting1(P1,_)=true, P1).
 
+cachingOrder(close(_,_,_)=false).	%0
 cachingOrder(fastApproach(_)).	%1
 cachingOrder(fighting(_,_)=true).	%1
 cachingOrder(moving(_,_)=true).	%1

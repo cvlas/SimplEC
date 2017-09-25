@@ -1,12 +1,6 @@
 IN RULE:
-activeOrInactivePerson(P) iff
-	active(P) or (inactive(P), person(P))
-
 close(Id1, Id2, Threshold)=false iff
 	not close(Id1, Id2, Threshold)
-	
-initiate passenger_density(ID,VT)=Val iff
-passenger_density_change(ID,VT,Val)
 ERROR: Unknown event pattern detected.
 Please check your syntax.
 

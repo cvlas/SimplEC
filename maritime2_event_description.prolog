@@ -1,3 +1,13 @@
+holdsFor(activeOrInactivePerson(P)=true, I) :-
+	holdsFor(active(P)=true,I2),
+	holdsFor(inactive(P)=true,I3),
+	holdsFor(person(P)=true,I4),
+	intersect_all([I3,I4],I5),
+	union_all([I2,I5],I).
+
+initiatedAt(passenger_density(ID,VT)=Val, T) :-
+	happensAt(passenger_density_change(ID,VT,Val), T).
+
 initiatedAt(moving(P1,P2)=true, T) :-
 	happensAt(start(walking(P1)=true), T),
 	holdsAt(walking(P2)=true, T),
