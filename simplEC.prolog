@@ -609,36 +609,51 @@ conjunction(CStr, IC, HeadDeclRepr, HeadGraphRepr)	-->	cTerm(CTStr, ICT, HeadDec
 					
 	%Step 3
 	subtract(IMMCT, ICIS, ComplementFreeIntersection),
+	with_output_to(string(ComplementFreeIntersectionStr), write(ComplementFreeIntersection)),
 	
-	%TODO Algo
-	If neither ICIS, nor ComplementFreeIntersection is empty
-		If ComplementFreeIntersection contains exactly one element
-			write just the relative_complement_all
-		Else
-			write both intersect_all and relative_complement_all
-	Else
-		write just the intersect_all
-	EndIf	
-	
-%	(length(ComplementFreeIntersection, 1) -> )
-	
-%	with_output_to(string(ComplementFreeIntersectionStr), write(ComplementFreeIntersection)),
-					
-%	nb_getval(intervalNo, Int),
-%	NewInt is Int + 1,
-%	NewerInt is NewInt + 1,
-%	nb_setval(intervalNo, NewerInt),
-%	string_concat("I", Int, IFB1),
-%	string_concat("I", NewInt, IFB2),
-					
-%	atomics_to_string([BodyStrPending, ",\n\t", "intersect_all(", ComplementFreeIntersectionStr, ", ", IFB1, ")"], "", FBStr1),
+	(
+		(ICUS \= [], ComplementFreeIntersection \= []) -> 
+		(
+			length(ComplementFreeIntersection, 1) ->
+			(
+				nb_getval(intervalNo, Int),
+				NewInt is Int + 1,
+				nb_setval(intervalNo, NewInt),
+				string_concat("I", Int, IFB2),
 				
-%	%Step 4
-%	((ICUS \= [], ComplementFreeIntersection \= []) -> (atomics_to_string([",\n\t", "relative_complement_all(", IFB1, ", ", ICUSStr, ", ", IFB2, ")"], "", FBStr2), string_concat(IFB2, "", IC))
-%	;
-%	(atomics_to_string([], "", FBStr2), string_concat(IFB1, "", IC))),
-					
-%	atomics_to_string([FBStr1, FBStr2], "", CStr)
+				atomics_to_string([BodyStrPending], "", FBStr1),
+				atomics_to_string([",\n\t", "relative_complement_all(", ComplementFreeIntersectionStr, ", ", ICUSStr, ", ", IFB2, ")"], "", FBStr2),
+				string_concat(IFB2, "", IC)
+			)
+			;
+			(
+				nb_getval(intervalNo, Int),
+				NewInt is Int + 1,
+				NewerInt is NewInt + 1,
+				nb_setval(intervalNo, NewerInt),
+				string_concat("I", Int, IFB1),
+				string_concat("I", NewInt, IFB2),
+				
+				atomics_to_string([BodyStrPending, ",\n\t", "intersect_all(", ComplementFreeIntersectionStr, ", ", IFB1, ")"], "", FBStr1),
+				atomics_to_string([",\n\t", "relative_complement_all(", IFB1, ", ", ICUSStr, ", ", IFB2, ")"], "", FBStr2),
+				string_concat(IFB2, "", IC)
+			)
+		)
+		;
+		(
+			nb_getval(intervalNo, Int),
+			NewInt is Int + 1,
+			nb_setval(intervalNo, NewInt),
+			string_concat("I", Int, IFB2),
+			
+			atomics_to_string([BodyStrPending], "", FBStr1),
+			
+			(ComplementFreeIntersection = [] -> atomics_to_string([",\n\t", "intersect_all(", ICUSStr, ", ", IFB2, ")"], "", FBStr2);
+			atomics_to_string([",\n\t", "intersect_all(", ComplementFreeIntersectionStr, ", ", IFB2, ")"], "", FBStr2))
+		)
+	),
+	
+	atomics_to_string([FBStr1, FBStr2], "", CStr)
 }.
 
 moreCTerms(MMCTStr, IMMCT, HeadDeclRepr, HeadGraphRepr)	-->	",", space, cTerm(CTStr, ICT, HeadDeclRepr, HeadGraphRepr), moreCTerms(MCTStr, IMCT, HeadDeclRepr, HeadGraphRepr),

@@ -84,7 +84,7 @@ holdsFor(activeOrInactivePerson(P)=true, I) :-
 	holdsFor(inactive(P)=true,I3),
 	holdsFor(person(P)=true,I4),
 	intersect_all([I3,I4],I5),
-	union_all([I2,I5],I).
+	union_all([I2,_21814],I).
 
 initiatedAt(meeting(P1,P2)=false, T) :-
 	happensAt(start(running(P1)=true), T).
