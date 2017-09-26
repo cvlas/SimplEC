@@ -3,7 +3,7 @@ holdsFor(activeOrInactivePerson(P)=true, I) :-
 	holdsFor(inactive(P)=true,I3),
 	holdsFor(person(P)=true,I4),
 	intersect_all([I3,I4],I5),
-	union_all([I2,_11466],I).
+	union_all([I2,I5],I).
 
 holdsFor(close(Id1,Id2,Threshold)=false, I) :-
 	holdsFor(close(Id1,Id2,Threshold)=true,I1),

@@ -649,7 +649,9 @@ conjunction(CStr, IC, HeadDeclRepr, HeadGraphRepr)	-->	cTerm(CTStr, ICT, HeadDec
 			atomics_to_string([BodyStrPending], "", FBStr1),
 			
 			(ComplementFreeIntersection = [] -> atomics_to_string([",\n\t", "intersect_all(", ICUSStr, ", ", IFB2, ")"], "", FBStr2);
-			atomics_to_string([",\n\t", "intersect_all(", ComplementFreeIntersectionStr, ", ", IFB2, ")"], "", FBStr2))
+			atomics_to_string([",\n\t", "intersect_all(", ComplementFreeIntersectionStr, ", ", IFB2, ")"], "", FBStr2)),
+			
+			string_concat(IFB2, "", IC)
 		)
 	),
 	
