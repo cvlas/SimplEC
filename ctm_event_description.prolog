@@ -33,10 +33,10 @@ holdsFor(driving_style(Id,VehicleType)=uncomfortable, I) :-
 	holdsFor(abrupt_acceleration(Id,VehicleType)=very_abrupt,I4),
 	holdsFor(abrupt_deceleration(Id,VehicleType)=very_abrupt,I5),
 	union_all([I4,I5],I6),
-	relative_complement_all(I2,[I6],I8),
-	holdsFor(abrupt_acceleration(Id,VehicleType)=abrupt,I9),
-	holdsFor(abrupt_deceleration(Id,VehicleType)=abrupt,I10),
-	union_all([I8,I9,I10],I).
+	relative_complement_all(I2,[I6],I7),
+	holdsFor(abrupt_acceleration(Id,VehicleType)=abrupt,I8),
+	holdsFor(abrupt_deceleration(Id,VehicleType)=abrupt,I9),
+	union_all([I7,I8,I9],I).
 
 holdsFor(driving_quality(Id,VehicleType)=high, I) :-
 	holdsFor(punctuality(Id,VehicleType)=punctual,I1),

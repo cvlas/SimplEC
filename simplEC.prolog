@@ -617,11 +617,12 @@ conjunction(CStr, IC, HeadDeclRepr, HeadGraphRepr)	-->	cTerm(CTStr, ICT, HeadDec
 			length(ComplementFreeIntersection, 1) ->
 			(
 				list_head(ComplementFreeIntersection, ComplementFreeInterval, []),
+				list_head(ICIS, IFB2, []),
 				
-				nb_getval(intervalNo, Int),
-				NewInt is Int + 1,
-				nb_setval(intervalNo, NewInt),
-				string_concat("I", Int, IFB2),
+				%nb_getval(intervalNo, Int),
+				%NewInt is Int + 1,
+				%nb_setval(intervalNo, NewInt),
+				%string_concat("I", Int, IFB2),
 				
 				atomics_to_string([BodyStrPending], "", FBStr1),
 				atomics_to_string([",\n\t", "relative_complement_all(", ComplementFreeInterval, ", ", ICUSStr, ", ", IFB2, ")"], "", FBStr2),
