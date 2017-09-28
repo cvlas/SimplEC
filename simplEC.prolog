@@ -321,6 +321,7 @@ fluent(Type, Etype, CTStr, DeclRepr, GraphRepr, _, I, HeadDeclRepr, HeadGraphRep
 	\+ atem(FncStr),
 	atomics_to_string([FncStr, "(", ArgLStr, ")", ValStr], "", CTStr),
 	atomics_to_string([FncStr, "(", GArgLStr, ")"], "", DeclRePrefix),
+	%atomics_to_string(["\nDecl Repr Prefix for ", CTStr, ":\t", DeclRePrefix, "\n"], "", Message1), write(Message1),
 	atomics_to_string([DeclRePrefix, ValStr], "", DeclRepr),
 	atomics_to_string([FncStr, "(", GArgLStr, ")", ValStr], "", GraphRepr),
 	atomics_to_string([FncStr, "(", IndArgLStr, ")", ValStr, ", ", Index], "", IndRepr),
@@ -338,12 +339,13 @@ fluent(Type, Etype, CTStr, DeclRepr, GraphRepr, _, I, HeadDeclRepr, HeadGraphRep
 		declared(DeclRepr, GraphRepr, IndRepr, Type, Etype) -> true
 		;
 		(
-			VType = var -> findall((D, G, I, T, E), (declared(D, G, I, T, E), sub_string(D, 0, _, _, DeclRePrefix), assertz(declared(D, G, I, Type, Etype))), _)
+			VType = var -> findall((D, G, Ind), (declared(D, G, Ind, _, _), split_string(D, "=", " ", [DeclRePrefix|_]), assertz(declared(D, G, Ind, Type, Etype))), _)
 			;
 			(
 				HeadDeclRepr = null -> assertz(declared(DeclRepr, GraphRepr, IndRepr, Type, Etype))
 				;
 				(
+					%write("\nBika\n"),
 					% Ψάξε και βρες αν υπάρχει κάποιο output entity με το ίδιο όνομα, την ίδια τιμή και το ίδιο πλήθος ορισμάτων.
 					% Aν υπάρχει, τότε κάνε assertz το τρέχον fluent σαν output entity.
 					
