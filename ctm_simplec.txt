@@ -1,3 +1,5 @@
+multivalued: internal_temperature(Id, VehicleType)=[normal, very_warm, very_cold].
+
 initially punctuality(_,_)=punctual.
 
 initiate punctuality(Id, VehicleType)=punctual if

@@ -522,7 +522,7 @@ value(ValStr, val)						-->	"=", space, tuple(ArgStr, _),
 }.
 value("=true", val)						-->	[].
 
-restChars(Chars)						--> 	string_without([9, 10, 13, 32, 40, 41, 44, 46], Chars).
+restChars(Chars)						--> 	string_without([9, 10, 13, 32, 40, 41, 44, 46, 91, 93], Chars).
 
 argumentsList(ArgLStr, UArgLStr, GArgLStr, IndArgLStr, ArgStr, ArgList)	--> 	argument(ArgStr), moreArguments(MArgStr, UMArgStr, GMArgStr, MArgList),
 {
