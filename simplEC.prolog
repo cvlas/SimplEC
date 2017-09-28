@@ -20,53 +20,7 @@ prod([],[[]]).
 prod([L|Ls],Out) :-
 	bagof([X|R],(prod(Ls,O), member(X,L), member(R,O)),Out).
 
-% Update the caching priority of an element and propagate this update to all output entities that depend on it.
-%propagatePriority(E, P) :-
-%	
-%	% Initially, the caching priority of E is P.
-%	% If there are no dependents, exit.
-%	(\+ defines(E, _, _) -> true
-%	;
-%	
-%	% If E is Self-dependent, exit
-%	defines(E, E, _) -> true
-%	;
-%	
-%	% Else, update the caching priorities of all dependants.
-%	% Find all direct dependents (list has at least one element). Sort them and remove duplicates.
-%	findall(H, defines(E, H, _), Heads), Heads \= [], sort(Heads, HeadsSorted),
-%	
-%	% Find and remove all dependencies with the old value C (Future work: Do this only if old value C \= P)
-%	findall((E, B, C), (defines(E, B, C), retract(defines(E, B, C))), _),
-%	
-%	% For each direct dependent of E assert new dependency with new value P.
-%	forall(member(H, HeadsSorted), (assertz(defines(E, H, P)), 
-%	
-%	% Calculate the new caching priority of dependent H, based on the new dependencies.
-%	calculatePriority(H, Q),
-%	assertz(cachingPriority(H, Q)),
-%	
-%	% Repeat procedure, this time for dependent H.
-%	propagatePriority(H, Q)))).
-
-% Caclulate the caching priority of an output entity by looking at its dependencies.
-%calculatePriority(H, Q) :-
-%	
-%	% Find all dependencies of H, along with their caching priority values.
-%	findall(dddt(O,P), defines(O, H, P), OPS),
-%	
-%	% Alphabetically sort dependencies, removing duplicates. (Future work: Are both sortings needed?)
-%	sort(2, @>=, OPS, OOPS),
-%	sort(1, @<, OOPS, OOPSS),
-%	
-%	% Gather the caching priorities of the dependencies of H in a list
-%	% Take the sum of all values in this list
-%	% The updated caching priority of H will be the sum of the caching priorities of its dependencies + 1
-%	% Adding 1 to the amount above ensures that H will be higher in the caching hierarchy than all of its dependencies.
-%	findall(P, member(dddt(_, P), OOPSS), PS),
-%	sum_list(PS, TmpQ),
-%	Q is TmpQ + 1.
-
+% 
 cachingLevel(Node, Level) :-
 	findall(Parent, (defines(Parent, Node, _), Parent \= Node), Parents),
 	(length(Parents, 0) -> Level is 0
@@ -386,7 +340,26 @@ fluent(Type, Etype, CTStr, DeclRepr, GraphRepr, _, I, HeadDeclRepr, HeadGraphRep
 		(
 			VType = var -> findall((D, G, I, T, E), (declared(D, G, I, T, E), sub_string(D, 0, _, _, DeclRePrefix), assertz(declared(D, G, I, Type, Etype))), _)
 			;
-			assertz(declared(DeclRepr, GraphRepr, IndRepr, Type, Etype))
+			(
+				HeadDeclRepr = null -> assertz(declared(DeclRepr, GraphRepr, IndRepr, Type, Etype))
+				;
+				(
+					% Ψάξε και βρες αν υπάρχει κάποιο output entity με το ίδιο όνομα, την ίδια τιμή και το ίδιο πλήθος ορισμάτων.
+					% Aν υπάρχει, τότε κάνε assertz το τρέχον fluent σαν output entity.
+					
+					split_string(DeclRepr, "()=,", ")= ", DeclReprParts),
+					list_head(DeclReprParts, DeclReprFunctor, DeclReprRest),
+					last(DeclReprRest, DeclReprValue),
+					
+					((declared(HD, _, _, HT, "output"),
+					split_string(HD, "()=,", ")= ", HDParts),
+					same_length(HDParts, DeclReprParts),
+					list_head(HDParts, DeclReprFunctor, HDRest),
+					last(HDRest, DeclReprValue)) -> assertz(declared(DeclRepr, GraphRepr, IndRepr, HT, "output"))
+					;
+					assertz(declared(DeclRepr, GraphRepr, IndRepr, Type, Etype)))
+				)
+			)
 		)
 	),
 	
@@ -439,9 +412,28 @@ event(Etype, EvStr, DeclRepr, GraphRepr, _, HeadDeclRepr, HeadGraphRepr)		-->	fu
 	atomics_to_string([FncStr, "(", GArgLStr, ")"], "", GraphRepr),
 	atomics_to_string([FncStr, "(", IndArgLStr, "), ", Index], "", IndRepr),
 
-	(declared(DeclRepr, GraphRepr, IndRepr, "event", Etype) -> true
-	;
-	assertz(declared(DeclRepr, GraphRepr, IndRepr, "event", Etype))),
+	(
+		declared(DeclRepr, GraphRepr, IndRepr, "event", Etype) -> true
+		;
+		(
+			HeadDeclRepr = null -> assertz(declared(DeclRepr, GraphRepr, IndRepr, "event", Etype))
+			;
+			(
+				% Ψάξε και βρες αν υπάρχει κάποιο output event με το ίδιο όνομα και το ίδιο πλήθος ορισμάτων.
+				% Aν υπάρχει, τότε κάνε assertz το τρέχον event σαν output entity.
+				
+				split_string(DeclRepr, "()=,", ")= ", DeclReprParts),
+				list_head(DeclReprParts, DeclReprFunctor, _),
+				
+				((declared(HD, _, _, "event", "output"),
+				split_string(HD, "()=,", ")= ", HDParts),
+				same_length(HDParts, DeclReprParts),
+				list_head(HDParts, DeclReprFunctor, _)) -> assertz(declared(DeclRepr, GraphRepr, IndRepr, "event", "output"))
+				;
+				assertz(declared(DeclRepr, GraphRepr, IndRepr, "event", Etype)))
+			)
+		)
+	),
 	
 	%(cachingPriority(DeclRepr, GraphRepr, _) -> (findall(P, cachingPriority(DeclRepr, GraphRepr, P), PS), max_list(PS, Priority))
 	%;

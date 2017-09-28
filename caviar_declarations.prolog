@@ -3,9 +3,6 @@ event(disappear(_)).	inputEntity(disappear(_)).	index(disappear(Id), Id).
 
 sDFluent(abrupt(_)=true).	inputEntity(abrupt(_)=true).	index(abrupt(Id)=true, Id).
 sDFluent(active(_)=true).	inputEntity(active(_)=true).	index(active(Id)=true, Id).
-sDFluent(close(_,_,34)=false).	inputEntity(close(_,_,34)=false).	index(close(P1,_,34)=false, P1).
-sDFluent(close(_,_,_)=true).	inputEntity(close(_,_,_)=true).	index(close(Id1,_,_)=true, Id1).
-sDFluent(closeSymmetric(_,_,30)=true).	inputEntity(closeSymmetric(_,_,30)=true).	index(closeSymmetric(Person,_,30)=true, Person).
 sDFluent(distance(_,_,24)=true).	inputEntity(distance(_,_,24)=true).	index(distance(Id1,_,24)=true, Id1).
 sDFluent(distance(_,_,25)=true).	inputEntity(distance(_,_,25)=true).	index(distance(Id1,_,25)=true, Id1).
 sDFluent(distance(_,_,30)=true).	inputEntity(distance(_,_,30)=true).	index(distance(Id1,_,30)=true, Id1).
@@ -26,8 +23,11 @@ sDFluent(activeOrInactivePerson(_)=true).	outputEntity(activeOrInactivePerson(_)
 sDFluent(close(_,_,24)=true).	outputEntity(close(_,_,24)=true).	index(close(Id1,_,24)=true, Id1).
 sDFluent(close(_,_,25)=true).	outputEntity(close(_,_,25)=true).	index(close(Id1,_,25)=true, Id1).
 sDFluent(close(_,_,30)=true).	outputEntity(close(_,_,30)=true).	index(close(Id1,_,30)=true, Id1).
+sDFluent(close(_,_,34)=false).	outputEntity(close(_,_,34)=false).	index(close(P1,_,34)=false, P1).
 sDFluent(close(_,_,34)=true).	outputEntity(close(_,_,34)=true).	index(close(Id1,_,34)=true, Id1).
 sDFluent(close(_,_,_)=false).	outputEntity(close(_,_,_)=false).	index(close(Id1,_,_)=false, Id1).
+sDFluent(close(_,_,_)=true).	outputEntity(close(_,_,_)=true).	index(close(Id1,_,_)=true, Id1).
+sDFluent(closeSymmetric(_,_,30)=true).	outputEntity(closeSymmetric(_,_,30)=true).	index(closeSymmetric(Person,_,30)=true, Person).
 sDFluent(closeSymmetric(_,_,_)=true).	outputEntity(closeSymmetric(_,_,_)=true).	index(closeSymmetric(Id1,_,_)=true, Id1).
 sDFluent(fighting(_,_)=true).	outputEntity(fighting(_,_)=true).	index(fighting(P1,_)=true, P1).
 sDFluent(greeting1(_,_)=true).	outputEntity(greeting1(_,_)=true).	index(greeting1(P1,_)=true, P1).
