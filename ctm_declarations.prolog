@@ -16,14 +16,14 @@ sDFluent(sharp_turn(_,_)=very_sharp).	inputEntity(sharp_turn(_,_)=very_sharp).	i
 event(punctuality_change(_,_,non_punctual)).	outputEntity(punctuality_change(_,_,non_punctual)).	index(punctuality_change(Id,_,non_punctual), Id).
 event(punctuality_change(_,_,punctual)).	outputEntity(punctuality_change(_,_,punctual)).	index(punctuality_change(Id,_,punctual), Id).
 
-simpleFluent(internal_temperature(_,_)=normal).	outputEntity(internal_temperature(_,_)=normal).	index(internal_temperature(_,_)=normal, _).
+simpleFluent(internal_temperature(_,_)=normal).	outputEntity(internal_temperature(_,_)=normal).	index(internal_temperature(X,_)=normal, X).
 simpleFluent(internal_temperature(_,_)=very_cold).	outputEntity(internal_temperature(_,_)=very_cold).	index(internal_temperature(Id,_)=very_cold, Id).
 simpleFluent(internal_temperature(_,_)=very_warm).	outputEntity(internal_temperature(_,_)=very_warm).	index(internal_temperature(Id,_)=very_warm, Id).
 simpleFluent(noise_level(_,_)=high).	outputEntity(noise_level(_,_)=high).	index(noise_level(Id,_)=high, Id).
-simpleFluent(noise_level(_,_)=low).	outputEntity(noise_level(_,_)=low).	index(noise_level(_,_)=low, _).
+simpleFluent(noise_level(_,_)=low).	outputEntity(noise_level(_,_)=low).	index(noise_level(X,_)=low, X).
 simpleFluent(passenger_density(_,_)=high).	outputEntity(passenger_density(_,_)=high).	index(passenger_density(Id,_)=high, Id).
-simpleFluent(passenger_density(_,_)=low).	outputEntity(passenger_density(_,_)=low).	index(passenger_density(_,_)=low, _).
-simpleFluent(punctuality(_,_)=punctual).	outputEntity(punctuality(_,_)=punctual).	index(punctuality(_,_)=punctual, _).
+simpleFluent(passenger_density(_,_)=low).	outputEntity(passenger_density(_,_)=low).	index(passenger_density(X,_)=low, X).
+simpleFluent(punctuality(_,_)=punctual).	outputEntity(punctuality(_,_)=punctual).	index(punctuality(X,_)=punctual, X).
 
 sDFluent(driver_comfort(_,_)=reducing).	outputEntity(driver_comfort(_,_)=reducing).	index(driver_comfort(Id,_)=reducing, Id).
 sDFluent(driving_quality(_,_)=high).	outputEntity(driving_quality(_,_)=high).	index(driving_quality(Id,_)=high, Id).

@@ -232,8 +232,6 @@ initially		-->	"initially", space, fluent("simple", "output", CTStr, _, _, _, _,
 				{
 					atomics_to_string(["initially(", CTStr, ").\n\n"], "", InitiallyStr),
 					write(InitiallyStr)
-					%assertz(cachingPriority(DeclRepr, GraphRepr, 1)),
-					%propagatePriority(DeclRepr, GraphRepr, 1)
 				}.
 					
 holdsFor		--> 	fhead(Head, HeadDeclRepr, HeadGraphRepr), space, sep, space, {nb_setval(intervalNo, 1)}, forBody(Body, HeadDeclRepr, HeadGraphRepr), ".",
@@ -526,6 +524,14 @@ value("=true", val)						-->	[].
 
 restChars(Chars)						--> 	string_without([9, 10, 13, 32, 40, 41, 44, 46, 91, 93], Chars).
 
+argumentsList(ArgLStr, UArgLStr, GArgLStr, IndArgLStr, "X", ArgList)	--> 	"_", moreArguments(MArgStr, UMArgStr, GMArgStr, MArgList),
+{
+	string_concat("_", MArgStr, ArgLStr),
+	string_concat("_", UMArgStr, UArgLStr),
+	string_concat("_", GMArgStr, GArgLStr),
+	string_concat("X", GMArgStr, IndArgLStr),
+	addToHead(MArgList, "_", ArgList)
+}.
 argumentsList(ArgLStr, UArgLStr, GArgLStr, IndArgLStr, ArgStr, ArgList)	--> 	argument(ArgStr), moreArguments(MArgStr, UMArgStr, GMArgStr, MArgList),
 {
 	string_concat(ArgStr, MArgStr, ArgLStr),
@@ -541,14 +547,6 @@ argumentsList(ArgLStr, UArgLStr, GArgLStr, IndArgLStr, ArgStr, ArgList)	--> 	arg
 	
 	string_concat(ArgStr, GMArgStr, IndArgLStr),
 	addToHead(MArgList, ArgStr, ArgList)
-}.
-argumentsList(ArgLStr, UArgLStr, GArgLStr, IndArgLStr, "X", ArgList)	--> 	"_", moreArguments(MArgStr, UMArgStr, GMArgStr, MArgList),
-{
-	string_concat("_", MArgStr, ArgLStr),
-	string_concat("_", UMArgStr, UArgLStr),
-	string_concat("_", GMArgStr, GArgLStr),
-	string_concat("X", GMArgStr, IndArgLStr),
-	addToHead(MArgList, "_", ArgList)
 }.
 
 argument(ArgStr) 						--> 	functawr(ArgStr).
