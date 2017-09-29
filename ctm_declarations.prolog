@@ -38,7 +38,11 @@ sDFluent(punctuality(_,_)=non_punctual).	outputEntity(punctuality(_,_)=non_punct
 cachingOrder(driving_style(_,_)=uncomfortable).	%1
 cachingOrder(driving_style(_,_)=unsafe).	%1
 cachingOrder(internal_temperature(_,_)=normal).	%1
+cachingOrder(internal_temperature(_,_)=very_cold).	%1
+cachingOrder(internal_temperature(_,_)=very_warm).	%1
+cachingOrder(noise_level(_,_)=high).	%1
 cachingOrder(noise_level(_,_)=low).	%1
+cachingOrder(passenger_density(_,_)=high).	%1
 cachingOrder(passenger_density(_,_)=low).	%1
 cachingOrder(punctuality(_,_)=punctual).	%1
 cachingOrder(driver_comfort(_,_)=reducing).	%2

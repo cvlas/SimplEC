@@ -23,11 +23,14 @@ prod([L|Ls],Out) :-
 % 
 cachingLevel(Node, Level) :-
 	findall(Parent, (defines(Parent, Node, _), Parent \= Node), Parents),
+	%with_output_to(string(ParentsStr), write(Parents)), atomics_to_string(["\n\tNode ", Node, "'s parents:\t", ParentsStr], Messagebu), write(Messagebu),
 	(length(Parents, 0) -> Level is 0
 	;
 	(findall(L, (member(P, Parents), cachingLevel(P, L)), Levels),
 	max_list(Levels, MaxLevel),
-	Level is MaxLevel + 1)).
+	Level is MaxLevel + 1)
+	%atomics_to_string(["\n\tNode ", Node, "'s level:\t", Level], Messagebu1), write(Messagebu1)
+	).
 
 % -----------------------------------------------
 % SIMPL-EC
@@ -121,12 +124,12 @@ simplEC(InputFile, OutputFile, DeclarationsFile, GraphFile) :-
 	
 	% For each output entity (among those that have not been flagged as "noCaching") find its level in the caching hierarchy
 	% Sort by caching priority value, in ascending order and print in the declarations file
-	findall(cachingHierarchy(Node, Level), (head(Node), \+ noCaching(Node), cachingLevel(Node, Level)), CachingUnordered),
-	%write(CachingUnordered),
+	findall(cachingHierarchy(Node, Level), (declared(Node, _, _, _, "output"), \+ noCaching(Node), cachingLevel(Node, Level)), CachingUnordered),
+	%forall(member(Tuple, CachingUnordered), (writeln(Tuple))), nl, nl, 
 	sort(1, @<, CachingUnordered, CachingSorted),
-	%write(CachingSorted),
+	%forall(member(Tuple, CachingSorted), (writeln(Tuple))), nl, nl, 
 	sort(2, @=<, CachingSorted, CachingOrdered),
-	%write(CachingOrdered),
+	%forall(member(Tuple, CachingOrdered), (writeln(Tuple))), nl, nl, 
 	findall(H,
 		(member(cachingHierarchy(H, Q), CachingOrdered),
 		atomics_to_string(["cachingOrder(", H, ").\t%", Q, "\n"], "", Out),
@@ -318,6 +321,8 @@ fluent(Type, Etype, CTStr, DeclRepr, GraphRepr, _, I, HeadDeclRepr, HeadGraphRep
 {
 	\+ atem(FncStr),
 	atomics_to_string([FncStr, "(", ArgLStr, ")", ValStr], "", CTStr),
+						%atomics_to_string(["\nEimai to flouent ", CTStr, " kai dhlwnw oti:\n"], "", Message2),
+						%write(Message2),
 	atomics_to_string([FncStr, "(", GArgLStr, ")"], "", DeclRePrefix),
 	%atomics_to_string(["\nDecl Repr Prefix for ", CTStr, ":\t", DeclRePrefix, "\n"], "", Message1), write(Message1),
 	atomics_to_string([DeclRePrefix, ValStr], "", DeclRepr),
@@ -371,6 +376,8 @@ fluent(Type, Etype, CTStr, DeclRepr, GraphRepr, _, I, HeadDeclRepr, HeadGraphRep
 		(HeadDeclRepr = null, HeadGraphRepr = null) -> assertz(head(DeclRepr))
 		;
 		(
+						%atomics_to_string(["Currently examining floyent: ", HeadDeclRepr, ""], "", Message5),
+						%write(Message5),
 			split_string(HeadDeclRepr, "=", "", Parts),
 			length(Parts, Length),
 			(
@@ -380,12 +387,18 @@ fluent(Type, Etype, CTStr, DeclRepr, GraphRepr, _, I, HeadDeclRepr, HeadGraphRep
 					string_codes(Value, ValueCodes),
 					list_head(ValueCodes, First, _),
 					(
+						%atomics_to_string(["\nCurrently examining char: ", First, ", from head fluent ", HeadDeclRepr], "", Message1),
+						%write(Message1),
 						char_type(First, upper) ->
 						(
-							findall((H, G, I, T, E), (declared(H, G, I, T, E), sub_string(H, 0, _, _, HeadDeclRePrefix), assertz(defines(DeclRepr, H, _)), assertz(graphines(GraphRepr, H))), _)
+							%write("\nOpa! Vrika mpampa mysthrio, katse na dw ti paizei."),
+							% TODO: EDW EXOUME THEMA. DEN FTIAXNEI TA DEPENDENCIES POU PREPEI KAI TO CACHING ORDER DEN EXEI OLA TA OUTPUT ENTITIES
+							findall((Hi, Gi, In, Ti, Ei), (declared(Hi, Gi, In, Ti, Ei), sub_string(Hi, 0, _, _, HeadDeclRePrefix), assertz(defines(DeclRepr, Hi, _)), assertz(graphines(GraphRepr, Hi))), _)
 						)
 						;
 						(
+							%atomics_to_string(["\nFluent ", HeadDeclRepr, " has a normal value. Creating regular dependencies...\n"], "", Message3),
+							%write(Message3),
 							assertz(defines(DeclRepr, HeadDeclRepr, _)),
 							assertz(graphines(DeclRepr, HeadDeclRepr))
 						)
@@ -393,6 +406,8 @@ fluent(Type, Etype, CTStr, DeclRepr, GraphRepr, _, I, HeadDeclRepr, HeadGraphRep
 				)
 				;
 				(
+					%atomics_to_string(["\nObject ", HeadDeclRepr, " does not have a value. Must be an event.\n"], "", Message4),
+					%write(Message4),
 					assertz(defines(DeclRepr, HeadDeclRepr, _)),
 					assertz(graphines(DeclRepr, HeadDeclRepr))
 				)
@@ -408,6 +423,8 @@ fluent(Type, Etype, CTStr, DeclRepr, GraphRepr, _, I, HeadDeclRepr, HeadGraphRep
 event(Etype, EvStr, DeclRepr, GraphRepr, _, HeadDeclRepr, HeadGraphRepr)		-->	functawr(FncStr), "(", argumentsList(ArgLStr, _, GArgLStr, IndArgLStr, Index, _), ")",
 {
 	atomics_to_string([FncStr, "(", ArgLStr, ")"], "", EvStr),
+						%atomics_to_string(["\nEimai to ivent ", EvStr, " kai dhlwnw oti:\n"], "", Message2),
+						%write(Message2),
 	atomics_to_string([FncStr, "(", GArgLStr, ")"], "", DeclRepr),
 	atomics_to_string([FncStr, "(", GArgLStr, ")"], "", GraphRepr),
 	atomics_to_string([FncStr, "(", IndArgLStr, "), ", Index], "", IndRepr),
@@ -443,6 +460,8 @@ event(Etype, EvStr, DeclRepr, GraphRepr, _, HeadDeclRepr, HeadGraphRepr)		-->	fu
 		(HeadDeclRepr = null, HeadGraphRepr = null) -> assertz(head(DeclRepr))
 		;
 		(
+						%atomics_to_string(["Currently examining floyent: ", HeadDeclRepr, ""], "", Message5),
+						%write(Message5),
 			split_string(HeadDeclRepr, "=", "", Parts),
 			length(Parts, Length),
 			(
@@ -452,12 +471,18 @@ event(Etype, EvStr, DeclRepr, GraphRepr, _, HeadDeclRepr, HeadGraphRepr)		-->	fu
 					string_codes(Value, ValueCodes),
 					list_head(ValueCodes, First, _),
 					(
+						%atomics_to_string(["\nCurrently examining char: ", First, ", from head fluent ", HeadDeclRepr], "", Message1),
+						%write(Message1),
 						char_type(First, upper) ->
 						(
-							findall((H, G, I, T, E), (declared(H, G, I, T, E), sub_string(H, 0, _, _, HeadDeclRePrefix), assertz(defines(DeclRepr, H, _)), assertz(graphines(GraphRepr, H))), _)
+							%write("\nOpa! Vrika mpampa mysthrio, katse na dw ti paizei."),
+							% TODO: EDW EXOUME THEMA. DEN FTIAXNEI TA DEPENDENCIES POU PREPEI KAI TO CACHING ORDER DEN EXEI OLA TA OUTPUT ENTITIES
+							findall((Hi, Gi, In, Ti, Ei), (declared(Hi, Gi, In, Ti, Ei), sub_string(Hi, 0, _, _, HeadDeclRePrefix), assertz(defines(DeclRepr, Hi, _)), assertz(graphines(GraphRepr, Hi))), _)
 						)
 						;
 						(
+							%atomics_to_string(["\nFluent ", HeadDeclRepr, " has a normal value. Creating regular dependencies...\n"], "", Message3),
+							%write(Message3),
 							assertz(defines(DeclRepr, HeadDeclRepr, _)),
 							assertz(graphines(DeclRepr, HeadDeclRepr))
 						)
@@ -465,6 +490,8 @@ event(Etype, EvStr, DeclRepr, GraphRepr, _, HeadDeclRepr, HeadGraphRepr)		-->	fu
 				)
 				;
 				(
+					%atomics_to_string(["\nObject ", HeadDeclRepr, " does not have a value. Must be an event.\n"], "", Message4),
+					%write(Message4),
 					assertz(defines(DeclRepr, HeadDeclRepr, _)),
 					assertz(graphines(DeclRepr, HeadDeclRepr))
 				)

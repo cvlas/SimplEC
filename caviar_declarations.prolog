@@ -34,6 +34,9 @@ sDFluent(greeting1(_,_)=true).	outputEntity(greeting1(_,_)=true).	index(greeting
 sDFluent(greeting2(_,_)=true).	outputEntity(greeting2(_,_)=true).	index(greeting2(P1,_)=true, P1).
 sDFluent(moving(_,_)=true).	outputEntity(moving(_,_)=true).	index(moving(P1,_)=true, P1).
 
+cachingOrder(close(_,_,34)=false).	%0
+cachingOrder(close(_,_,_)=true).	%0
+cachingOrder(closeSymmetric(_,_,30)=true).	%0
 cachingOrder(close(_,_,24)=true).	%1
 cachingOrder(close(_,_,_)=false).	%1
 cachingOrder(closeSymmetric(_,_,_)=true).	%1
