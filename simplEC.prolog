@@ -317,13 +317,13 @@ shead(HeadStr, DeclRepr, GraphRepr)						--> 	"happens", space, event("output", 
 	atomics_to_string(["happensAt(", EvStr, ", T)"], "", HeadStr)
 }.
 
-fluent(Type, Etype, CTStr, DeclRepr, GraphRepr, _, I, HeadDeclRepr, HeadGraphRepr)	--> 	functawr(FncStr), "(", argumentsList(ArgLStr, _, GArgLStr, IndArgLStr, Index, _), ")", space, value(ValStr, VType), !,
+fluent(Type, Etype, CTStr, DeclRepr, GraphRepr, _, I, HeadDeclRepr, HeadGraphRepr)	--> 	functawr(FncStr), "(", argumentsList(ArgLStr, UArgLStr, GArgLStr, IndArgLStr, Index, _), ")", space, value(ValStr, VType), !,
 {
 	\+ atem(FncStr),
 	atomics_to_string([FncStr, "(", ArgLStr, ")", ValStr], "", CTStr),
 						%atomics_to_string(["\nEimai to flouent ", CTStr, " kai dhlwnw oti:\n"], "", Message2),
 						%write(Message2),
-	atomics_to_string([FncStr, "(", GArgLStr, ")"], "", DeclRePrefix),
+	atomics_to_string([FncStr, "(", UArgLStr, ")"], "", DeclRePrefix),
 	%atomics_to_string(["\nDecl Repr Prefix for ", CTStr, ":\t", DeclRePrefix, "\n"], "", Message1), write(Message1),
 	atomics_to_string([DeclRePrefix, ValStr], "", DeclRepr),
 	atomics_to_string([FncStr, "(", GArgLStr, ")", ValStr], "", GraphRepr),
@@ -420,12 +420,12 @@ fluent(Type, Etype, CTStr, DeclRepr, GraphRepr, _, I, HeadDeclRepr, HeadGraphRep
 	assertz(matchRepr(DeclRepr, GraphRepr)))
 }.
 
-event(Etype, EvStr, DeclRepr, GraphRepr, _, HeadDeclRepr, HeadGraphRepr)		-->	functawr(FncStr), "(", argumentsList(ArgLStr, _, GArgLStr, IndArgLStr, Index, _), ")",
+event(Etype, EvStr, DeclRepr, GraphRepr, _, HeadDeclRepr, HeadGraphRepr)		-->	functawr(FncStr), "(", argumentsList(ArgLStr, UArgLStr, GArgLStr, IndArgLStr, Index, _), ")",
 {
 	atomics_to_string([FncStr, "(", ArgLStr, ")"], "", EvStr),
 						%atomics_to_string(["\nEimai to ivent ", EvStr, " kai dhlwnw oti:\n"], "", Message2),
 						%write(Message2),
-	atomics_to_string([FncStr, "(", GArgLStr, ")"], "", DeclRepr),
+	atomics_to_string([FncStr, "(", UArgLStr, ")"], "", DeclRepr),
 	atomics_to_string([FncStr, "(", GArgLStr, ")"], "", GraphRepr),
 	atomics_to_string([FncStr, "(", IndArgLStr, "), ", Index], "", IndRepr),
 

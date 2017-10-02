@@ -5,7 +5,6 @@ event(speedChange(_)).	inputEntity(speedChange(_)).	index(speedChange(Vessel), V
 sDFluent(abrupt(_)=true).	inputEntity(abrupt(_)=true).	index(abrupt(P)=true, P).
 sDFluent(active(_)=true).	inputEntity(active(_)=true).	index(active(P)=true, P).
 sDFluent(close(_,_)=true).	inputEntity(close(_,_)=true).	index(close(P1,_)=true, P1).
-sDFluent(close(_,_,25)=true).	inputEntity(close(_,_,25)=true).	index(close(P1,_,25)=true, P1).
 sDFluent(close(_,_,_)=true).	inputEntity(close(_,_,_)=true).	index(close(Id1,_,_)=true, Id1).
 sDFluent(disappear(_)=true).	inputEntity(disappear(_)=true).	index(disappear(P)=true, P).
 sDFluent(headingToVessels(_)=true).	inputEntity(headingToVessels(_)=true).	index(headingToVessels(Vessel)=true, Vessel).
