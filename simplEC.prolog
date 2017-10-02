@@ -109,6 +109,15 @@ simplEC(InputFile, OutputFile, DeclarationsFile, GraphFile) :-
 		write(DeclStream, OutStr)),
 		_), nl(DeclStream),
 	
+	% CollectIntervals...
+	findall(Result, (one(Result), write(Result)), _),
+	
+	% BuildFromPoints...
+	findall(Result, (two(Result), write(Result)), _),
+	
+	% Grounding...
+	findall(Result, (three(Result), write(Result)), _),
+	
 	% For each output entity (among those that have not been flagged as "noCaching") find its maximal caching priority
 	% Sort by caching priority value, in ascending order and print in the declarations file
 	%findall((H, Q), (head(H), \+ noCaching(H), findall(Pr, cachingPriority(H, Pr), Prs), max_list(Prs, Q)), CachingUnordered),
@@ -190,6 +199,9 @@ ceDefinition		-->	multivaluedFluents.
 ceDefinition		-->	initially.
 ceDefinition		-->	starAt.
 ceDefinition		-->	holdsFor.
+ceDefinition		-->	collectIntervals.
+ceDefinition		-->	buildFromPoints.
+ceDefinition		-->	grounding.
 ceDefinition		-->	string_without([46], ErrRule), ".",
 				{
 					% Write error message in log file
@@ -230,6 +242,37 @@ multivaluedFluent	-->	functawr(FncStr), "(", argumentsList(_, _, GArgLStr, IndAr
 					
 					assertz(declared(DeclRepr, GraphRepr, IndRepr, "sD", "input"))))
 				}.
+
+collectIntervals	-->	"collectIntervals:", space, fluent("sD", "input", CTStr, _, _, _, _, _, _), moreCIFluents(MFStr),
+{
+	atomics_to_string(["collectIntervals(", CTStr, ").\n", MFStr], Result),
+	assertz(one(Result))
+}.
+
+moreCIFluents(MFStr)	-->	space, ",", space, fluent("sD", "input", CTStr, _, _, _, _, _, _), moreCIFluents(MMFStr),
+{
+	atomics_to_string(["collectIntervals(", CTStr, ").\n", MMFStr], MFStr)
+}.
+moreCIFluents("")	-->	[].
+
+buildFromPoints	-->	"buildFromPoints:", space, fluent("sD", "input", CTStr, _, _, _, _, _, _), moreBPFluents(MFStr),
+{
+	atomics_to_string(["buildFromPoints(", CTStr, ").\n", MFStr], Result),
+	assertz(two(Result))
+}.
+
+moreBPFluents(MFStr)	-->	space, ",", space, fluent("sD", "input", CTStr, _, _, _, _, _, _), moreBPFluents(MMFStr),
+{
+	atomics_to_string(["buildFromPoints(", CTStr, ").\n", MMFStr], MFStr)
+}.
+moreBPFluents("")	-->	[].
+
+grounding	--> "grounding:", space, fluent(_, _, CTStr, _, _, _, _, _, _), space, "-->", space, string_without([46], Fact), ".",
+{
+	string_codes(FactStr, Fact),
+	atomics_to_string(["grounding(", CTStr, ")\t:-\t", FactStr, ".\n"], Result),
+	assertz(three(Result))
+}
 
 initially		-->	"initially", space, fluent("simple", "output", CTStr, _, _, _, _, null, null), ".",
 				{
