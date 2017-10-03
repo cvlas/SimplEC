@@ -22,6 +22,9 @@ simpleFluent(withinArea(_,_)=true).	outputEntity(withinArea(_,_)=true).	index(wi
 sDFluent(loitering(_)=true).	outputEntity(loitering(_)=true).	index(loitering(Vessel)=true, Vessel).
 sDFluent(rendezVouz(_,_)=true).	outputEntity(rendezVouz(_,_)=true).	index(rendezVouz(Vessel1,_)=true, Vessel1).
 
+
+
+
 cachingOrder(fastApproach(_)).	%1
 cachingOrder(highSpeedIn(_,_)=true).	%1
 cachingOrder(sailing(_)=true).	%1

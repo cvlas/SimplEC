@@ -23,6 +23,9 @@ sDFluent(close(_,_,_)=false).	outputEntity(close(_,_,_)=false).	index(close(Id1,
 sDFluent(fighting(_,_)=true).	outputEntity(fighting(_,_)=true).	index(fighting(P1,_)=true, P1).
 sDFluent(greeting1(_,_)=true).	outputEntity(greeting1(_,_)=true).	index(greeting1(P1,_)=true, P1).
 
+
+
+
 cachingOrder(close(_,_,_)=false).	%1
 cachingOrder(fastApproach(_)).	%1
 cachingOrder(fighting(_,_)=true).	%1

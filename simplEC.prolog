@@ -1,6 +1,6 @@
 :- [library(dcg/basics)].
 
-:- dynamic atem/1, cachingPriority/2, declared/5, defines/3, graphines/2, head/1, noCaching/1, matchRepr/2.
+:- dynamic atem/1, cachingPriority/2, declared/5, defines/3, graphines/2, head/1, noCaching/1, matchRepr/2, one/1, two/1, three/1.
 
 % -----------------------------------------------
 % AUXILIARY TOOLS
@@ -110,13 +110,13 @@ simplEC(InputFile, OutputFile, DeclarationsFile, GraphFile) :-
 		_), nl(DeclStream),
 	
 	% CollectIntervals...
-	findall(Result, (one(Result), write(Result)), _),
+	findall(Result, (one(Result), write(DeclStream, Result)), _),nl(DeclStream),
 	
 	% BuildFromPoints...
-	findall(Result, (two(Result), write(Result)), _),
+	findall(Result, (two(Result), write(DeclStream, Result)), _),nl(DeclStream),
 	
 	% Grounding...
-	findall(Result, (three(Result), write(Result)), _),
+	findall(Result, (three(Result), write(DeclStream, Result)), _),nl(DeclStream),
 	
 	% For each output entity (among those that have not been flagged as "noCaching") find its maximal caching priority
 	% Sort by caching priority value, in ascending order and print in the declarations file
@@ -267,12 +267,14 @@ moreBPFluents(MFStr)	-->	space, ",", space, fluent("sD", "input", CTStr, _, _, _
 }.
 moreBPFluents("")	-->	[].
 
-grounding	--> "grounding:", space, fluent(_, _, CTStr, _, _, _, _, _, _), space, "-->", space, string_without([46], Fact), ".",
+grounding	--> "grounding:", space, string_without([45], Thingy), "-->", space, string_without([46], Fact), ".",
 {
+	string_codes(ThingyStr, Thingy),
+	split_string(ThingyStr, "", " \t\n", [ClearThingyStr]),
 	string_codes(FactStr, Fact),
-	atomics_to_string(["grounding(", CTStr, ")\t:-\t", FactStr, ".\n"], Result),
+	atomics_to_string(["grounding(", ClearThingyStr, ")\t:-\t", FactStr, ".\n"], Result),
 	assertz(three(Result))
-}
+}.
 
 initially		-->	"initially", space, fluent("simple", "output", CTStr, _, _, _, _, null, null), ".",
 				{

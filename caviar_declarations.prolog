@@ -25,6 +25,34 @@ sDFluent(greeting1(_,_)=true).	outputEntity(greeting1(_,_)=true).	index(greeting
 sDFluent(greeting2(_,_)=true).	outputEntity(greeting2(_,_)=true).	index(greeting2(P1,_)=true, P1).
 sDFluent(moving(_,_)=true).	outputEntity(moving(_,_)=true).	index(moving(P1,_)=true, P1).
 
+
+buildFromPoints(walking(_)=true).
+buildFromPoints(active(_)=true).
+buildFromPoints(inactive(_)=true).
+buildFromPoints(running(_)=true).
+buildFromPoints(abrupt(_)=true).
+
+grounding(close(P1,P2,24)=true)	:-	id_pair(P1, P2).
+grounding(close(P1,P2,25)=true)	:-	id_pair(P1, P2).
+grounding(close(P1,P2,30)=true)	:-	id_pair(P1, P2).
+grounding(close(P1,P2,34)=true)	:-	id_pair(P1, P2).
+grounding(close(P1,P2,34)=false)	:-	id_pair(P1, P2).
+grounding(closeSymmetric(P1,P2,30)=true)	:-	id_pair(P1, P2).
+grounding(walking(P)=true)	:-	list_of_ids(P).
+grounding(active(P)=true)	:-	list_of_ids(P).
+grounding(inactive(P)=true)	:-	list_of_ids(P).
+grounding(abrupt(P)=true)	:-	list_of_ids(P).
+grounding(running(P)=true)	:-	list_of_ids(P).
+grounding(person(P)=true)	:-	list_of_ids(P).
+grounding(activeOrInactivePerson(P)=true)	:-	list_of_ids(P).
+grounding(greeting1(P1,P2)=true)	:-	id_pair(P1, P2).
+grounding(greeting2(P1,P2)=true)	:-	id_pair(P1, P2).
+grounding(leaving_object(Person,Object)=true)	:-	id_pair(Person, Object).
+grounding(leaving_object(Person,Object)=true)	:-	symmetric_id_pair(Person, Object).
+grounding(meeting(P1,P2)=true)	:-	id_pair(P1, P2).
+grounding(moving(P1,P2)=true)	:-	id_pair(P1, P2).
+grounding(fighting(P1,P2)=true)	:-	id_pair(P1, P2).
+
 cachingOrder(close(_,_,_)=true).	%1
 cachingOrder(leaving_object(_,_)=false).	%1
 cachingOrder(person(_)=false).	%1
