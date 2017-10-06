@@ -213,7 +213,7 @@ ceDefinition		-->	atemporalPredicates.
 ceDefinition		-->	multivaluedFluents.
 ceDefinition		-->	initially.
 ceDefinition		-->	starAt.
-ceDefinition		-->	holdsFor.
+ceDefinition		-->	holdsFir.
 ceDefinition		-->	collectIntervals.
 ceDefinition		-->	buildFromPoints.
 ceDefinition		-->	grounding.
@@ -297,7 +297,7 @@ initially		-->	"initially", space, fluent("simple", "output", CTStr, _, _, _, _,
 					write(InitiallyStr)
 				}.
 					
-holdsFor		--> 	fhead(Head, HeadDeclRepr, HeadGraphRepr), space, sep, space, {nb_setval(intervalNo, 1)}, forBody(Body, HeadDeclRepr, HeadGraphRepr), ".",
+holdsFir		--> 	fhead(Head, HeadDeclRepr, HeadGraphRepr), space, sep, space, {nb_setval(intervalNo, 1)}, forBody(Body, HeadDeclRepr, HeadGraphRepr), ".",
 				{
 					split_string(Body, "\n", ",\t\n", BodySubs),
 					findall((Term, VNames), (member(Sub, BodySubs), term_string(Term, Sub, [variable_names(VNames)])), Terms),
@@ -354,7 +354,7 @@ sep		--> 	"if".
 
 fhead(HeadStr, DeclRepr, GraphRepr)						--> 	fluent("sD", "output", CTStr, DeclRepr, GraphRepr, _, _, null, null),
 {
-	atomics_to_string(["holdsFor(", CTStr, ", I)"], "", HeadStr)
+	atomics_to_string(["holdsFir(", CTStr, ", I)"], "", HeadStr)
 	%(
 	%	\+ head(DeclRepr) -> assertz(head(DeclRepr))
 	%	;
@@ -776,7 +776,7 @@ moreCTerms("", [], _, _)	-->	[].
 
 cTerm(CTStr, ICT, HeadDeclRepr, HeadGraphRepr)	-->	fluent("sD", "input", Str, _, _, _, ICT, HeadDeclRepr, HeadGraphRepr),
 {
-	atomics_to_string([",\n\t", "holdsFor(", Str, ", ", ICT, ")"], "", CTStr)
+	atomics_to_string([",\n\t", "holdsFir(", Str, ", ", ICT, ")"], "", CTStr)
 }.
 cTerm(CTStr, ICT, HeadDeclRepr, HeadGraphRepr)	-->	"(", disjunction(CTStr, ICT, HeadDeclRepr, HeadGraphRepr), ")".
 cTerm(CTStr, ICT, HeadDeclRepr, HeadGraphRepr)	-->	"not", space, "(", conjunction(CStr, IC, HeadDeclRepr, HeadGraphRepr), ")",
@@ -820,11 +820,11 @@ moreDTerms("", [], _, _)	-->	[].
 
 dTerm(DTStr, IDT, HeadDeclRepr, HeadGraphRepr)	-->	fluent("sD", "input", Str, _, _, _, IDT, HeadDeclRepr, HeadGraphRepr),
 {
-	atomics_to_string([",\n\t", "holdsFor(", Str, ", ", IDT, ")"], "", DTStr)
+	atomics_to_string([",\n\t", "holdsFir(", Str, ", ", IDT, ")"], "", DTStr)
 }.
 dTerm(CTStr, ICT, HeadDeclRepr, HeadGraphRepr)	-->	"not", space, fluent("sD", "input", Str, _, _, _, IC, HeadDeclRepr, HeadGraphRepr),
 {
-	atomics_to_string([",\n\t", "holdsFor(", Str, ", ", IC, ")"], "", CStr),
+	atomics_to_string([",\n\t", "holdsFir(", Str, ", ", IC, ")"], "", CStr),
 	nb_getval(intervalNo, Int),
 	NewInt is Int + 1,
 	nb_setval(intervalNo, NewInt),
