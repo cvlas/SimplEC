@@ -98,3 +98,4 @@ grounding: leaving_object(Person,Object)=true	-->	symmetric_id_pair(Person, Obje
 grounding: meeting(P1,P2)=true	-->		id_pair(P1, P2).
 grounding: moving(P1,P2)=true	-->		id_pair(P1, P2).
 grounding: fighting(P1,P2)=true	-->		id_pair(P1, P2).
+

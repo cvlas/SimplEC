@@ -1,3 +1,5 @@
+:- ['src/RTEC.prolog'].
+
 :- [library(dcg/basics)].
 
 :- dynamic atem/1, cachingPriority/2, declared/5, defines/3, graphines/2, head/1, noCaching/1, matchRepr/2, one/1, two/1, three/1.
@@ -31,6 +33,19 @@ cachingLevel(Node, Level) :-
 	Level is MaxLevel + 1)
 	%atomics_to_string(["\n\tNode ", Node, "'s level:\t", Level], Messagebu1), write(Messagebu1)
 	).
+
+% -----------------------------------------------
+% FULL COMPILER
+% -----------------------------------------------
+
+compile(SimplECStatements, EventDescription, Declarations, DependencyGraph, CompiledEventDescription) :-
+	simplEC(SimplECStatements, EventDescription, Declarations, DependencyGraph),
+	open(CompiledEventDescription, write, CEDStream),
+	atomics_to_string([":- ['../src/RTEC.prolog'].\n"], Result1),
+	atomics_to_string([":- ['", Declarations, "'].\n\n"], Result2),
+	write(CEDStream, Result1),
+	write(CEDStream, Result2),
+	compileEventDescription(Declarations, EventDescription, CompiledEventDescription).
 
 % -----------------------------------------------
 % SIMPL-EC
