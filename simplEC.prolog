@@ -2,7 +2,7 @@
 
 :- dynamic atem/1, cachingPriority/2, declared/5, defines/3, graphines/2, head/1, noCaching/1, matchRepr/2, one/1, two/1, three/1.
 
-:- ['RTEC.prolog'].
+%:- ['RTEC.prolog'].
 
 % -----------------------------------------------
 % AUXILIARY TOOLS
@@ -38,14 +38,14 @@ cachingLevel(Node, Level) :-
 % FULL COMPILER
 % -----------------------------------------------
 
-compile(SimplECStatements, EventDescription, Declarations, DependencyGraph, CompiledEventDescription) :-
-	simplEC(SimplECStatements, EventDescription, Declarations, DependencyGraph),
-	open(CompiledEventDescription, write, CEDStream),
-	atomics_to_string([":- ['RTEC.prolog'].\n"], Result1),
-	atomics_to_string([":- ['", Declarations, "'].\n\n"], Result2),
-	write(CEDStream, Result1),
-	write(CEDStream, Result2),
-	compileEventDescription(Declarations, EventDescription, CompiledEventDescription).
+%compile(SimplECStatements, EventDescription, Declarations, DependencyGraph, CompiledEventDescription) :-
+%	simplEC(SimplECStatements, EventDescription, Declarations, DependencyGraph),
+%	open(CompiledEventDescription, write, CEDStream),
+%	atomics_to_string([":- ['RTEC.prolog'].\n"], Result1),
+%	atomics_to_string([":- ['", Declarations, "'].\n\n"], Result2),
+%	write(CEDStream, Result1),
+%	write(CEDStream, Result2),
+%	compileEventDescription(Declarations, EventDescription, CompiledEventDescription).
 
 % -----------------------------------------------
 % SIMPL-EC
