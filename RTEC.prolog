@@ -78,7 +78,7 @@ DECLARATIONS:
 % ========================
 
 :- set_prolog_flag(toplevel_print_options, [max_depth(400)]).
-%:- set_prolog_flag(unknown, fail).
+:- set_prolog_flag(unknown, fail).
 
 :- use_module(library(lists)).
 
