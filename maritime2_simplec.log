@@ -1,0 +1,51 @@
+IN RULE:
+terminate sailing(Vessel) if
+	(velocity(Vessel, Speed, Heading),
+	Speed < 20)
+or	gap_start(Vessel)
+ERROR: Unknown event pattern detected.
+Please check your syntax.
+
+IN RULE:
+terminate highSpeedIn(Vessel, AreaName) if
+	(isInArea(Vessel, AreaName),
+	happens velocity(Vessel, Speed, Heading),
+	speedArea(AreaName,SpeedArea),
+	Speed < SpeedArea)
+or	leavesArea(Vessel, AreaName)
+or	gap_start(Vessel)
+ERROR: Unknown event pattern detected.
+Please check your syntax.
+
+IN RULE:
+initiate passenger_density(ID,VT)=Val iff
+passenger_density_change(ID,VT,Val)
+ERROR: Unknown event pattern detected.
+Please check your syntax.
+
+IN RULE:
+initiate person(P) iff
+(start walking(P) or
+start active(P) or
+start running(P) or
+start abrupt(P)),
+not disappear(P)
+ERROR: Unknown event pattern detected.
+Please check your syntax.
+
+IN RULE:
+terminate person(P) iff
+disappear(P)
+ERROR: Unknown event pattern detected.
+Please check your syntax.
+
+IN RULE:
+happens fastApproach(Vessel) iff
+speedChange(Vessel),
+velocity(Vessel) > 20 knots,
+coord(Vessel) =(Lon, Lat),
+not nearPorts(Lon, Lat),
+headingToVessels(Vessel)
+ERROR: Unknown event pattern detected.
+Please check your syntax.
+

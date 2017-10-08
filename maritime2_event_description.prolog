@@ -9,9 +9,6 @@ holdsFor(close(Id1,Id2,Threshold)=false, I) :-
 	holdsFor(close(Id1,Id2,Threshold)=true,I1),
 	complement_all([I1],I).
 
-initiatedAt(passenger_density(ID,VT)=Val, T) :-
-	happensAt(passenger_density_change(ID,VT,Val), T).
-
 initiatedAt(moving(P1,P2)=true, T) :-
 	happensAt(start(walking(P1)=true), T),
 	holdsAt(walking(P2)=true, T),
@@ -35,25 +32,6 @@ terminatedAt(moving(P1,P2)=true, T) :-
 
 terminatedAt(moving(P1,P2)=true, T) :-
 	happensAt(end(close(P1,P2)=true), T).
-
-initiatedAt(person(P)=true, T) :-
-	happensAt(start(walking(P)=true), T),
-	\+ holdsAt(disappear(P)=true, T).
-
-initiatedAt(person(P)=true, T) :-
-	happensAt(start(active(P)=true), T),
-	\+ holdsAt(disappear(P)=true, T).
-
-initiatedAt(person(P)=true, T) :-
-	happensAt(start(running(P)=true), T),
-	\+ holdsAt(disappear(P)=true, T).
-
-initiatedAt(person(P)=true, T) :-
-	happensAt(start(abrupt(P)=true), T),
-	\+ holdsAt(disappear(P)=true, T).
-
-terminatedAt(person(P)=true, T) :-
-	happensAt(disappear(P), T).
 
 holdsFor(moving(P1,P2)=true, I) :-
 	holdsFor(walking(P1)=true,I1),
@@ -81,12 +59,4 @@ holdsFor(fighting(P1,P2)=true, I) :-
 	union_all([I6,I7],I8),
 	intersect_all([I3,I4],I10),
 	relative_complement_all(I10,[I8],I).
-
-happensAt(fastApproach(Vessel), T) :-
-	happensAt(speedChange(Vessel), T),
-	holdsAt(velocity(Vessel)=Value, T),
-	Value > 20 knots,
-	holdsAt(coord(Vessel)=(Lon,Lat), T),
-	\+ holdsAt(nearPorts(Lon,Lat)=true, T),
-	holdsAt(headingToVessels(Vessel)=true, T).
 

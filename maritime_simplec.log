@@ -1,8 +1,65 @@
 IN RULE:
+initiate stopped(Vessel) if
+	stop_start(Vessel),
+	happens coord(Vessel, Lon, Lat),
+	nearPorts(Lon,Lat,[])
+ERROR: Unknown event pattern detected.
+Please check your syntax.
+
+IN RULE:
+terminate stopped(Vessel) if
+	stop_end(Vessel)
+ERROR: Unknown event pattern detected.
+Please check your syntax.
+
+IN RULE:
+initiate lowSpeed(Vessel) if
+	slow_motion_start(Vessel),
+	happens coord(Vessel, Lon, Lat),
+	nearPorts(Lon,Lat,[])
+ERROR: Unknown event pattern detected.
+Please check your syntax.
+
+IN RULE:
+terminate lowSpeed(Vessel) if
+	slow_motion_end(Vessel)
+or	start stopped(Vessel)
+ERROR: Unknown event pattern detected.
+Please check your syntax.
+
+IN RULE:
+initiate withinArea(Vessel, AreaName) if
+	isInArea(Vessel, AreaName)
+ERROR: Unknown event pattern detected.
+Please check your syntax.
+
+IN RULE:
+terminate withinArea(Vessel, AreaName) if
+	leavesArea(Vessel, AreaName)
+ERROR: Unknown event pattern detected.
+Please check your syntax.
+
+IN RULE:
+initiate sailing(Vessel) if
+	velocity(Vessel, Speed, Heading),
+	Speed > 20
+ERROR: Unknown event pattern detected.
+Please check your syntax.
+
+IN RULE:
 terminate sailing(Vessel) if
 	(velocity(Vessel, Speed, Heading),
 	Speed < 20)
 or	gap_start(Vessel)
+ERROR: Unknown event pattern detected.
+Please check your syntax.
+
+IN RULE:
+initiate highSpeedIn(Vessel, AreaName) if
+	isInArea(Vessel, AreaName),
+	happens velocity(Vessel, Speed, Heading),
+	speedArea(AreaName,SpeedArea),
+	Speed > SpeedArea
 ERROR: Unknown event pattern detected.
 Please check your syntax.
 
@@ -14,6 +71,16 @@ terminate highSpeedIn(Vessel, AreaName) if
 	Speed < SpeedArea)
 or	leavesArea(Vessel, AreaName)
 or	gap_start(Vessel)
+ERROR: Unknown event pattern detected.
+Please check your syntax.
+
+IN RULE:
+happens fastApproach(Vessel) if
+	speedChange(Vessel),
+	velocity(Vessel) > 20 knots,
+	coord(Vessel) = (Lon, Lat),
+	not nearPorts(Lon, Lat),
+	headingToVessels(Vessel)
 ERROR: Unknown event pattern detected.
 Please check your syntax.
 

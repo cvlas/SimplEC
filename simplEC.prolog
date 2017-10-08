@@ -871,76 +871,220 @@ durationConstraint(DCStr, IDC)					-->	"duration", space, operator(OpStr), space
 	atomics_to_string([",\n\tfindall((S,E), (member((S,E), I", PrevInt, "), Diff is E-S, Diff ", OpStr, " ", NumStr, "), ", IDC, ")"], "", DCStr)
 }.
 
-atBody(AtBodyStr, _, HeadDeclRepr, HeadGraphRepr)			-->	firstAtBodyAlternatives(List1, _, HeadDeclRepr, HeadGraphRepr), moreAtBodyAlternatives(ListOfLists, _, HeadDeclRepr, HeadGraphRepr),
-	{
-		addToHead(ListOfLists, List1, List),
-							
-		prod(List, AltBodyLists),
-		findall(AltBodyStr, (member(AltBodyList, AltBodyLists), atomics_to_string(AltBodyList, "", AltBodyStr)), AltBodyStrs),
-		atomics_to_string(AltBodyStrs, "^", AtBodyStr)
-	}.
+%atBody(AtBodyStr, _, HeadDeclRepr, HeadGraphRepr)			-->	firstAtBodyAlternatives(List1, _, HeadDeclRepr, HeadGraphRepr), moreAtBodyAlternatives(ListOfLists, _, HeadDeclRepr, HeadGraphRepr),
+%	{
+%		addToHead(ListOfLists, List1, List),
+%							
+%		prod(List, AltBodyLists),
+%		findall(AltBodyStr, (member(AltBodyList, AltBodyLists), atomics_to_string(AltBodyList, "", AltBodyStr)), AltBodyStrs),
+%		atomics_to_string(AltBodyStrs, "^", AtBodyStr)
+%	}.
+%
+%moreAtBodyAlternatives(List, _, HeadDeclRepr, HeadGraphRepr)		-->	",", space, restAtBodyAlternatives(List1, _, HeadDeclRepr, HeadGraphRepr), moreAtBodyAlternatives(ListOfLists, _, HeadDeclRepr, HeadGraphRepr),
+%	{
+%		addToHead(ListOfLists, List1, List)
+%	}.
+%moreAtBodyAlternatives([], _, _, _)					-->	[].
+%
+%firstAtBodyAlternatives(List, _, HeadDeclRepr, HeadGraphRepr)		-->	atBodyPart(BPStr, _, HeadDeclRepr, HeadGraphRepr), moreAtBodyParts(BPList, _, HeadDeclRepr, HeadGraphRepr),
+%	{
+%		addToHead(BPList, BPStr, List)
+%	}.
+%firstAtBodyAlternatives(List, _, HeadDeclRepr, HeadGraphRepr)		-->	"(", atBodyPart(BPStr1, _, HeadDeclRepr, HeadGraphRepr), space, "or", space, atBodyPart(BPStr2, _, HeadDeclRepr, HeadGraphRepr), moreAtBodyParts(BPList, _, HeadDeclRepr, HeadGraphRepr), ")",
+%	{
+%		addToHead(BPList, BPStr2, BPTemp),
+%		addToHead(BPTemp, BPStr1, List)
+%	}.
+%
+%restAtBodyAlternatives([BPStr], _, HeadDeclRepr, HeadGraphRepr)		-->	conditionGroup(BPStr, _, HeadDeclRepr, HeadGraphRepr).
+%restAtBodyAlternatives(List, _, HeadDeclRepr, HeadGraphRepr)		-->	"(", conditionGroup(BPStr1, _, HeadDeclRepr, HeadGraphRepr), space, "or", space, conditionGroup(BPStr2, _, HeadDeclRepr, HeadGraphRepr), moreConditionGroups(BPList, _, HeadDeclRepr, HeadGraphRepr), ")",
+%	{
+%		addToHead(BPList, BPStr2, BPTemp),
+%		addToHead(BPTemp, BPStr1, List)
+%	}.
+%
+%moreAtBodyParts(List, _, HeadDeclRepr, HeadGraphRepr)			-->	space, "or", space, atBodyPart(BPStr, _, HeadDeclRepr, HeadGraphRepr), moreAtBodyParts(BPList, _, HeadDeclRepr, HeadGraphRepr),
+%	{
+%		addToHead(BPList, BPStr, List)
+%	}.
+%moreAtBodyParts([], _, _, _)						-->	[].
 
-moreAtBodyAlternatives(List, _, HeadDeclRepr, HeadGraphRepr)		-->	",", space, restAtBodyAlternatives(List1, _, HeadDeclRepr, HeadGraphRepr), moreAtBodyAlternatives(ListOfLists, _, HeadDeclRepr, HeadGraphRepr),
-	{
-		addToHead(ListOfLists, List1, List)
-	}.
-moreAtBodyAlternatives([], _, _, _)					-->	[].
+%moreConditionGroups(List, _, HeadDeclRepr, HeadGraphRepr)		-->	space, "or", space, conditionGroup(BPStr, _, HeadDeclRepr, HeadGraphRepr), moreConditionGroups(BPList, _, HeadDeclRepr, HeadGraphRepr),
+%	{
+%		addToHead(BPList, BPStr, List)
+%	}.
+%moreConditionGroups([], _, _, _)					-->	[].
 
-firstAtBodyAlternatives(List, _, HeadDeclRepr, HeadGraphRepr)		-->	atBodyPart(BPStr, _, HeadDeclRepr, HeadGraphRepr), moreAtBodyParts(BPList, _, HeadDeclRepr, HeadGraphRepr),
-	{
-		addToHead(BPList, BPStr, List)
-	}.
-firstAtBodyAlternatives(List, _, HeadDeclRepr, HeadGraphRepr)		-->	"(", atBodyPart(BPStr1, _, HeadDeclRepr, HeadGraphRepr), space, "or", space, atBodyPart(BPStr2, _, HeadDeclRepr, HeadGraphRepr), moreAtBodyParts(BPList, _, HeadDeclRepr, HeadGraphRepr), ")",
-	{
-		addToHead(BPList, BPStr2, BPTemp),
-		addToHead(BPTemp, BPStr1, List)
-	}.
 
-restAtBodyAlternatives([BPStr], _, HeadDeclRepr, HeadGraphRepr)		-->	conditionGroup(BPStr, _, HeadDeclRepr, HeadGraphRepr).
-restAtBodyAlternatives(List, _, HeadDeclRepr, HeadGraphRepr)		-->	"(", conditionGroup(BPStr1, _, HeadDeclRepr, HeadGraphRepr), space, "or", space, conditionGroup(BPStr2, _, HeadDeclRepr, HeadGraphRepr), moreConditionGroups(BPList, _, HeadDeclRepr, HeadGraphRepr), ")",
-	{
-		addToHead(BPList, BPStr2, BPTemp),
-		addToHead(BPTemp, BPStr1, List)
-	}.
 
-moreAtBodyParts(List, _, HeadDeclRepr, HeadGraphRepr)			-->	space, "or", space, atBodyPart(BPStr, _, HeadDeclRepr, HeadGraphRepr), moreAtBodyParts(BPList, _, HeadDeclRepr, HeadGraphRepr),
-	{
-		addToHead(BPList, BPStr, List)
-	}.
-moreAtBodyParts([], _, _, _)						-->	[].
 
-moreConditionGroups(List, _, HeadDeclRepr, HeadGraphRepr)		-->	space, "or", space, conditionGroup(BPStr, _, HeadDeclRepr, HeadGraphRepr), moreConditionGroups(BPList, _, HeadDeclRepr, HeadGraphRepr),
-	{
-		addToHead(BPList, BPStr, List)
-	}.
-moreConditionGroups([], _, _, _)					-->	[].
 
-atBodyPart(AtBodyStr, _, HeadDeclRepr, HeadGraphRepr)			-->	event("input", CTStr, _, _, _, HeadDeclRepr, HeadGraphRepr), moreConditions(MCondStr, _, HeadDeclRepr, HeadGraphRepr),
+
+
+
+atBody(AtBodyStr, _, HeadDeclRepr, HeadGraphRepr)				-->	initialAlternatives(List1, _, HeadDeclRepr, HeadGraphRepr), allOtherAlternatives(ListOfLists, _, HeadDeclRepr, HeadGraphRepr),
 {
-	atomics_to_string([",\n\thappensAt(", CTStr, ", T)", MCondStr], "", AtBodyStr)
-	%Priority is Priority1 + Priority2
-}.
-%atBodyPart(AtBodyStr, _, HeadDeclRepr, HeadGraphRepr)			-->	"not happens", space, event("input", CTStr, _, _, _, HeadDeclRepr, HeadGraphRepr), moreConditions(MCondStr, _, HeadDeclRepr, HeadGraphRepr),
-%{
-%	atomics_to_string([",\n\t\\+ happensAt(", CTStr, ", T)", MCondStr], "", AtBodyStr)
-%	%Priority is Priority1 + Priority2
-%}.
-atBodyPart(AtBodyStr, _, HeadDeclRepr, HeadGraphRepr)			-->	"start", space, fluent("sD", "input", CTStr, _, _, _, _, HeadDeclRepr, HeadGraphRepr), moreConditions(MCondStr, _, HeadDeclRepr, HeadGraphRepr),
-{
-	atomics_to_string([",\n\thappensAt(start(", CTStr, "), T)", MCondStr], "", AtBodyStr)
-	%Priority is Priority1 + Priority2
-}.
-atBodyPart(AtBodyStr, _, HeadDeclRepr, HeadGraphRepr)			-->	"end", space, fluent("sD", "input", CTStr, _, _, _, _, HeadDeclRepr, HeadGraphRepr), moreConditions(MCondStr, _, HeadDeclRepr, HeadGraphRepr),
-{
-	atomics_to_string([",\n\thappensAt(end(", CTStr, "), T)", MCondStr], "", AtBodyStr)
-	%Priority is Priority1 + Priority2
+	addToHead(ListOfLists, List1, List),
+						
+	prod(List, AltBodyLists),
+	findall(AltBodyStr, (member(AltBodyList, AltBodyLists), atomics_to_string(AltBodyList, "", AltBodyStr)), AltBodyStrs),
+	atomics_to_string(AltBodyStrs, "^", AtBodyStr)
 }.
 
-conditionGroup(AtBodyStr, _, HeadDeclRepr, HeadGraphRepr)		-->	condition(CondStr, _, HeadDeclRepr, HeadGraphRepr), moreConditions(MCondStr, _, HeadDeclRepr, HeadGraphRepr),
+
+
+
+
+
+
+initialAlternatives(List, _, HeadDeclRepr, HeadGraphRepr)		-->	initialConditionGroup(AtBodyStr, _, HeadDeclRepr, HeadGraphRepr), moreInitialAlternatives(MIAList, _, HeadDeclRepr, HeadGraphRepr),
+{
+	split_string(AtBodyStr, "\n\t", ",\n\t\s", ConditionElementList),
+	length(ConditionElementList, Length),
+	Length = 1,
+	addToHead(MIAList, AtBodyStr, List)
+}.
+initialAlternatives(List, _, HeadDeclRepr, HeadGraphRepr)		-->	"(", initialConditionGroup(AtBodyStr, _, HeadDeclRepr, HeadGraphRepr), ")", moreInitialAlternatives(MIAList, _, HeadDeclRepr, HeadGraphRepr),
+{
+	split_string(AtBodyStr, "\n\t", ",\n\t\s", ConditionElementList),
+	length(ConditionElementList, Length),
+	Length > 1,
+	addToHead(MIAList, AtBodyStr, List)
+}.
+initialAlternatives(List, _, HeadDeclRepr, HeadGraphRepr)		-->	initialConditionGroup(AtBodyStr, _, HeadDeclRepr, HeadGraphRepr), moreInitialAlternatives([], _, HeadDeclRepr, HeadGraphRepr),
+{
+	split_string(AtBodyStr, "\n\t", ",\n\t\s", ConditionElementList),
+	length(ConditionElementList, Length),
+	Length > 1,
+	addToHead([], AtBodyStr, List)
+}.
+
+moreInitialAlternatives(MIAList, _, HeadDeclRepr, HeadGraphRepr)	-->	space, "or", space, initialConditionGroup(AtBodyStr, _, HeadDeclRepr, HeadGraphRepr), moreInitialAlternatives(MMIAList, _, HeadDeclRepr, HeadGraphRepr),
+{
+	split_string(AtBodyStr, "\n\t", ",\n\t\s", ConditionElementList),
+	length(ConditionElementList, Length),
+	Length = 1,
+	addToHead(MMIAList, AtBodyStr, MIAList)
+}.
+moreInitialAlternatives(MIAList, _, HeadDeclRepr, HeadGraphRepr)	-->	space, "or", space, "(", initialConditionGroup(AtBodyStr, _, HeadDeclRepr, HeadGraphRepr), ")", moreInitialAlternatives(MMIAList, _, HeadDeclRepr, HeadGraphRepr),
+{
+	split_string(AtBodyStr, "\n\t", ",\n\t\s", ConditionElementList),
+	length(ConditionElementList, Length),
+	Length > 1,
+	addToHead(MMIAList, AtBodyStr, MIAList)
+}.
+moreInitialAlternatives([], _, _, _)					-->	[].
+
+
+
+
+
+
+
+
+
+
+
+allOtherAlternatives(ListOfLists, _, HeadDeclRepr, HeadGraphRepr)	-->	space, ",", space, restAlternatives(List, _, HeadDeclRepr, HeadGraphRepr), allOtherAlternatives(MLoL, _, HeadDeclRepr, HeadGraphRepr),
+{
+	addToHead(MLoL, List, ListOfLists)
+}.
+allOtherAlternatives([], _, _, _)	-->	[].
+
+
+
+
+restAlternatives(List, _, HeadDeclRepr, HeadGraphRepr)		-->	conditionGroup(AtBodyStr, _, HeadDeclRepr, HeadGraphRepr), moreAlternatives(MIAList, _, HeadDeclRepr, HeadGraphRepr),
+{
+	split_string(AtBodyStr, "\n\t", ",\n\t\s", ConditionElementList),
+	length(ConditionElementList, Length),
+	Length = 1,
+	addToHead(MIAList, AtBodyStr, List)
+}.
+restAlternatives(List, _, HeadDeclRepr, HeadGraphRepr)		-->	"(", conditionGroup(AtBodyStr, _, HeadDeclRepr, HeadGraphRepr), ")", moreAlternatives(MIAList, _, HeadDeclRepr, HeadGraphRepr),
+{
+	split_string(AtBodyStr, "\n\t", ",\n\t\s", ConditionElementList),
+	length(ConditionElementList, Length),
+	Length > 1,
+	addToHead(MIAList, AtBodyStr, List)
+}.
+restAlternatives(List, _, HeadDeclRepr, HeadGraphRepr)		-->	conditionGroup(AtBodyStr, _, HeadDeclRepr, HeadGraphRepr), moreAlternatives([], _, HeadDeclRepr, HeadGraphRepr),
+{
+	split_string(AtBodyStr, "\n\t", ",\n\t\s", ConditionElementList),
+	length(ConditionElementList, Length),
+	Length > 1,
+	addToHead([], AtBodyStr, List)
+}.
+
+moreAlternatives(MIAList, _, HeadDeclRepr, HeadGraphRepr)	-->	space, "or", space, conditionGroup(AtBodyStr, _, HeadDeclRepr, HeadGraphRepr), moreAlternatives(MMIAList, _, HeadDeclRepr, HeadGraphRepr),
+{
+	split_string(AtBodyStr, "\n\t", ",\n\t\s", ConditionElementList),
+	length(ConditionElementList, Length),
+	Length = 1,
+	addToHead(MMIAList, AtBodyStr, MIAList)
+}.
+moreAlternatives(MIAList, _, HeadDeclRepr, HeadGraphRepr)	-->	space, "or", space, "(", conditionGroup(AtBodyStr, _, HeadDeclRepr, HeadGraphRepr), ")", moreAlternatives(MMIAList, _, HeadDeclRepr, HeadGraphRepr),
+{
+	split_string(AtBodyStr, "\n\t", ",\n\t\s", ConditionElementList),
+	length(ConditionElementList, Length),
+	Length > 1,
+	addToHead(MMIAList, AtBodyStr, MIAList)
+}.
+moreAlternatives([], _, _, _)					-->	[].
+
+
+
+
+
+initialCondition(CondStr, _, HeadDeclRepr, HeadGraphRepr)			-->	"start", space, fluent("sD", "input", CTStr, _, _, _, _, HeadDeclRepr, HeadGraphRepr),
+{
+	atomics_to_string([",\n\thappensAt(start(", CTStr, "), T)"], "", CondStr)
+}.
+initialCondition(CondStr, _, HeadDeclRepr, HeadGraphRepr)			-->	"end", space, fluent("sD", "input", CTStr, _, _, _, _, HeadDeclRepr, HeadGraphRepr),
+{
+	atomics_to_string([",\n\thappensAt(end(", CTStr, "), T)"], "", CondStr)
+}.
+initialCondition(CondStr, _, HeadDeclRepr, HeadGraphRepr)			-->	"happens", space, event("input", CTStr, _, _, _, HeadDeclRepr, HeadGraphRepr),
+{
+	atomics_to_string([",\n\thappensAt(", CTStr, ", T)"], "", CondStr)
+}.
+
+
+
+
+
+
+
+moreConditions(MCondStr, _, HeadDeclRepr, HeadGraphRepr)		-->	",", space, condition(CondStr, _, HeadDeclRepr, HeadGraphRepr), moreConditions(MMCondStr, _, HeadDeclRepr, HeadGraphRepr),
+{
+	string_concat(CondStr, MMCondStr, MCondStr)
+	%Priority is Priority1 + Priority2
+}.
+moreConditions("", 0, _, _)					-->	[].
+
+
+
+
+
+
+
+
+
+
+initialConditionGroup(AtBodyStr, _, HeadDeclRepr, HeadGraphRepr)			-->	initialCondition(CondStr, _, HeadDeclRepr, HeadGraphRepr), moreConditions(MCondStr, _, HeadDeclRepr, HeadGraphRepr),
 {
 	atomics_to_string([CondStr, MCondStr], "", AtBodyStr)
 	%Priority is Priority1 + Priority2
 }.
+
+
+
+
+
+
+
+
+
 
 condition(CondStr, Priority, HeadDeclRepr, HeadGraphRepr)			-->	"start", space, fluent("sD", "input", CTStr, _, _, Priority, _, HeadDeclRepr, HeadGraphRepr),
 {
@@ -971,13 +1115,31 @@ condition(CondStr, Priority, HeadDeclRepr, HeadGraphRepr)			-->	"not", space, fl
 {
 	atomics_to_string([",\n\t\\+ holdsAt(", CTStr, ", T)"], "", CondStr)
 }.
-	
-moreConditions(MCondStr, _, HeadDeclRepr, HeadGraphRepr)		-->	",", space, condition(CondStr, _, HeadDeclRepr, HeadGraphRepr), moreConditions(MMCondStr, _, HeadDeclRepr, HeadGraphRepr),
+
+
+
+
+
+
+
+
+
+
+conditionGroup(AtBodyStr, _, HeadDeclRepr, HeadGraphRepr)		-->	condition(CondStr, _, HeadDeclRepr, HeadGraphRepr), moreConditions(MCondStr, _, HeadDeclRepr, HeadGraphRepr),
 {
-	string_concat(CondStr, MMCondStr, MCondStr)
+	atomics_to_string([CondStr, MCondStr], "", AtBodyStr)
 	%Priority is Priority1 + Priority2
 }.
-moreConditions("", 0, _, _)					-->	[].
+
+
+
+
+
+
+
+
+
+
 
 atemporalConstraint(ACStr, _)					-->	fact(FStr),
 {

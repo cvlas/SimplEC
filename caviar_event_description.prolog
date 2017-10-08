@@ -25,44 +25,6 @@ holdsFor(closeSymmetric(Id1,Id2,Threshold)=true, I) :-
 	holdsFor(close(Id2,Id1,Threshold)=true,I3),
 	union_all([I2,I3],I).
 
-initiatedAt(person(Id)=true, T) :-
-	happensAt(start(walking(Id)=true), T),
-	\+ happensAt(disappear(Id), T).
-
-initiatedAt(person(Id)=true, T) :-
-	happensAt(start(running(Id)=true), T),
-	\+ happensAt(disappear(Id), T).
-
-initiatedAt(person(Id)=true, T) :-
-	happensAt(start(active(Id)=true), T),
-	\+ happensAt(disappear(Id), T).
-
-initiatedAt(person(Id)=true, T) :-
-	happensAt(start(abrupt(Id)=true), T),
-	\+ happensAt(disappear(Id), T).
-
-initiatedAt(person(Id)=false, T) :-
-	happensAt(disappear(Id), T).
-
-initiatedAt(leaving_object(Person,Object)=true, T) :-
-	happensAt(appear(Object), T),
-	holdsAt(inactive(Object)=true, T),
-	holdsAt(person(Person)=true, T),
-	holdsAt(closeSymmetric(Person,Object,30)=true, T).
-
-initiatedAt(leaving_object(Person,Object)=false, T) :-
-	happensAt(disappear(Object), T).
-
-initiatedAt(meeting(P1,P2)=true, T) :-
-	happensAt(start(greeting1(P1,P2)=true), T),
-	\+ happensAt(disappear(P1), T),
-	\+ happensAt(disappear(P2), T).
-
-initiatedAt(meeting(P1,P2)=true, T) :-
-	happensAt(start(greeting2(P1,P2)=true), T),
-	\+ happensAt(disappear(P1), T),
-	\+ happensAt(disappear(P2), T).
-
 holdsFor(greeting1(P1,P2)=true, I) :-
 	holdsFor(activeOrInactivePerson(P1)=true,I1),
 	holdsFor(person(P2)=true,I2),

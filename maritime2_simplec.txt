@@ -1,3 +1,18 @@
+atemporal: nearPorts, speedArea.
+
+terminate sailing(Vessel) if
+	(velocity(Vessel, Speed, Heading),
+	Speed < 20)
+or	gap_start(Vessel).
+
+terminate highSpeedIn(Vessel, AreaName) if
+	(isInArea(Vessel, AreaName),
+	happens velocity(Vessel, Speed, Heading),
+	speedArea(AreaName,SpeedArea),
+	Speed < SpeedArea)
+or	leavesArea(Vessel, AreaName)
+or	gap_start(Vessel).
+
 activeOrInactivePerson(P) iff
 	active(P) or (inactive(P), person(P)).
 

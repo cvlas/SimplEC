@@ -1,8 +1,3 @@
-event(internal_temperature_change(_,_,_)).	inputEntity(internal_temperature_change(_,_,_)).	index(internal_temperature_change(Id,_,_), Id).
-event(noise_level_change(_,_,_)).	inputEntity(noise_level_change(_,_,_)).	index(noise_level_change(Id,_,_), Id).
-event(passenger_density_change(_,_,_)).	inputEntity(passenger_density_change(_,_,_)).	index(passenger_density_change(Id,_,_), Id).
-event(stop_enter(_,_,_,_)).	inputEntity(stop_enter(_,_,_,_)).	index(stop_enter(Id,_,_,scheduled), Id).
-event(stop_leave(_,_,_,_)).	inputEntity(stop_leave(_,_,_,_)).	index(stop_leave(Id,_,_,early), Id).
 
 sDFluent(abrupt_acceleration(_,_)=abrupt).	inputEntity(abrupt_acceleration(_,_)=abrupt).	index(abrupt_acceleration(Id,_)=abrupt, Id).
 sDFluent(abrupt_acceleration(_,_)=very_abrupt).	inputEntity(abrupt_acceleration(_,_)=very_abrupt).	index(abrupt_acceleration(Id,_)=very_abrupt, Id).
@@ -63,21 +58,21 @@ grounding(passenger_comfort(Id,VehicleType)=reducing)	:-	vehicle(Id, VehicleType
 grounding(driver_comfort(Id,VehicleType)=reducing)	:-	vehicle(Id, VehicleType).
 grounding(passenger_satisfaction(Id,VehicleType)=reducing)	:-	vehicle(Id, VehicleType).
 
+cachingOrder(internal_temperature(_,_)=normal).	%0
+cachingOrder(internal_temperature(_,_)=very_cold).	%0
+cachingOrder(internal_temperature(_,_)=very_warm).	%0
+cachingOrder(noise_level(_,_)=high).	%0
+cachingOrder(noise_level(_,_)=low).	%0
+cachingOrder(passenger_density(_,_)=high).	%0
+cachingOrder(passenger_density(_,_)=low).	%0
+cachingOrder(punctuality(_,_)=punctual).	%0
 cachingOrder(driving_style(_,_)=uncomfortable).	%1
 cachingOrder(driving_style(_,_)=unsafe).	%1
-cachingOrder(internal_temperature(_,_)=normal).	%1
-cachingOrder(internal_temperature(_,_)=very_cold).	%1
-cachingOrder(internal_temperature(_,_)=very_warm).	%1
-cachingOrder(noise_level(_,_)=high).	%1
-cachingOrder(noise_level(_,_)=low).	%1
-cachingOrder(passenger_density(_,_)=high).	%1
-cachingOrder(passenger_density(_,_)=low).	%1
-cachingOrder(punctuality(_,_)=punctual).	%1
+cachingOrder(punctuality(_,_)=non_punctual).	%1
 cachingOrder(driver_comfort(_,_)=reducing).	%2
 cachingOrder(driving_quality(_,_)=high).	%2
+cachingOrder(driving_quality(_,_)=low).	%2
 cachingOrder(driving_quality(_,_)=medium).	%2
 cachingOrder(passenger_comfort(_,_)=reducing).	%2
-cachingOrder(punctuality(_,_)=non_punctual).	%2
-cachingOrder(driving_quality(_,_)=low).	%3
+cachingOrder(punctuality_change(_,_,_)).	%2
 cachingOrder(passenger_satisfaction(_,_)=reducing).	%3
-cachingOrder(punctuality_change(_,_,_)).	%3
