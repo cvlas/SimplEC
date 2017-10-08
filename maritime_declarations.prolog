@@ -1,5 +1,17 @@
+event(coord(_,_,_)).	inputEntity(coord(_,_,_)).	index(coord(Vessel,_,_), Vessel).
+event(gap_start(_)).	inputEntity(gap_start(_)).	index(gap_start(Vessel), Vessel).
+event(isInArea(_,_)).	inputEntity(isInArea(_,_)).	index(isInArea(Vessel,_), Vessel).
+event(leavesArea(_,_)).	inputEntity(leavesArea(_,_)).	index(leavesArea(Vessel,_), Vessel).
+event(slow_motion_end(_)).	inputEntity(slow_motion_end(_)).	index(slow_motion_end(Vessel), Vessel).
+event(slow_motion_start(_)).	inputEntity(slow_motion_start(_)).	index(slow_motion_start(Vessel), Vessel).
+event(speedChange(_)).	inputEntity(speedChange(_)).	index(speedChange(Vessel), Vessel).
+event(stop_end(_)).	inputEntity(stop_end(_)).	index(stop_end(Vessel), Vessel).
+event(stop_start(_)).	inputEntity(stop_start(_)).	index(stop_start(Vessel), Vessel).
+event(velocity(_,_,_)).	inputEntity(velocity(_,_,_)).	index(velocity(Vessel,_,_), Vessel).
 
+sDFluent(headingToVessels(_)=true).	inputEntity(headingToVessels(_)=true).	index(headingToVessels(Vessel)=true, Vessel).
 sDFluent(proximity(_,_)=true).	inputEntity(proximity(_,_)=true).	index(proximity(Vessel1,_)=true, Vessel1).
+sDFluent(velocity(_)=true).	inputEntity(velocity(_)=true).	index(velocity(Vessel)=true, Vessel).
 
 event(fastApproach(_)).	outputEntity(fastApproach(_)).	index(fastApproach(Vessel), Vessel).
 
@@ -15,11 +27,11 @@ sDFluent(rendezVouz(_,_)=true).	outputEntity(rendezVouz(_,_)=true).	index(rendez
 
 
 
-cachingOrder(fastApproach(_)).	%0
-cachingOrder(highSpeedIn(_,_)=true).	%0
-cachingOrder(lowSpeed(_)=true).	%0
-cachingOrder(sailing(_)=true).	%0
-cachingOrder(stopped(_)=true).	%0
-cachingOrder(withinArea(_,_)=true).	%0
-cachingOrder(loitering(_)=true).	%1
-cachingOrder(rendezVouz(_,_)=true).	%1
+cachingOrder(fastApproach(_)).	%1
+cachingOrder(highSpeedIn(_,_)=true).	%1
+cachingOrder(sailing(_)=true).	%1
+cachingOrder(stopped(_)=true).	%1
+cachingOrder(withinArea(_,_)=true).	%1
+cachingOrder(lowSpeed(_)=true).	%2
+cachingOrder(loitering(_)=true).	%3
+cachingOrder(rendezVouz(_,_)=true).	%3

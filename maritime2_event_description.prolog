@@ -1,3 +1,22 @@
+terminatedAt(sailing(Vessel)=true, T) :-
+	happensAt(velocity(Vessel,Speed,Heading), T),
+	Speed < 20.
+
+terminatedAt(sailing(Vessel)=true, T) :-
+	happensAt(gap_start(Vessel), T).
+
+terminatedAt(highSpeedIn(Vessel,AreaName)=true, T) :-
+	happensAt(isInArea(Vessel,AreaName), T),
+	happensAt(velocity(Vessel,Speed,Heading), T),
+	speedArea(AreaName,SpeedArea),
+	Speed < SpeedArea.
+
+terminatedAt(highSpeedIn(Vessel,AreaName)=true, T) :-
+	happensAt(leavesArea(Vessel,AreaName), T).
+
+terminatedAt(highSpeedIn(Vessel,AreaName)=true, T) :-
+	happensAt(gap_start(Vessel), T).
+
 holdsFor(activeOrInactivePerson(P)=true, I) :-
 	holdsFor(active(P)=true,I2),
 	holdsFor(inactive(P)=true,I3),
@@ -8,6 +27,9 @@ holdsFor(activeOrInactivePerson(P)=true, I) :-
 holdsFor(close(Id1,Id2,Threshold)=false, I) :-
 	holdsFor(close(Id1,Id2,Threshold)=true,I1),
 	complement_all([I1],I).
+
+initiatedAt(passenger_density(ID,VT)=Val, T) :-
+	happensAt(passenger_density_change(ID,VT,Val), T).
 
 initiatedAt(moving(P1,P2)=true, T) :-
 	happensAt(start(walking(P1)=true), T),
@@ -32,6 +54,9 @@ terminatedAt(moving(P1,P2)=true, T) :-
 
 terminatedAt(moving(P1,P2)=true, T) :-
 	happensAt(end(close(P1,P2)=true), T).
+
+terminatedAt(person(P)=true, T) :-
+	happensAt(disappear(P), T).
 
 holdsFor(moving(P1,P2)=true, I) :-
 	holdsFor(walking(P1)=true,I1),
@@ -59,4 +84,12 @@ holdsFor(fighting(P1,P2)=true, I) :-
 	union_all([I6,I7],I8),
 	intersect_all([I3,I4],I10),
 	relative_complement_all(I10,[I8],I).
+
+happensAt(fastApproach(Vessel), T) :-
+	happensAt(speedChange(Vessel), T),
+	holdsAt(velocity(Vessel)=Value, T),
+	Value > 20 knots,
+	holdsAt(coord(Vessel)=(Lon,Lat), T),
+	\+ nearPorts(Lon,Lat),
+	holdsAt(headingToVessels(Vessel)=true, T).
 

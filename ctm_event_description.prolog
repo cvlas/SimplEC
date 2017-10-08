@@ -1,5 +1,17 @@
 initially(punctuality(_,_)=punctual).
 
+initiatedAt(punctuality(Id,VehicleType)=punctual, T) :-
+	happensAt(stop_enter(Id,VehicleType,_,scheduled), T).
+
+initiatedAt(punctuality(Id,VehicleType)=punctual, T) :-
+	happensAt(stop_enter(Id,VehicleType,_,early), T).
+
+terminatedAt(punctuality(Id,VehicleType)=punctual, T) :-
+	happensAt(stop_enter(Id,VehicleType,_,late), T).
+
+terminatedAt(punctuality(Id,VehicleType)=punctual, T) :-
+	happensAt(stop_leave(Id,VehicleType,_,early), T).
+
 holdsFor(punctuality(Id,VehicleType)=non_punctual, I) :-
 	holdsFor(punctuality(Id,VehicleType)=punctual,I1),
 	complement_all([I1],I).
@@ -54,9 +66,18 @@ holdsFor(passenger_comfort(Id,VehicleType)=reducing, I) :-
 
 initially(passenger_density(_,_)=low).
 
+initiatedAt(passenger_density(Id,VehicleType)=Value, T) :-
+	happensAt(passenger_density_change(Id,VehicleType,Value), T).
+
 initially(noise_level(_,_)=low).
 
+initiatedAt(noise_level(Id,VehicleType)=Value, T) :-
+	happensAt(noise_level_change(Id,VehicleType,Value), T).
+
 initially(internal_temperature(_,_)=normal).
+
+initiatedAt(internal_temperature(Id,VehicleType)=Value, T) :-
+	happensAt(internal_temperature_change(Id,VehicleType,Value), T).
 
 holdsFor(driver_comfort(Id,VehicleType)=reducing, I) :-
 	holdsFor(driving_style(Id,VehicleType)=uncomfortable,I2),

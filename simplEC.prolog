@@ -1044,7 +1044,7 @@ initialCondition(CondStr, _, HeadDeclRepr, HeadGraphRepr)			-->	"end", space, fl
 {
 	atomics_to_string([",\n\thappensAt(end(", CTStr, "), T)"], "", CondStr)
 }.
-initialCondition(CondStr, _, HeadDeclRepr, HeadGraphRepr)			-->	"happens", space, event("input", CTStr, _, _, _, HeadDeclRepr, HeadGraphRepr),
+initialCondition(CondStr, _, HeadDeclRepr, HeadGraphRepr)			-->	event("input", CTStr, _, _, _, HeadDeclRepr, HeadGraphRepr),
 {
 	atomics_to_string([",\n\thappensAt(", CTStr, ", T)"], "", CondStr)
 }.
