@@ -958,6 +958,7 @@ initialAlternatives(List, _, HeadDeclRepr, HeadGraphRepr)		-->	initialConditionG
 	Length > 1,
 	addToHead([], AtBodyStr, List)
 }.
+initialAlternatives(List, _, HeadDeclRepr, HeadGraphRepr)		-->	"(", initialAlternatives(List, _, HeadDeclRepr, HeadGraphRepr), ")".
 
 moreInitialAlternatives(MIAList, _, HeadDeclRepr, HeadGraphRepr)	-->	space, "or", space, initialConditionGroup(AtBodyStr, _, HeadDeclRepr, HeadGraphRepr), moreInitialAlternatives(MMIAList, _, HeadDeclRepr, HeadGraphRepr),
 {
@@ -1015,6 +1016,7 @@ restAlternatives(List, _, HeadDeclRepr, HeadGraphRepr)		-->	conditionGroup(AtBod
 	Length > 1,
 	addToHead([], AtBodyStr, List)
 }.
+restAlternatives(List, _, HeadDeclRepr, HeadGraphRepr)		-->	"(", restAlternatives(List, _, HeadDeclRepr, HeadGraphRepr), ")".
 
 moreAlternatives(MIAList, _, HeadDeclRepr, HeadGraphRepr)	-->	space, "or", space, conditionGroup(AtBodyStr, _, HeadDeclRepr, HeadGraphRepr), moreAlternatives(MMIAList, _, HeadDeclRepr, HeadGraphRepr),
 {

@@ -10,16 +10,21 @@ digraph
 	3 [label="<greeting1(_,_)=true> greeting1(_,_)=true|<greeting2(_,_)=true> greeting2(_,_)=true|<leaving_object(_,_)=true> leaving_object(_,_)=true|<meeting(_,_)=false> meeting(_,_)=false"];
 	4 [label="<meeting(_,_)=true> meeting(_,_)=true"];
 
+	0:"abrupt(_)=true" -> 1:"person(_)=true"
 	0:"abrupt(_)=true" -> 2:"fighting(_,_)=true"
 	0:"abrupt(_)=true" -> 3:"greeting1(_,_)=true"
 	0:"abrupt(_)=true" -> 3:"meeting(_,_)=false"
+	0:"active(_)=true" -> 1:"person(_)=true"
 	0:"active(_)=true" -> 2:"activeOrInactivePerson(_)=true"
 	0:"appear(_)" -> 3:"leaving_object(_,_)=true"
 	0:"disappear(_)" -> 1:"leaving_object(_,_)=false"
 	0:"disappear(_)" -> 1:"person(_)=false"
+	0:"disappear(_)" -> 1:"person(_)=true"
+	0:"disappear(_)" -> 4:"meeting(_,_)=true"
 	0:"inactive(_)=true" -> 2:"activeOrInactivePerson(_)=true"
 	0:"inactive(_)=true" -> 2:"fighting(_,_)=true"
 	0:"inactive(_)=true" -> 3:"leaving_object(_,_)=true"
+	0:"running(_)=true" -> 1:"person(_)=true"
 	0:"running(_)=true" -> 3:"greeting1(_,_)=true"
 	0:"running(_)=true" -> 3:"meeting(_,_)=false"
 	0:"walking(_)=true" -> 1:"person(_)=true"
@@ -40,4 +45,5 @@ digraph
 	2:"close(_,_,_)=false" -> 3:"meeting(_,_)=false"
 	2:"closeSymmetric(_,_,_)=true" -> 3:"leaving_object(_,_)=true"
 	3:"greeting1(_,_)=true" -> 4:"meeting(_,_)=true"
+	3:"greeting2(_,_)=true" -> 4:"meeting(_,_)=true"
 }

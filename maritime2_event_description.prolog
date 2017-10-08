@@ -55,6 +55,22 @@ terminatedAt(moving(P1,P2)=true, T) :-
 terminatedAt(moving(P1,P2)=true, T) :-
 	happensAt(end(close(P1,P2)=true), T).
 
+initiatedAt(person(P)=true, T) :-
+	happensAt(start(walking(P)=true), T),
+	\+ holdsAt(disappear(P)=true, T).
+
+initiatedAt(person(P)=true, T) :-
+	happensAt(start(active(P)=true), T),
+	\+ holdsAt(disappear(P)=true, T).
+
+initiatedAt(person(P)=true, T) :-
+	happensAt(start(running(P)=true), T),
+	\+ holdsAt(disappear(P)=true, T).
+
+initiatedAt(person(P)=true, T) :-
+	happensAt(start(abrupt(P)=true), T),
+	\+ holdsAt(disappear(P)=true, T).
+
 terminatedAt(person(P)=true, T) :-
 	happensAt(disappear(P), T).
 

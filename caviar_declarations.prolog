@@ -1,11 +1,11 @@
 event(appear(_)).	inputEntity(appear(_)).	index(appear(Object), Object).
 event(disappear(_)).	inputEntity(disappear(_)).	index(disappear(Id), Id).
 
-sDFluent(abrupt(_)=true).	inputEntity(abrupt(_)=true).	index(abrupt(P2)=true, P2).
-sDFluent(active(_)=true).	inputEntity(active(_)=true).	index(active(P)=true, P).
+sDFluent(abrupt(_)=true).	inputEntity(abrupt(_)=true).	index(abrupt(Id)=true, Id).
+sDFluent(active(_)=true).	inputEntity(active(_)=true).	index(active(Id)=true, Id).
 sDFluent(distance(_,_,_)=true).	inputEntity(distance(_,_,_)=true).	index(distance(Id1,_,24)=true, Id1).
 sDFluent(inactive(_)=true).	inputEntity(inactive(_)=true).	index(inactive(Object)=true, Object).
-sDFluent(running(_)=true).	inputEntity(running(_)=true).	index(running(P2)=true, P2).
+sDFluent(running(_)=true).	inputEntity(running(_)=true).	index(running(Id)=true, Id).
 sDFluent(walking(_)=true).	inputEntity(walking(_)=true).	index(walking(Id)=true, Id).
 
 

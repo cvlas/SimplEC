@@ -6,13 +6,14 @@ event(passenger_density_change(_,_,_)).	inputEntity(passenger_density_change(_,_
 event(speedChange(_)).	inputEntity(speedChange(_)).	index(speedChange(Vessel), Vessel).
 event(velocity(_,_,_)).	inputEntity(velocity(_,_,_)).	index(velocity(Vessel,_,_), Vessel).
 
-sDFluent(abrupt(_)=true).	inputEntity(abrupt(_)=true).	index(abrupt(P2)=true, P2).
+sDFluent(abrupt(_)=true).	inputEntity(abrupt(_)=true).	index(abrupt(P)=true, P).
 sDFluent(active(_)=true).	inputEntity(active(_)=true).	index(active(P)=true, P).
 sDFluent(close(_,_)=true).	inputEntity(close(_,_)=true).	index(close(P1,_)=true, P1).
 sDFluent(close(_,_,_)=true).	inputEntity(close(_,_,_)=true).	index(close(Id1,_,_)=true, Id1).
+sDFluent(disappear(_)=true).	inputEntity(disappear(_)=true).	index(disappear(P)=true, P).
 sDFluent(headingToVessels(_)=true).	inputEntity(headingToVessels(_)=true).	index(headingToVessels(Vessel)=true, Vessel).
 sDFluent(inactive(_)=true).	inputEntity(inactive(_)=true).	index(inactive(P)=true, P).
-sDFluent(running(_)=true).	inputEntity(running(_)=true).	index(running(P2)=true, P2).
+sDFluent(running(_)=true).	inputEntity(running(_)=true).	index(running(P)=true, P).
 sDFluent(velocity(_)=true).	inputEntity(velocity(_)=true).	index(velocity(Vessel)=true, Vessel).
 sDFluent(walking(_)=true).	inputEntity(walking(_)=true).	index(walking(P1)=true, P1).
 
