@@ -1,8 +1,8 @@
 event(internal_temperature_change(_,_,_)).	inputEntity(internal_temperature_change(_,_,_)).	index(internal_temperature_change(Id,_,_), Id).
 event(noise_level_change(_,_,_)).	inputEntity(noise_level_change(_,_,_)).	index(noise_level_change(Id,_,_), Id).
 event(passenger_density_change(_,_,_)).	inputEntity(passenger_density_change(_,_,_)).	index(passenger_density_change(Id,_,_), Id).
-event(stop_enter(_,_,_,_)).	inputEntity(stop_enter(_,_,_,_)).	index(stop_enter(Id,_,_,scheduled), Id).
-event(stop_leave(_,_,_,_)).	inputEntity(stop_leave(_,_,_,_)).	index(stop_leave(Id,_,_,early), Id).
+event(stop_enter(_,_,_,_)).	inputEntity(stop_enter(_,_,_,_)).	index(stop_enter(Id,_,_,_), Id).
+event(stop_leave(_,_,_,_)).	inputEntity(stop_leave(_,_,_,_)).	index(stop_leave(Id,_,_,_), Id).
 
 sDFluent(abrupt_acceleration(_,_)=abrupt).	inputEntity(abrupt_acceleration(_,_)=abrupt).	index(abrupt_acceleration(Id,_)=abrupt, Id).
 sDFluent(abrupt_acceleration(_,_)=very_abrupt).	inputEntity(abrupt_acceleration(_,_)=very_abrupt).	index(abrupt_acceleration(Id,_)=very_abrupt, Id).
@@ -11,7 +11,7 @@ sDFluent(abrupt_deceleration(_,_)=very_abrupt).	inputEntity(abrupt_deceleration(
 sDFluent(sharp_turn(_,_)=sharp).	inputEntity(sharp_turn(_,_)=sharp).	index(sharp_turn(Id,_)=sharp, Id).
 sDFluent(sharp_turn(_,_)=very_sharp).	inputEntity(sharp_turn(_,_)=very_sharp).	index(sharp_turn(Id,_)=very_sharp, Id).
 
-event(punctuality_change(_,_,_)).	outputEntity(punctuality_change(_,_,_)).	index(punctuality_change(Id,_,punctual), Id).
+event(punctuality_change(_,_,_)).	outputEntity(punctuality_change(_,_,_)).	index(punctuality_change(Id,_,_), Id).
 
 simpleFluent(internal_temperature(_,_)=normal).	outputEntity(internal_temperature(_,_)=normal).	index(internal_temperature(X,_)=normal, X).
 simpleFluent(internal_temperature(_,_)=very_cold).	outputEntity(internal_temperature(_,_)=very_cold).	index(internal_temperature(Id,_)=very_cold, Id).

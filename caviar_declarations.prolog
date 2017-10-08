@@ -3,7 +3,7 @@ event(disappear(_)).	inputEntity(disappear(_)).	index(disappear(Id), Id).
 
 sDFluent(abrupt(_)=true).	inputEntity(abrupt(_)=true).	index(abrupt(Id)=true, Id).
 sDFluent(active(_)=true).	inputEntity(active(_)=true).	index(active(Id)=true, Id).
-sDFluent(distance(_,_,_)=true).	inputEntity(distance(_,_,_)=true).	index(distance(Id1,_,24)=true, Id1).
+sDFluent(distance(_,_,_)=true).	inputEntity(distance(_,_,_)=true).	index(distance(Id1,_,_)=true, Id1).
 sDFluent(inactive(_)=true).	inputEntity(inactive(_)=true).	index(inactive(Object)=true, Object).
 sDFluent(running(_)=true).	inputEntity(running(_)=true).	index(running(Id)=true, Id).
 sDFluent(walking(_)=true).	inputEntity(walking(_)=true).	index(walking(Id)=true, Id).
@@ -18,7 +18,7 @@ simpleFluent(person(_)=true).	outputEntity(person(_)=true).	index(person(Id)=tru
 
 sDFluent(activeOrInactivePerson(_)=true).	outputEntity(activeOrInactivePerson(_)=true).	index(activeOrInactivePerson(P)=true, P).
 sDFluent(close(_,_,_)=false).	outputEntity(close(_,_,_)=false).	index(close(Id1,_,_)=false, Id1).
-sDFluent(close(_,_,_)=true).	outputEntity(close(_,_,_)=true).	index(close(Id1,_,24)=true, Id1).
+sDFluent(close(_,_,_)=true).	outputEntity(close(_,_,_)=true).	index(close(Id1,_,_)=true, Id1).
 sDFluent(closeSymmetric(_,_,_)=true).	outputEntity(closeSymmetric(_,_,_)=true).	index(closeSymmetric(Id1,_,_)=true, Id1).
 sDFluent(fighting(_,_)=true).	outputEntity(fighting(_,_)=true).	index(fighting(P1,_)=true, P1).
 sDFluent(greeting1(_,_)=true).	outputEntity(greeting1(_,_)=true).	index(greeting1(P1,_)=true, P1).
