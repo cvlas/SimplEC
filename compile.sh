@@ -1,20 +1,17 @@
 #!/bin/bash
 
-if [ $# != 4 ];
+if [ $# != 1 ];
 then
-	printf "Please provide 4 arguments: The input SimplEC file, as well as the desired names for the compiled event description, the declarations and the dependency graph files.\n\n"
+	printf "Please provide 1 argument with the name of the input SimplEC file.\n\n"
 	exit 100
 fi
 
 simplec=$1
-evdescomp=$2
-decl=$3
-graph=$4
 
-swipl -l simplEC.prolog -g "simplEC('$1','event_description.prolog','$3', '$4')" -g "halt"
-swipl -l RTEC.prolog -g "compileEventDescription('$3', 'event_description.prolog', 'tmp.pl')" -g "halt"
-printf ":- ['RTEC.prolog'].\n:-['$3'].\n\n" > $2
-cat tmp.pl >> $2
+swipl -l simplEC.prolog -g "simplEC('$1','event_description.prolog','declarations.prolog', 'dependency_graph.txt')" -g "halt"
+swipl -l RTEC.prolog -g "compileEventDescription('declarations.prolog', 'event_description.prolog', 'tmp.pl')" -g "halt"
+printf ":- ['RTEC.prolog'].\n:- ['declarations.prolog'].\n\n" > event_description_compiled.prolog
+cat tmp.pl >> event_description_compiled.prolog
 rm -f tmp.pl
 
 exit 0
