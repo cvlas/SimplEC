@@ -1,3 +1,6 @@
+:- ['RTEC.prolog'].
+:-['caviar_declarations.prolog'].
+
 initiatedAt(person(_3156)=true, _, _3134, _) :-
      happensAtProcessedIE(_3156,start(walking(_3156)=true),_3134),
      \+happensAtIE(disappear(_3156),_3134).
@@ -56,32 +59,32 @@ holdsForSDFluent(close(_3162,_3164,24)=true,_3134) :-
 
 holdsForSDFluent(close(_3162,_3164,25)=true,_3134) :-
      holdsForProcessedSDFluent(_3162,close(_3162,_3164,24)=true,_3186),
-     holdsForSDFluent(distance(_3162,_3164,25)=true,_3206),
+     holdsForProcessedIE(_3162,distance(_3162,_3164,25)=true,_3206),
      union_all([_3186,_3206],_3134).
 
 holdsForSDFluent(close(_3162,_3164,30)=true,_3134) :-
-     holdsForSDFluent(close(_3162,_3164,25)=true,_3186),
-     holdsForSDFluent(distance(_3162,_3164,30)=true,_3206),
+     holdsForProcessedSDFluent(_3162,close(_3162,_3164,25)=true,_3186),
+     holdsForProcessedIE(_3162,distance(_3162,_3164,30)=true,_3206),
      union_all([_3186,_3206],_3134).
 
 holdsForSDFluent(close(_3162,_3164,34)=true,_3134) :-
-     holdsForSDFluent(close(_3162,_3164,30)=true,_3186),
-     holdsForSDFluent(distance(_3162,_3164,34)=true,_3206),
+     holdsForProcessedSDFluent(_3162,close(_3162,_3164,30)=true,_3186),
+     holdsForProcessedIE(_3162,distance(_3162,_3164,34)=true,_3206),
      union_all([_3186,_3206],_3134).
 
-holdsForSDFluent(close(_3162,_3164,24)=false,_3134) :-
-     holdsForProcessedSDFluent(_3162,close(_3162,_3164,24)=true,_3186),
+holdsForSDFluent(close(_3162,_3164,_3166)=false,_3134) :-
+     holdsForProcessedSDFluent(_3162,close(_3162,_3164,_3166)=true,_3186),
      complement_all([_3186],_3134).
 
-holdsForSDFluent(closeSymmetric(_3162,_3164,24)=true,_3134) :-
-     holdsForProcessedSDFluent(_3162,close(_3162,_3164,24)=true,_3186),
-     holdsForProcessedSDFluent(_3164,close(_3164,_3162,24)=true,_3206),
+holdsForSDFluent(closeSymmetric(_3162,_3164,_3166)=true,_3134) :-
+     holdsForProcessedSDFluent(_3162,close(_3162,_3164,_3166)=true,_3186),
+     holdsForProcessedSDFluent(_3164,close(_3164,_3162,_3166)=true,_3206),
      union_all([_3186,_3206],_3134).
 
 holdsForSDFluent(greeting1(_3162,_3164)=true,_3134) :-
      holdsForProcessedSDFluent(_3162,activeOrInactivePerson(_3162)=true,_3180),
      holdsForProcessedSimpleFluent(_3164,person(_3164)=true,_3196),
-     holdsForSDFluent(close(_3162,_3164,25)=true,_3216),
+     holdsForProcessedSDFluent(_3162,close(_3162,_3164,25)=true,_3216),
      holdsForProcessedIE(_3164,running(_3164)=true,_3232),
      holdsForProcessedIE(_3164,abrupt(_3164)=true,_3248),
      union_all([_3232,_3248],_3266),
@@ -91,7 +94,7 @@ holdsForSDFluent(greeting1(_3162,_3164)=true,_3134) :-
 holdsForSDFluent(greeting2(_3162,_3164)=true,_3134) :-
      holdsForProcessedIE(_3162,walking(_3162)=true,_3180),
      holdsForProcessedSDFluent(_3164,activeOrInactivePerson(_3164)=true,_3196),
-     holdsForSDFluent(close(_3164,_3162,25)=true,_3216),
+     holdsForProcessedSDFluent(_3164,close(_3164,_3162,25)=true,_3216),
      intersect_all([_3180,_3196,_3216],_3134).
 
 holdsForSDFluent(activeOrInactivePerson(_3162)=true,_3134) :-
@@ -104,7 +107,7 @@ holdsForSDFluent(activeOrInactivePerson(_3162)=true,_3134) :-
 holdsForSDFluent(moving(_3162,_3164)=true,_3134) :-
      holdsForProcessedIE(_3162,walking(_3162)=true,_3180),
      holdsForProcessedIE(_3164,walking(_3164)=true,_3196),
-     holdsForSDFluent(close(_3162,_3164,34)=true,_3216),
+     holdsForProcessedSDFluent(_3162,close(_3162,_3164,34)=true,_3216),
      intersect_all([_3180,_3196,_3216],_3134).
 
 holdsForSDFluent(fighting(_3162,_3164)=true,_3134) :-
@@ -119,6 +122,15 @@ holdsForSDFluent(fighting(_3162,_3164)=true,_3134) :-
      relative_complement_all(_3302,[_3284],_3134).
 
 cachingOrder2(_3138, close(_3138,_3140,24)=true) :-
+     id_pair(_3138,_3140).
+
+cachingOrder2(_3138, close(_3138,_3140,25)=true) :-
+     id_pair(_3138,_3140).
+
+cachingOrder2(_3138, close(_3138,_3140,30)=true) :-
+     id_pair(_3138,_3140).
+
+cachingOrder2(_3138, close(_3138,_3140,34)=true) :-
      id_pair(_3138,_3140).
 
 cachingOrder2(_3138, person(_3138)=true) :-

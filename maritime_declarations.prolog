@@ -24,8 +24,16 @@ simpleFluent(withinArea(_,_)=true).	outputEntity(withinArea(_,_)=true).	index(wi
 sDFluent(loitering(_)=true).	outputEntity(loitering(_)=true).	index(loitering(Vessel)=true, Vessel).
 sDFluent(rendezVouz(_,_)=true).	outputEntity(rendezVouz(_,_)=true).	index(rendezVouz(Vessel1,_)=true, Vessel1).
 
+collectIntervals(proximity(_,_)=true).
 
 
+grounding(lowSpeed(Vessel)=true)	:-	vessel(Vessel).
+grounding(sailing(Vessel)=true)	:-	vessel(Vessel).
+grounding(stopped(Vessel)=true)	:-	vessel(Vessel).
+grounding(withinArea(Vessel,_AreaName)=true)	:-	vessel(Vessel).
+grounding(highSpeedIn(Vessel,_AreaName)=true)	:-	vessel(Vessel).
+grounding(loitering(Vessel)=true)	:-	vessel(Vessel).
+grounding(rendezVouz(Vessel,Vessel2)=true)	:-	vessel(Vessel), vessel(Vessel2), Vessel =\= Vessel2.
 
 cachingOrder(fastApproach(_)).	%1
 cachingOrder(highSpeedIn(_,_)=true).	%1

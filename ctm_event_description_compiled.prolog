@@ -1,3 +1,6 @@
+:- ['RTEC.prolog'].
+:-['ctm_declarations.prolog'].
+
 initially(punctuality(_4656,_4658)=punctual).
 
 initially(passenger_density(_4656,_4658)=low).
@@ -135,6 +138,9 @@ cachingOrder2(_3138, passenger_satisfaction(_3138,_3140)=reducing) :-
      vehicle(_3138,_3140).
 
 cachingOrder2(_3132, punctuality_change(_3132,_3134,punctual)) :-
+     vehicle(_3132,_3134).
+
+cachingOrder2(_3132, punctuality_change(_3132,_3134,non_punctual)) :-
      vehicle(_3132,_3134).
 
 collectIntervals2(_3138, abrupt_acceleration(_3138,_3140)=abrupt) :-
