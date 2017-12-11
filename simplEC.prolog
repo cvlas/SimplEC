@@ -51,7 +51,7 @@ cachingLevel(Node, Level) :-
 % SIMPL-EC
 % -----------------------------------------------
 
-simplEC(InputFile, OutputFile, DeclarationsFile, GraphFile) :-
+simplEC(InputFile, OutputFile, DeclarationsFile, GraphFile, FourArgAtRules) :-
 	
 	% Prepare files for reading and writing
 	split_string(InputFile, ".", "", InputFileTokens),
@@ -65,6 +65,7 @@ simplEC(InputFile, OutputFile, DeclarationsFile, GraphFile) :-
 	% Set auxiliary global variables for interval numbering and logfile production
 	nb_setval(intervalNo, 1),
 	nb_setval(logFile, LogFile),
+	nb_setval(fourArgs, FourArgAtRules),
 	
 	% Parse and translate the rules into RTEC format
 	read_stream_to_codes(Input, Codes),
@@ -355,22 +356,20 @@ sep		--> 	"if".
 fhead(HeadStr, DeclRepr, GraphRepr)						--> 	fluent("sD", "output", CTStr, DeclRepr, GraphRepr, _, _, null, null),
 {
 	atomics_to_string(["holdsFor(", CTStr, ", I)"], "", HeadStr)
-	%(
-	%	\+ head(DeclRepr) -> assertz(head(DeclRepr))
-	%	;
-	%	true
-	%)
 }.
 shead(HeadStr, DeclRepr, GraphRepr)						--> 	"initiate", space, fluent("simple", "output", CTStr, DeclRepr, GraphRepr, _, _, null, null),
 {
-	atomics_to_string(["initiatedAt(", CTStr, ", T)"], "", HeadStr)
-	%(\+ head(DeclRepr) -> assertz(head(DeclRepr))
-	%;
-	%true)
+	nb_getval(fourArgs, FA),
+	(FA -> atomics_to_string(["initiatedAt(", CTStr, ", T1, T, T2)"], "", HeadStr)
+	;
+	atomics_to_string(["initiatedAt(", CTStr, ", T)"], "", HeadStr))
 }.
 shead(HeadStr, DeclRepr, GraphRepr)						--> 	"terminate", space, fluent("simple", "output", CTStr, DeclRepr, GraphRepr, _, _, null, null),
 {
-	atomics_to_string(["terminatedAt(", CTStr, ", T)"], "", HeadStr)
+	nb_getval(fourArgs, FA),
+	(FA -> atomics_to_string(["terminatedAt(", CTStr, ", T1, T, T2)"], "", HeadStr)
+	;
+	atomics_to_string(["terminatedAt(", CTStr, ", T)"], "", HeadStr))
 }.
 shead(HeadStr, DeclRepr, GraphRepr)						--> 	"happens", space, event("output", EvStr, DeclRepr, GraphRepr, _, null, null),
 {
@@ -874,9 +873,14 @@ durationConstraint(DCStr, IDC)					-->	"duration", space, operator(OpStr), space
 atBody(AtBodyStr, _, HeadDeclRepr, HeadGraphRepr)				-->	initialAlternatives(List1, _, HeadDeclRepr, HeadGraphRepr), allOtherAlternatives(ListOfLists, _, HeadDeclRepr, HeadGraphRepr),
 {
 	addToHead(ListOfLists, List1, List),
-						
+	
 	prod(List, AltBodyLists),
-	findall(AltBodyStr, (member(AltBodyList, AltBodyLists), atomics_to_string(AltBodyList, "", AltBodyStr)), AltBodyStrs),
+	
+	nb_getval(fourArgs, FA),
+	(FA -> findall(AltBodyStr, (member(AltBodyList, AltBodyLists), addToTail(AltBodyList, ", T1=<T, T<T2", AltBodyPlusList), atomics_to_string(AltBodyPlusList, "", AltBodyStr)), AltBodyStrs)
+	;
+	findall(AltBodyStr, (member(AltBodyList, AltBodyLists), atomics_to_string(AltBodyList, "", AltBodyStr)), AltBodyStrs)),
+	
 	atomics_to_string(AltBodyStrs, "^", AtBodyStr)
 }.
 
