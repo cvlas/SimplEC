@@ -667,8 +667,17 @@ moreArguments(MArgStr, UMArgStr, GMArgStr, MArgList)				-->	",", space, "_", mor
 	addToHead(MMArgList, "_", MArgList)
 }.
 
-forBody(BodyStr, HeadDeclRepr, HeadGraphRepr)	-->	conjunction(BodyStr, _, HeadDeclRepr, HeadGraphRepr).
-forBody(BodyStr, HeadDeclRepr, HeadGraphRepr)	-->	disjunction(BodyStr, _, HeadDeclRepr, HeadGraphRepr).
+forBody(FinalBodyStr, HeadDeclRepr, HeadGraphRepr)	-->	conjunction(BodyStr, _, HeadDeclRepr, HeadGraphRepr), ",", space, possibleConstraint(PCStr, _),
+{
+	atomics_to_string([BodyStr, PCStr], "", FinalBodyStr)
+}.
+forBody(FinalBodyStr, HeadDeclRepr, HeadGraphRepr)	-->	disjunction(BodyStr, _, HeadDeclRepr, HeadGraphRepr), ",", space, possibleConstraint(PCStr, _),
+{
+	atomics_to_string([BodyStr, PCStr], "", FinalBodyStr)
+}.
+
+possibleConstraint(Str, I)		-->		constraint(Str, I).
+possibleConstraint("", _)		-->		"".
 
 conjunction(CStr, IC, HeadDeclRepr, HeadGraphRepr)	-->	cTerm(CTStr, ICT, HeadDeclRepr, HeadGraphRepr), moreCTerms(MCTStr, IMCT, HeadDeclRepr, HeadGraphRepr),
 {
@@ -794,7 +803,7 @@ cTerm(CTStr, ICT, HeadDeclRepr, HeadGraphRepr)	-->	"not", space, "(", disjunctio
 	string_concat("I", Int, ICT),
 	atomics_to_string([DStr, ",\n\t", "complement_all([", ID, "], ", ICT, ")"], "", CTStr)
 }.
-cTerm(CTStr, Int, _, _)	-->	constraint(CTStr, Int).
+%cTerm(CTStr, Int, _, _)	-->	constraint(CTStr, Int).
 
 disjunction(DStr, ID, HeadDeclRepr, HeadGraphRepr)	-->	dTerm(DTStr, IDT, HeadDeclRepr, HeadGraphRepr), moreDTerms(MDTStr, IMDT, HeadDeclRepr, HeadGraphRepr),
 {
