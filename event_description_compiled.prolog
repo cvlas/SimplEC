@@ -1,105 +1,163 @@
 :- ['RTEC.prolog'].
 :- ['declarations.prolog'].
 
-initiatedAt(stopped(_3156)=true, _, _3134, _) :-
-     happensAtIE(stop_start(_3156),_3134),
-     happensAtIE(coord(_3156,_3172,_3174),_3134),
-     nearPorts(_3172,_3174,[]).
+initially(punctuality(_4656,_4658)=punctual).
 
-initiatedAt(lowSpeed(_3156)=true, _, _3134, _) :-
-     happensAtIE(slow_motion_start(_3156),_3134),
-     happensAtIE(coord(_3156,_3172,_3174),_3134),
-     nearPorts(_3172,_3174,[]).
+initially(passenger_density(_4656,_4658)=low).
 
-initiatedAt(withinArea(_3156,_3158)=true, _, _3134, _) :-
-     happensAtIE(isInArea(_3156,_3158),_3134).
+initially(noise_level(_4656,_4658)=low).
 
-initiatedAt(sailing(_3156)=true, _, _3134, _) :-
-     happensAtIE(velocity(_3156,_3162,_3164),_3134),
-     _3162>20.
+initially(internal_temperature(_4656,_4658)=normal).
 
-initiatedAt(highSpeedIn(_3156,_3158)=true, _, _3134, _) :-
-     happensAtIE(isInArea(_3156,_3158),_3134),
-     happensAtIE(velocity(_3156,_3176,_3178),_3134),
-     speedArea(_3158,_3190),
-     _3176>_3190.
+initiatedAt(punctuality(_3156,_3158)=punctual, _, _3134, _) :-
+     happensAtIE(stop_enter(_3156,_3158,_3166,scheduled),_3134).
 
-terminatedAt(stopped(_3156)=true, _, _3134, _) :-
-     happensAtIE(stop_end(_3156),_3134).
+initiatedAt(punctuality(_3156,_3158)=punctual, _, _3134, _) :-
+     happensAtIE(stop_enter(_3156,_3158,_3166,early),_3134).
 
-terminatedAt(lowSpeed(_3156)=true, _, _3134, _) :-
-     happensAtIE(slow_motion_end(_3156),_3134).
+initiatedAt(passenger_density(_3156,_3158)=_3152, _, _3134, _) :-
+     happensAtIE(passenger_density_change(_3156,_3158,_3152),_3134).
 
-terminatedAt(lowSpeed(_3156)=true, _, _3134, _) :-
-     happensAtProcessedSimpleFluent(_3156,start(stopped(_3156)=true),_3134).
+initiatedAt(noise_level(_3156,_3158)=_3152, _, _3134, _) :-
+     happensAtIE(noise_level_change(_3156,_3158,_3152),_3134).
 
-terminatedAt(withinArea(_3156,_3158)=true, _, _3134, _) :-
-     happensAtIE(leavesArea(_3156,_3158),_3134).
+initiatedAt(internal_temperature(_3156,_3158)=_3152, _, _3134, _) :-
+     happensAtIE(internal_temperature_change(_3156,_3158,_3152),_3134).
 
-terminatedAt(sailing(_3156)=true, _, _3134, _) :-
-     happensAtIE(velocity(_3156,_3162,_3164),_3134),
-     _3162<20.
+terminatedAt(punctuality(_3156,_3158)=punctual, _, _3134, _) :-
+     happensAtIE(stop_enter(_3156,_3158,_3166,late),_3134).
 
-terminatedAt(sailing(_3156)=true, _, _3134, _) :-
-     happensAtIE(gap_start(_3156),_3134).
+terminatedAt(punctuality(_3156,_3158)=punctual, _, _3134, _) :-
+     happensAtIE(stop_leave(_3156,_3158,_3166,early),_3134).
 
-terminatedAt(highSpeedIn(_3156,_3158)=true, _, _3134, _) :-
-     happensAtIE(isInArea(_3156,_3158),_3134),
-     happensAtIE(velocity(_3156,_3176,_3178),_3134),
-     speedArea(_3158,_3190),
-     _3176<_3190.
+holdsForSDFluent(punctuality(_3162,_3164)=non_punctual,_3134) :-
+     holdsForProcessedSimpleFluent(_3162,punctuality(_3162,_3164)=punctual,_3182),
+     complement_all([_3182],_3134).
 
-terminatedAt(highSpeedIn(_3156,_3158)=true, _, _3134, _) :-
-     happensAtIE(leavesArea(_3156,_3158),_3134).
+holdsForSDFluent(driving_style(_3162,_3164)=unsafe,_3134) :-
+     holdsForProcessedIE(_3162,sharp_turn(_3162,_3164)=very_sharp,_3182),
+     holdsForProcessedIE(_3162,abrupt_acceleration(_3162,_3164)=very_abrupt,_3200),
+     holdsForProcessedIE(_3162,abrupt_deceleration(_3162,_3164)=very_abrupt,_3218),
+     union_all([_3182,_3200,_3218],_3134).
 
-terminatedAt(highSpeedIn(_3156,_3158)=true, _, _3134, _) :-
-     happensAtIE(gap_start(_3156),_3134).
+holdsForSDFluent(driving_style(_3162,_3164)=uncomfortable,_3134) :-
+     holdsForProcessedIE(_3162,sharp_turn(_3162,_3164)=sharp,_3182),
+     holdsForProcessedIE(_3162,abrupt_acceleration(_3162,_3164)=very_abrupt,_3200),
+     holdsForProcessedIE(_3162,abrupt_deceleration(_3162,_3164)=very_abrupt,_3218),
+     union_all([_3200,_3218],_3236),
+     relative_complement_all(_3182,[_3236],_3250),
+     holdsForProcessedIE(_3162,abrupt_acceleration(_3162,_3164)=abrupt,_3268),
+     holdsForProcessedIE(_3162,abrupt_deceleration(_3162,_3164)=abrupt,_3286),
+     union_all([_3250,_3268,_3286],_3134).
 
-holdsForSDFluent(loitering(_3162)=true,_3134) :-
-     holdsForProcessedSimpleFluent(_3162,lowSpeed(_3162)=true,_3178),
-     holdsForProcessedSimpleFluent(_3162,stopped(_3162)=true,_3194),
-     union_all([_3178,_3194],_3212),
-     holdsForProcessedSimpleFluent(_3162,withinArea(_3162,_3224)=true,_3230),
-     intersect_all([_3212,_3230],_3248),
-     findall((_3252,_3254),(member((_3252,_3254),_3248),_3282 is _3254-_3252,_3282>600),_3134).
+holdsForSDFluent(driving_quality(_3162,_3164)=high,_3134) :-
+     holdsForProcessedSimpleFluent(_3162,punctuality(_3162,_3164)=punctual,_3182),
+     holdsForProcessedSDFluent(_3162,driving_style(_3162,_3164)=unsafe,_3200),
+     holdsForProcessedSDFluent(_3162,driving_style(_3162,_3164)=uncomfortable,_3218),
+     union_all([_3200,_3218],_3236),
+     relative_complement_all(_3182,[_3236],_3134).
 
-holdsForSDFluent(rendezVouz(_3162,_3164)=true,_3134) :-
-     holdsForProcessedIE(_3162,proximity(_3162,_3164)=true,_3182),
-     holdsForProcessedSimpleFluent(_3162,lowSpeed(_3162)=true,_3198),
-     holdsForProcessedSimpleFluent(_3162,stopped(_3162)=true,_3214),
-     union_all([_3198,_3214],_3232),
-     holdsForProcessedSimpleFluent(_3164,lowSpeed(_3164)=true,_3248),
-     holdsForProcessedSimpleFluent(_3164,stopped(_3164)=true,_3264),
-     union_all([_3248,_3264],_3282),
-     intersect_all([_3182,_3232,_3282],_3306),
-     findall((_3310,_3312),(member((_3310,_3312),_3306),_3340 is _3312-_3310,_3340>600),_3134).
+holdsForSDFluent(driving_quality(_3162,_3164)=medium,_3134) :-
+     holdsForProcessedSimpleFluent(_3162,punctuality(_3162,_3164)=punctual,_3182),
+     holdsForProcessedSDFluent(_3162,driving_style(_3162,_3164)=uncomfortable,_3200),
+     intersect_all([_3182,_3200],_3134).
 
-happensAtEv(fastApproach(_3150),_3134) :-
-     happensAtIE(speedChange(_3150),_3134),
-     holdsAtProcessedIE(_3150,velocity(_3150)=true,_3134),
-     true>20,
-     holdsAt(coord(_3150)=(_3196,_3198),_3134),
-     \+nearPorts(_3196,_3198),
-     holdsAtProcessedIE(_3150,headingToVessels(_3150)=true,_3134).
+holdsForSDFluent(driving_quality(_3162,_3164)=low,_3134) :-
+     holdsForProcessedSDFluent(_3162,punctuality(_3162,_3164)=non_punctual,_3182),
+     holdsForProcessedSDFluent(_3162,driving_style(_3162,_3164)=unsafe,_3200),
+     union_all([_3182,_3200],_3134).
 
-cachingOrder2(_3138, highSpeedIn(_3138,_3140)=true) :-
-     vessel(_3138).
+holdsForSDFluent(passenger_comfort(_3162,_3164)=reducing,_3134) :-
+     holdsForProcessedSDFluent(_3162,driving_style(_3162,_3164)=uncomfortable,_3182),
+     holdsForProcessedSDFluent(_3162,driving_style(_3162,_3164)=unsafe,_3200),
+     holdsForProcessedSimpleFluent(_3162,passenger_density(_3162,_3164)=high,_3218),
+     holdsForProcessedSimpleFluent(_3162,noise_level(_3162,_3164)=high,_3236),
+     holdsForProcessedSimpleFluent(_3162,internal_temperature(_3162,_3164)=very_warm,_3254),
+     holdsForProcessedSimpleFluent(_3162,internal_temperature(_3162,_3164)=very_cold,_3272),
+     union_all([_3182,_3200,_3218,_3236,_3254,_3272],_3134).
 
-cachingOrder2(_3138, sailing(_3138)=true) :-
-     vessel(_3138).
+holdsForSDFluent(driver_comfort(_3162,_3164)=reducing,_3134) :-
+     holdsForProcessedSDFluent(_3162,driving_style(_3162,_3164)=uncomfortable,_3182),
+     holdsForProcessedSDFluent(_3162,driving_style(_3162,_3164)=unsafe,_3200),
+     holdsForProcessedSimpleFluent(_3162,noise_level(_3162,_3164)=high,_3218),
+     holdsForProcessedSimpleFluent(_3162,internal_temperature(_3162,_3164)=very_warm,_3236),
+     holdsForProcessedSimpleFluent(_3162,internal_temperature(_3162,_3164)=very_cold,_3254),
+     union_all([_3182,_3200,_3218,_3236,_3254],_3134).
 
-cachingOrder2(_3138, stopped(_3138)=true) :-
-     vessel(_3138).
+holdsForSDFluent(passenger_satisfaction(_3162,_3164)=reducing,_3134) :-
+     holdsForProcessedSDFluent(_3162,punctuality(_3162,_3164)=non_punctual,_3182),
+     holdsForProcessedSDFluent(_3162,passenger_comfort(_3162,_3164)=reducing,_3200),
+     union_all([_3182,_3200],_3134).
 
-cachingOrder2(_3138, withinArea(_3138,_3140)=true) :-
-     vessel(_3138).
+happensAtEv(punctuality_change(_3150,_3152,punctual),_3134) :-
+     happensAtProcessedSDFluent(_3150,end(punctuality(_3150,_3152)=non_punctual),_3134).
 
-cachingOrder2(_3138, lowSpeed(_3138)=true) :-
-     vessel(_3138).
+happensAtEv(punctuality_change(_3150,_3152,non_punctual),_3134) :-
+     happensAtProcessedSimpleFluent(_3150,end(punctuality(_3150,_3152)=punctual),_3134).
 
-cachingOrder2(_3138, loitering(_3138)=true) :-
-     vessel(_3138).
+cachingOrder2(_3138, driving_style(_3138,_3140)=uncomfortable) :-
+     vehicle(_3138,_3140).
 
-cachingOrder2(_3138, rendezVouz(_3138,_3140)=true) :-
-     vessel(_3138),vessel(_3140),_3138=\=_3140.
+cachingOrder2(_3138, driving_style(_3138,_3140)=unsafe) :-
+     vehicle(_3138,_3140).
+
+cachingOrder2(_3138, internal_temperature(_3138,_3140)=very_cold) :-
+     vehicle(_3138,_3140).
+
+cachingOrder2(_3138, internal_temperature(_3138,_3140)=very_warm) :-
+     vehicle(_3138,_3140).
+
+cachingOrder2(_3138, noise_level(_3138,_3140)=high) :-
+     vehicle(_3138,_3140).
+
+cachingOrder2(_3138, passenger_density(_3138,_3140)=high) :-
+     vehicle(_3138,_3140).
+
+cachingOrder2(_3138, punctuality(_3138,_3140)=punctual) :-
+     vehicle(_3138,_3140).
+
+cachingOrder2(_3138, driver_comfort(_3138,_3140)=reducing) :-
+     vehicle(_3138,_3140).
+
+cachingOrder2(_3138, driving_quality(_3138,_3140)=high) :-
+     vehicle(_3138,_3140).
+
+cachingOrder2(_3138, driving_quality(_3138,_3140)=medium) :-
+     vehicle(_3138,_3140).
+
+cachingOrder2(_3138, passenger_comfort(_3138,_3140)=reducing) :-
+     vehicle(_3138,_3140).
+
+cachingOrder2(_3138, punctuality(_3138,_3140)=non_punctual) :-
+     vehicle(_3138,_3140).
+
+cachingOrder2(_3138, driving_quality(_3138,_3140)=low) :-
+     vehicle(_3138,_3140).
+
+cachingOrder2(_3138, passenger_satisfaction(_3138,_3140)=reducing) :-
+     vehicle(_3138,_3140).
+
+cachingOrder2(_3132, punctuality_change(_3132,_3134,punctual)) :-
+     vehicle(_3132,_3134).
+
+cachingOrder2(_3132, punctuality_change(_3132,_3134,non_punctual)) :-
+     vehicle(_3132,_3134).
+
+collectIntervals2(_3138, abrupt_acceleration(_3138,_3140)=abrupt) :-
+     vehicle(_3138,_3140).
+
+collectIntervals2(_3138, abrupt_acceleration(_3138,_3140)=very_abrupt) :-
+     vehicle(_3138,_3140).
+
+collectIntervals2(_3138, abrupt_deceleration(_3138,_3140)=abrupt) :-
+     vehicle(_3138,_3140).
+
+collectIntervals2(_3138, abrupt_deceleration(_3138,_3140)=very_abrupt) :-
+     vehicle(_3138,_3140).
+
+collectIntervals2(_3138, sharp_turn(_3138,_3140)=sharp) :-
+     vehicle(_3138,_3140).
+
+collectIntervals2(_3138, sharp_turn(_3138,_3140)=very_sharp) :-
+     vehicle(_3138,_3140).
 

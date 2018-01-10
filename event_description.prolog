@@ -1,81 +1,94 @@
-initiatedAt(stopped(Vessel)=true, T) :-
-	happensAt(stop_start(Vessel), T),
-	happensAt(coord(Vessel,Lon,Lat), T),
-	nearPorts(Lon,Lat,[]).
+initially(punctuality(_,_)=punctual).
 
-terminatedAt(stopped(Vessel)=true, T) :-
-	happensAt(stop_end(Vessel), T).
+initiatedAt(punctuality(Id,VehicleType)=punctual, T) :-
+	happensAt(stop_enter(Id,VehicleType,_,scheduled), T).
 
-initiatedAt(lowSpeed(Vessel)=true, T) :-
-	happensAt(slow_motion_start(Vessel), T),
-	happensAt(coord(Vessel,Lon,Lat), T),
-	nearPorts(Lon,Lat,[]).
+initiatedAt(punctuality(Id,VehicleType)=punctual, T) :-
+	happensAt(stop_enter(Id,VehicleType,_,early), T).
 
-terminatedAt(lowSpeed(Vessel)=true, T) :-
-	happensAt(slow_motion_end(Vessel), T).
+terminatedAt(punctuality(Id,VehicleType)=punctual, T) :-
+	happensAt(stop_enter(Id,VehicleType,_,late), T).
 
-terminatedAt(lowSpeed(Vessel)=true, T) :-
-	happensAt(start(stopped(Vessel)=true), T).
+terminatedAt(punctuality(Id,VehicleType)=punctual, T) :-
+	happensAt(stop_leave(Id,VehicleType,_,early), T).
 
-initiatedAt(withinArea(Vessel,AreaName)=true, T) :-
-	happensAt(isInArea(Vessel,AreaName), T).
+holdsFor(punctuality(Id,VehicleType)=non_punctual, I) :-
+	holdsFor(punctuality(Id,VehicleType)=punctual,I1),
+	complement_all([I1],I).
 
-terminatedAt(withinArea(Vessel,AreaName)=true, T) :-
-	happensAt(leavesArea(Vessel,AreaName), T).
+happensAt(punctuality_change(Id,VehicleType,punctual), T) :-
+	happensAt(end(punctuality(Id,VehicleType)=non_punctual), T).
 
-initiatedAt(sailing(Vessel)=true, T) :-
-	happensAt(velocity(Vessel,Speed,Heading), T),
-	Speed > 20.
+happensAt(punctuality_change(Id,VehicleType,non_punctual), T) :-
+	happensAt(end(punctuality(Id,VehicleType)=punctual), T).
 
-terminatedAt(sailing(Vessel)=true, T) :-
-	happensAt(velocity(Vessel,Speed,Heading), T),
-	Speed < 20.
+holdsFor(driving_style(Id,VehicleType)=unsafe, I) :-
+	holdsFor(sharp_turn(Id,VehicleType)=very_sharp,I2),
+	holdsFor(abrupt_acceleration(Id,VehicleType)=very_abrupt,I3),
+	holdsFor(abrupt_deceleration(Id,VehicleType)=very_abrupt,I4),
+	union_all([I2,I3,I4],I).
 
-terminatedAt(sailing(Vessel)=true, T) :-
-	happensAt(gap_start(Vessel), T).
+holdsFor(driving_style(Id,VehicleType)=uncomfortable, I) :-
+	holdsFor(sharp_turn(Id,VehicleType)=sharp,I2),
+	holdsFor(abrupt_acceleration(Id,VehicleType)=very_abrupt,I4),
+	holdsFor(abrupt_deceleration(Id,VehicleType)=very_abrupt,I5),
+	union_all([I4,I5],I6),
+	relative_complement_all(I2,[I6],I7),
+	holdsFor(abrupt_acceleration(Id,VehicleType)=abrupt,I8),
+	holdsFor(abrupt_deceleration(Id,VehicleType)=abrupt,I9),
+	union_all([I7,I8,I9],I).
 
-initiatedAt(highSpeedIn(Vessel,AreaName)=true, T) :-
-	happensAt(isInArea(Vessel,AreaName), T),
-	happensAt(velocity(Vessel,Speed,Heading), T),
-	speedArea(AreaName,SpeedArea),
-	Speed > SpeedArea.
+holdsFor(driving_quality(Id,VehicleType)=high, I) :-
+	holdsFor(punctuality(Id,VehicleType)=punctual,I1),
+	holdsFor(driving_style(Id,VehicleType)=unsafe,I3),
+	holdsFor(driving_style(Id,VehicleType)=uncomfortable,I4),
+	union_all([I3,I4],I5),
+	relative_complement_all(I1,[I5],I).
 
-terminatedAt(highSpeedIn(Vessel,AreaName)=true, T) :-
-	happensAt(isInArea(Vessel,AreaName), T),
-	happensAt(velocity(Vessel,Speed,Heading), T),
-	speedArea(AreaName,SpeedArea),
-	Speed < SpeedArea.
+holdsFor(driving_quality(Id,VehicleType)=medium, I) :-
+	holdsFor(punctuality(Id,VehicleType)=punctual,I1),
+	holdsFor(driving_style(Id,VehicleType)=uncomfortable,I2),
+	intersect_all([I1,I2],I).
 
-terminatedAt(highSpeedIn(Vessel,AreaName)=true, T) :-
-	happensAt(leavesArea(Vessel,AreaName), T).
+holdsFor(driving_quality(Id,VehicleType)=low, I) :-
+	holdsFor(punctuality(Id,VehicleType)=non_punctual,I2),
+	holdsFor(driving_style(Id,VehicleType)=unsafe,I3),
+	union_all([I2,I3],I).
 
-terminatedAt(highSpeedIn(Vessel,AreaName)=true, T) :-
-	happensAt(gap_start(Vessel), T).
+holdsFor(passenger_comfort(Id,VehicleType)=reducing, I) :-
+	holdsFor(driving_style(Id,VehicleType)=uncomfortable,I2),
+	holdsFor(driving_style(Id,VehicleType)=unsafe,I3),
+	holdsFor(passenger_density(Id,VehicleType)=high,I4),
+	holdsFor(noise_level(Id,VehicleType)=high,I5),
+	holdsFor(internal_temperature(Id,VehicleType)=very_warm,I6),
+	holdsFor(internal_temperature(Id,VehicleType)=very_cold,I7),
+	union_all([I2,I3,I4,I5,I6,I7],I).
 
-holdsFor(loitering(Vessel)=true, I) :-
-	holdsFor(lowSpeed(Vessel)=true,I1),
-	holdsFor(stopped(Vessel)=true,I2),
-	union_all([I1,I2],I3),
-	holdsFor(withinArea(Vessel,AreaName)=true,I4),
-	intersect_all([I3,I4],I5),
-	findall((S,E),(member((S,E),I5),Diff is E-S,Diff>600),I).
+initially(passenger_density(_,_)=low).
 
-holdsFor(rendezVouz(Vessel1,Vessel2)=true, I) :-
-	holdsFor(proximity(Vessel1,Vessel2)=true,I1),
-	holdsFor(lowSpeed(Vessel1)=true,I2),
-	holdsFor(stopped(Vessel1)=true,I3),
-	union_all([I2,I3],I4),
-	holdsFor(lowSpeed(Vessel2)=true,I5),
-	holdsFor(stopped(Vessel2)=true,I6),
-	union_all([I5,I6],I7),
-	intersect_all([I1,I4,I7],I8),
-	findall((S,E),(member((S,E),I8),Diff is E-S,Diff>600),I).
+initiatedAt(passenger_density(Id,VehicleType)=Value, T) :-
+	happensAt(passenger_density_change(Id,VehicleType,Value), T).
 
-happensAt(fastApproach(Vessel), T) :-
-	happensAt(speedChange(Vessel), T),
-	holdsAt(velocity(Vessel)=Value, T),
-	Value > 20,
-	holdsAt(coord(Vessel)=(Lon,Lat), T),
-	\+ nearPorts(Lon,Lat),
-	holdsAt(headingToVessels(Vessel)=true, T).
+initially(noise_level(_,_)=low).
+
+initiatedAt(noise_level(Id,VehicleType)=Value, T) :-
+	happensAt(noise_level_change(Id,VehicleType,Value), T).
+
+initially(internal_temperature(_,_)=normal).
+
+initiatedAt(internal_temperature(Id,VehicleType)=Value, T) :-
+	happensAt(internal_temperature_change(Id,VehicleType,Value), T).
+
+holdsFor(driver_comfort(Id,VehicleType)=reducing, I) :-
+	holdsFor(driving_style(Id,VehicleType)=uncomfortable,I2),
+	holdsFor(driving_style(Id,VehicleType)=unsafe,I3),
+	holdsFor(noise_level(Id,VehicleType)=high,I4),
+	holdsFor(internal_temperature(Id,VehicleType)=very_warm,I5),
+	holdsFor(internal_temperature(Id,VehicleType)=very_cold,I6),
+	union_all([I2,I3,I4,I5,I6],I).
+
+holdsFor(passenger_satisfaction(Id,VehicleType)=reducing, I) :-
+	holdsFor(punctuality(Id,VehicleType)=non_punctual,I2),
+	holdsFor(passenger_comfort(Id,VehicleType)=reducing,I3),
+	union_all([I2,I3],I).
 
