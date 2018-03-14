@@ -199,6 +199,7 @@ space			-->	[].
 goal			--> 	space, ceDefinition, space, goal.
 goal			--> 	[].
 
+% All possible statements in our dialect.
 ceDefinition		-->	atemporalPredicates.
 ceDefinition		-->	multivaluedFluents.
 ceDefinition		-->	initially.
@@ -218,7 +219,8 @@ ceDefinition		-->	string_without([46], ErrRule), ".",
 					write(LogStream, "\nERROR: Unknown event pattern detected.\nPlease check your syntax.\n\n"),
 					close(LogStream)
 				}.
-				
+
+% Statements that declare atemporal predicates.			
 atemporalPredicates	-->	"atemporal:", space, functawr(FncStr), moreFacts, ".",
 				{
 					assertz(atem(FncStr))
@@ -230,6 +232,7 @@ moreFacts		-->	space, ",", space, functawr(FncStr), moreFacts,
 				}.
 moreFacts		-->	"".
 
+% Statements that declare fluents that have values other than "true" and "false".	
 multivaluedFluents	-->	"multivalued:", space, multivaluedFluent, moremultivaluedFluents, ".".
 
 moremultivaluedFluents	-->	space, ",", space, multivaluedFluent, moremultivaluedFluents.
@@ -248,6 +251,7 @@ multivaluedFluent	-->	functawr(FncStr), "(", argumentsList(_, _, GArgLStr, IndAr
 					assertz(declared(DeclRepr, GraphRepr, IndRepr, "sD", "input"))))
 				}.
 
+% Statements that declare which fluents should have their intervals collected.	
 collectIntervals	-->	"collectIntervals:", space, fluent("sD", "input", CTStr, _, _, _, _, _, _), moreCIFluents(MFStr), ".",
 				{
 					atomics_to_string(["collectIntervals(", CTStr, ").\n", MFStr], Result),
@@ -260,6 +264,7 @@ moreCIFluents(MFStr)	-->	space, ",", space, fluent("sD", "input", CTStr, _, _, _
 				}.
 moreCIFluents("")	-->	[].
 
+% Statements that declare which fluents should have their intervals built from timepoints.	
 buildFromPoints		-->	"buildFromPoints:", space, fluent("sD", "input", CTStr, _, _, _, _, _, _), moreBPFluents(MFStr), ".",
 				{
 					atomics_to_string(["buildFromPoints(", CTStr, ").\n", MFStr], Result),
@@ -272,6 +277,7 @@ moreBPFluents(MFStr)	-->	space, ",", space, fluent("sD", "input", CTStr, _, _, _
 				}.
 moreBPFluents("")	-->	[].
 
+% Statements that declare the groundings.
 grounding		--> 	"grounding:", space, string_without([45], Thingy), "-->", space, string_without([46], Fact), ".",
 				{
 					string_codes(ThingyStr, Thingy),
@@ -281,12 +287,14 @@ grounding		--> 	"grounding:", space, string_without([45], Thingy), "-->", space,
 					assertz(three(Result))
 				}.
 
+% The "initially" statement.
 initially		-->	"initially", space, fluent("simple", "output", CTStr, _, _, _, _, null, null), ".",
 				{
 					atomics_to_string(["initially(", CTStr, ").\n\n"], "", InitiallyStr),
 					write(InitiallyStr)
 				}.
-					
+
+% The "holdsFor" statement.	
 forRule			--> 	forHead(Head, HeadDeclRepr, HeadGraphRepr), space, sep, space, {nb_setval(intervalNo, 1)}, forBody(Body, HeadDeclRepr, HeadGraphRepr), ".",
 				{
 					split_string(Body, "\n", ",\t\n", BodySubs),
@@ -311,6 +319,7 @@ forRule			--> 	forHead(Head, HeadDeclRepr, HeadGraphRepr), space, sep, space, {n
 					assertz(noCaching(HeadDeclRepr)))
 				}.
 
+% "initiatedAt", "terminatedAt", and "happensAt" statements.
 atRule			-->	atHead(Head, HeadDeclRepr, HeadGraphRepr), space, sep, space, atBody(EntireBody, _, HeadDeclRepr, HeadGraphRepr), ".",
 				{
 					split_string(EntireBody, "^", "", BodyParts),
@@ -338,10 +347,13 @@ atRule			-->	atHead(Head, HeadDeclRepr, HeadGraphRepr), space, sep, space, atBod
 sep			--> 	"iff".
 sep			--> 	"if".
 
+% The head of a "holdsFor" statement.
 forHead(HeadStr, DeclRepr, GraphRepr)	--> 	fluent("sD", "output", CTStr, DeclRepr, GraphRepr, _, _, null, null),
 						{
 							atomics_to_string(["holdsFor(", CTStr, ", I)"], "", HeadStr)
 						}.
+
+% The head of an "initiatedAt", "terminatedAt", or "happensAt" statement.
 atHead(HeadStr, DeclRepr, GraphRepr)	--> 	"initiate", space, fluent("simple", "output", CTStr, DeclRepr, GraphRepr, _, _, null, null),
 						{
 							nb_getval(fourArgs, FA),
@@ -361,6 +373,7 @@ atHead(HeadStr, DeclRepr, GraphRepr)	--> 	"happens", space, event("output", EvSt
 							atomics_to_string(["happensAt(", EvStr, ", T)"], "", HeadStr)
 						}.
 
+% A fluent
 fluent(Type, Etype, CTStr, DeclRepr, GraphRepr, _, I, HeadDeclRepr, HeadGraphRepr)	--> 	functawr(FncStr), "(", argumentsList(ArgLStr, UArgLStr, GArgLStr, IndArgLStr, Index, _), ")", space, value(ValStr, VType), !,
 												{
 													\+ atem(FncStr),
@@ -449,6 +462,7 @@ fluent(Type, Etype, CTStr, DeclRepr, GraphRepr, _, I, HeadDeclRepr, HeadGraphRep
 													assertz(matchRepr(DeclRepr, GraphRepr)))
 												}.
 
+% An event
 event(Etype, EvStr, DeclRepr, GraphRepr, _, HeadDeclRepr, HeadGraphRepr)		-->	functawr(FncStr), "(", argumentsList(ArgLStr, UArgLStr, GArgLStr, IndArgLStr, Index, _), ")",
 												{
 													atomics_to_string([FncStr, "(", ArgLStr, ")"], "", EvStr),
@@ -630,6 +644,7 @@ moreArguments(MArgStr, UMArgStr, GMArgStr, MArgList)	-->	",", space, "_", moreAr
 									addToHead(MMArgList, "_", MArgList)
 								}.
 
+% The body of a "holdsFor" statement
 forBody(FinalBodyStr, HeadDeclRepr, HeadGraphRepr)	-->	conjunction(BodyStr, _, HeadDeclRepr, HeadGraphRepr), possibleConstraint(PCStr, _),
 								{
 									atomics_to_string([BodyStr, PCStr], "", FinalBodyStr)
@@ -758,7 +773,6 @@ cTerm(CTStr, ICT, HeadDeclRepr, HeadGraphRepr)		-->	"not", space, "(", disjuncti
 									string_concat("I", Int, ICT),
 									atomics_to_string([DStr, ",\n\t", "complement_all([", ID, "], ", ICT, ")"], "", CTStr)
 								}.
-%cTerm(CTStr, Int, _, _)				-->	constraint(CTStr, Int).
 
 disjunction(DStr, ID, HeadDeclRepr, HeadGraphRepr)	-->	dTerm(DTStr, IDT, HeadDeclRepr, HeadGraphRepr), moreDTerms(MDTStr, IMDT, HeadDeclRepr, HeadGraphRepr),
 								{
@@ -815,6 +829,7 @@ dTerm(DTStr, IDT, HeadDeclRepr, HeadGraphRepr)		-->	"not", space, "(", disjuncti
 possibleConstraint(Str, I)				-->	",", space, constraint(Str, I).
 possibleConstraint("", _)				-->	"".
 
+% A constraint (either concerning the duration of a fluent or atemporal)
 constraint(PStr, Int)					-->	durationConstraint(PStr, Int).
 constraint(PStr, _)					--> 	atemporalConstraint(PStr, _).
 
@@ -837,6 +852,24 @@ durationConstraint(DCStr, IDC)				-->	"duration", space, operator(OpStr), space,
 									atomics_to_string([",\n\tfindall((S,E), (member((S,E), I", PrevInt, "), Diff is E-S, Diff ", OpStr, " ", NumStr, "), ", IDC, ")"], "", DCStr)
 								}.
 
+atemporalConstraint(ACStr, _)				-->	fact(FStr),
+								{
+									atomics_to_string([",\n\t", FStr], "", ACStr)
+								}.
+atemporalConstraint(ACStr, _)				-->	math(MStr),
+								{
+									atomics_to_string([",\n\t", MStr], "", ACStr)
+								}.
+atemporalConstraint(ACStr, _)				-->	"not", space, fact(FStr),
+								{
+									atomics_to_string([",\n\t\\+ ", FStr], "", ACStr)
+								}.
+atemporalConstraint(ACStr, _)				-->	"not", space, math(MStr),
+								{
+									atomics_to_string([",\n\t\\+ ", MStr], "", ACStr)
+								}.
+
+% The body of an "initiatedAt", "terminatedAt", or "happensAt" statement.
 atBody(AtBodyStr, _, HeadDeclRepr, HeadGraphRepr)	-->	initialAlternatives(List1, _, HeadDeclRepr, HeadGraphRepr), allOtherAlternatives(ListOfLists, _, HeadDeclRepr, HeadGraphRepr),
 								{
 									addToHead(ListOfLists, List1, List),
@@ -994,23 +1027,7 @@ conditionGroup(AtBodyStr, _, HeadDeclRepr, HeadGraphRepr)		-->	condition(CondStr
 											atomics_to_string([CondStr, MCondStr], "", AtBodyStr)
 										}.
 
-atemporalConstraint(ACStr, _)						-->	fact(FStr),
-										{
-											atomics_to_string([",\n\t", FStr], "", ACStr)
-										}.
-atemporalConstraint(ACStr, _)						-->	math(MStr),
-										{
-											atomics_to_string([",\n\t", MStr], "", ACStr)
-										}.
-atemporalConstraint(ACStr, _)						-->	"not", space, fact(FStr),
-										{
-											atomics_to_string([",\n\t\\+ ", FStr], "", ACStr)
-										}.
-atemporalConstraint(ACStr, _)						-->	"not", space, math(MStr),
-										{
-											atomics_to_string([",\n\t\\+ ", MStr], "", ACStr)
-										}.
-
+% A constraint applied directly on the value of a fluent (e.g.: speed(VesselId, Interval) > 20, where "speed/2" is a fluent).
 fluaint("sD", "input", CTStr, MStr, Priority, HeadDeclRepr, HeadGraphRepr)	-->	functawr(FncStr), "(", argumentsList(ArgLStr, UArgLStr, GArgLStr, _, _, _), ")", space, operator(OpStr), space, variable(Var2Str),
 											{
 												\+ atem(FncStr),
