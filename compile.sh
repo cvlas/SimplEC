@@ -9,7 +9,7 @@ fi
 simplec=$1
 
 printf "Producing event description, declarations and dependency graph source... "
-swipl -l simplEC.prolog -g "simplEC('$1', 'event_description.prolog', 'declarations.prolog', 'dependency_graph.txt', $2, false)" -g "halt"
+swipl -l simplEC.prolog -g "simplEC('$1', $2, false)" -g "halt"
 
 printf "Done.\nExporting dependency graph image... "
 dot -o dependency_graph.png -T png dependency_graph.txt
