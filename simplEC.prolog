@@ -27,11 +27,13 @@ prod([L|Ls],Out) :-
 	bagof([X|R],(prod(Ls,O), member(X,L), member(R,O)),Out).
 
 % 
-cachingLevel(Node, Level) :-
-	findall(Parent, (defines(Parent, Node, _), Parent \= Node), Parents),
-	(length(Parents, 0) -> Level is 0
+cachingLevel(Node, Level, Path) :-
+	addToHead(Path, Node, NewPath),
+	findall(Parent, defines(Parent, Node, _), Parents),
+	subtract(Parents, NewPath, NewParents),
+	(length(NewParents, 0) -> Level is 0
 	;
-	(findall(L, (member(P, Parents), cachingLevel(P, L)), Levels),
+	(findall(L, (member(P, NewParents), cachingLevel(P, L, NewPath)), Levels),
 	max_list(Levels, MaxLevel),
 	Level is MaxLevel + 1)
 	).
@@ -138,7 +140,7 @@ simplEC(InputFile, GraphFontSize, FourArgAtRules) :-
 	
 	% For each output entity (among those that have not been flagged as "noCaching") find its level in the caching hierarchy
 	% Sort by caching priority value, in ascending order and print in the declarations file
-	findall(cachingHierarchy(Node, Level), (declared(Node, _, _, _, "output"), \+ noCaching(Node), cachingLevel(Node, Level)), CachingUnordered),
+	findall(cachingHierarchy(Node, Level), (declared(Node, _, _, _, "output"), \+ noCaching(Node), cachingLevel(Node, Level, [])), CachingUnordered),
 	%forall(member(Tuple, CachingUnordered), (writeln(Tuple))), nl, nl, 
 	sort(1, @<, CachingUnordered, CachingSorted),
 	%forall(member(Tuple, CachingSorted), (writeln(Tuple))), nl, nl, 
@@ -157,7 +159,7 @@ simplEC(InputFile, GraphFontSize, FourArgAtRules) :-
 	% where Q is a caching priority value and {H1, H2, ..., Hn} are the entities
 	% that have Q as their caching priority value
 	% (input entities are considered to have Q = 0)
-	findall((AG, B), (matchRepr(A, AG), \+ noCaching(A), cachingLevel(A, B)), AllCachingLevels),
+	findall((AG, B), (matchRepr(A, AG), \+ noCaching(A), cachingLevel(A, B, [])), AllCachingLevels),
 	%forall(member(ACL, AllCachingLevels), writeln(ACL)), nl,
 	findall(Q, member((_, Q), AllCachingLevels), QS),
 	findall(H, member((H, _), AllCachingLevels), HS),
@@ -180,7 +182,7 @@ simplEC(InputFile, GraphFontSize, FourArgAtRules) :-
 	write("digraph\n{\n\tnode [shape=Mrecord, fontsize="), write(GraphFontSize), write("];\n\trankdir=LR;\n\tranksep=\"1.2 equally\"\n\n"),
 	forall(member((Q, L), FinalList), (findall(LabelPart, (member(Part, L), atomics_to_string(["<", Part, "> ", Part], LabelPart)), LabelParts), atomics_to_string(LabelParts, "|", Label), atomics_to_string(["\t", Q, " [label=\"", Label, "\"];\n"], Line), write(Line))),nl,
 	%findall(edge(CI, I, CJ, J), (defines(I, J, _), member((J, CJ), CachingOrdered), (member((I, CI), CachingOrdered) -> true ; CI is 0)), Edges),
-	findall(edge(CI, IG, CJ, JG), (graphines(IG, JG), matchRepr(I, IG), matchRepr(J, JG), cachingLevel(I, CI), cachingLevel(J, CJ)), Edges),
+	findall(edge(CI, IG, CJ, JG), (graphines(IG, JG), matchRepr(I, IG), matchRepr(J, JG), cachingLevel(I, CI, []), cachingLevel(J, CJ, [])), Edges),
 	sort(Edges, EdgesSorted),
 	forall(member(edge(CK, K, CL, L), EdgesSorted), (write("\t"), write(CK), write(":\""), write(K), write("\" -> "), write(CL), write(":\""), write(L), writeln("\""))),
 	write("}\n"),
@@ -870,7 +872,7 @@ atemporalConstraint(ACStr, _)				-->	"not", space, math(MStr),
 								}.
 
 % The body of an "initiatedAt", "terminatedAt", or "happensAt" statement.
-atBody(AtBodyStr, _, HeadDeclRepr, HeadGraphRepr)	-->	initialAlternatives(List1, _, HeadDeclRepr, HeadGraphRepr), allOtherAlternatives(ListOfLists, _, HeadDeclRepr, HeadGraphRepr),
+atBody(AtBodyStr, _, HeadDeclRepr, HeadGraphRepr)	-->	initialConditionGroupChain(List1, _, HeadDeclRepr, HeadGraphRepr), regularConditionGroupChains(ListOfLists, _, HeadDeclRepr, HeadGraphRepr),
 								{
 									addToHead(ListOfLists, List1, List),
 	
@@ -884,148 +886,148 @@ atBody(AtBodyStr, _, HeadDeclRepr, HeadGraphRepr)	-->	initialAlternatives(List1,
 									atomics_to_string(AltBodyStrs, "^", AtBodyStr)
 								}.
 
-initialAlternatives(List, _, HeadDeclRepr, HeadGraphRepr)		-->	initialConditionGroup(AtBodyStr, _, HeadDeclRepr, HeadGraphRepr), moreInitialAlternatives(MIAList, _, HeadDeclRepr, HeadGraphRepr),
-										{
-											split_string(AtBodyStr, "\n\t", ",\n\t\s", ConditionElementList),
-											length(ConditionElementList, Length),
-											Length = 1,
-											addToHead(MIAList, AtBodyStr, List)
-										}.
-initialAlternatives(List, _, HeadDeclRepr, HeadGraphRepr)		-->	"(", initialConditionGroup(AtBodyStr, _, HeadDeclRepr, HeadGraphRepr), ")", moreInitialAlternatives(MIAList, _, HeadDeclRepr, HeadGraphRepr),
-										{
-											split_string(AtBodyStr, "\n\t", ",\n\t\s", ConditionElementList),
-											length(ConditionElementList, Length),
-											Length > 1,
-											addToHead(MIAList, AtBodyStr, List)
-										}.
-initialAlternatives(List, _, HeadDeclRepr, HeadGraphRepr)		-->	initialConditionGroup(AtBodyStr, _, HeadDeclRepr, HeadGraphRepr), moreInitialAlternatives([], _, HeadDeclRepr, HeadGraphRepr),
-										{
-											split_string(AtBodyStr, "\n\t", ",\n\t\s", ConditionElementList),
-											length(ConditionElementList, Length),
-											Length > 1,
-											addToHead([], AtBodyStr, List)
-										}.
-initialAlternatives(List, _, HeadDeclRepr, HeadGraphRepr)		-->	"(", initialAlternatives(List, _, HeadDeclRepr, HeadGraphRepr), ")".
+initialConditionGroupChain(List, _, HeadDeclRepr, HeadGraphRepr)		-->	initialConditionGroup(AtBodyStr, _, HeadDeclRepr, HeadGraphRepr), moreInitialConditionGroups(MIAList, _, HeadDeclRepr, HeadGraphRepr),
+											{
+												split_string(AtBodyStr, "\n\t", ",\n\t\s", ConditionElementList),
+												length(ConditionElementList, Length),
+												Length = 1,
+												addToHead(MIAList, AtBodyStr, List)
+											}.
+initialConditionGroupChain(List, _, HeadDeclRepr, HeadGraphRepr)		-->	"(", initialConditionGroup(AtBodyStr, _, HeadDeclRepr, HeadGraphRepr), ")", moreInitialConditionGroups(MIAList, _, HeadDeclRepr, HeadGraphRepr),
+											{
+												split_string(AtBodyStr, "\n\t", ",\n\t\s", ConditionElementList),
+												length(ConditionElementList, Length),
+												Length > 1,
+												addToHead(MIAList, AtBodyStr, List)
+											}.
+initialConditionGroupChain(List, _, HeadDeclRepr, HeadGraphRepr)		-->	initialConditionGroup(AtBodyStr, _, HeadDeclRepr, HeadGraphRepr), moreInitialConditionGroups([], _, HeadDeclRepr, HeadGraphRepr),
+											{
+												split_string(AtBodyStr, "\n\t", ",\n\t\s", ConditionElementList),
+												length(ConditionElementList, Length),
+												Length > 1,
+												addToHead([], AtBodyStr, List)
+											}.
+initialConditionGroupChain(List, _, HeadDeclRepr, HeadGraphRepr)		-->	"(", initialConditionGroupChain(List, _, HeadDeclRepr, HeadGraphRepr), ")".
 
-moreInitialAlternatives(MIAList, _, HeadDeclRepr, HeadGraphRepr)	-->	space, "or", space, initialConditionGroup(AtBodyStr, _, HeadDeclRepr, HeadGraphRepr), moreInitialAlternatives(MMIAList, _, HeadDeclRepr, HeadGraphRepr),
-										{
-											split_string(AtBodyStr, "\n\t", ",\n\t\s", ConditionElementList),
-											length(ConditionElementList, Length),
-											Length = 1,
-											addToHead(MMIAList, AtBodyStr, MIAList)
-										}.
-moreInitialAlternatives(MIAList, _, HeadDeclRepr, HeadGraphRepr)	-->	space, "or", space, "(", initialConditionGroup(AtBodyStr, _, HeadDeclRepr, HeadGraphRepr), ")", moreInitialAlternatives(MMIAList, _, HeadDeclRepr, HeadGraphRepr),
-										{
-											split_string(AtBodyStr, "\n\t", ",\n\t\s", ConditionElementList),
-											length(ConditionElementList, Length),
-											Length > 1,
-											addToHead(MMIAList, AtBodyStr, MIAList)
-										}.
-moreInitialAlternatives([], _, _, _)					-->	[].
+moreInitialConditionGroups(MIAList, _, HeadDeclRepr, HeadGraphRepr)		-->	space, "or", space, initialConditionGroup(AtBodyStr, _, HeadDeclRepr, HeadGraphRepr), moreInitialConditionGroups(MMIAList, _, HeadDeclRepr, HeadGraphRepr),
+											{
+												split_string(AtBodyStr, "\n\t", ",\n\t\s", ConditionElementList),
+												length(ConditionElementList, Length),
+												Length = 1,
+												addToHead(MMIAList, AtBodyStr, MIAList)
+											}.
+moreInitialConditionGroups(MIAList, _, HeadDeclRepr, HeadGraphRepr)		-->	space, "or", space, "(", initialConditionGroup(AtBodyStr, _, HeadDeclRepr, HeadGraphRepr), ")", moreInitialConditionGroups(MMIAList, _, HeadDeclRepr, HeadGraphRepr),
+											{
+												split_string(AtBodyStr, "\n\t", ",\n\t\s", ConditionElementList),
+												length(ConditionElementList, Length),
+												Length > 1,
+												addToHead(MMIAList, AtBodyStr, MIAList)
+											}.
+moreInitialConditionGroups([], _, _, _)						-->	[].
 
-allOtherAlternatives(ListOfLists, _, HeadDeclRepr, HeadGraphRepr)	-->	space, ",", space, restAlternatives(List, _, HeadDeclRepr, HeadGraphRepr), allOtherAlternatives(MLoL, _, HeadDeclRepr, HeadGraphRepr),
-										{
-											addToHead(MLoL, List, ListOfLists)
-										}.
-allOtherAlternatives([], _, _, _)					-->	[].
+regularConditionGroupChains(ListOfLists, _, HeadDeclRepr, HeadGraphRepr)	-->	space, ",", space, regularConditionGroupChain(List, _, HeadDeclRepr, HeadGraphRepr), regularConditionGroupChains(MLoL, _, HeadDeclRepr, HeadGraphRepr),
+											{
+												addToHead(MLoL, List, ListOfLists)
+											}.
+regularConditionGroupChains([], _, _, _)					-->	[].
 
-restAlternatives(List, _, HeadDeclRepr, HeadGraphRepr)			-->	conditionGroup(AtBodyStr, _, HeadDeclRepr, HeadGraphRepr), moreAlternatives(MIAList, _, HeadDeclRepr, HeadGraphRepr),
-										{
-											split_string(AtBodyStr, "\n\t", ",\n\t\s", ConditionElementList),
-											length(ConditionElementList, Length),
-											Length = 1,
-											addToHead(MIAList, AtBodyStr, List)
-										}.
-restAlternatives(List, _, HeadDeclRepr, HeadGraphRepr)			-->	"(", conditionGroup(AtBodyStr, _, HeadDeclRepr, HeadGraphRepr), ")", moreAlternatives(MIAList, _, HeadDeclRepr, HeadGraphRepr),
-										{
-											split_string(AtBodyStr, "\n\t", ",\n\t\s", ConditionElementList),
-											length(ConditionElementList, Length),
-											Length > 1,
-											addToHead(MIAList, AtBodyStr, List)
-										}.
-restAlternatives(List, _, HeadDeclRepr, HeadGraphRepr)			-->	conditionGroup(AtBodyStr, _, HeadDeclRepr, HeadGraphRepr), moreAlternatives([], _, HeadDeclRepr, HeadGraphRepr),
-										{
-											split_string(AtBodyStr, "\n\t", ",\n\t\s", ConditionElementList),
-											length(ConditionElementList, Length),
-											Length > 1,
-											addToHead([], AtBodyStr, List)
-										}.
-restAlternatives(List, _, HeadDeclRepr, HeadGraphRepr)			-->	"(", restAlternatives(List, _, HeadDeclRepr, HeadGraphRepr), ")".
+regularConditionGroupChain(List, _, HeadDeclRepr, HeadGraphRepr)		-->	regularConditionGroup(AtBodyStr, _, HeadDeclRepr, HeadGraphRepr), moreRegularConditionGroups(MIAList, _, HeadDeclRepr, HeadGraphRepr),
+											{
+												split_string(AtBodyStr, "\n\t", ",\n\t\s", ConditionElementList),
+												length(ConditionElementList, Length),
+												Length = 1,
+												addToHead(MIAList, AtBodyStr, List)
+											}.
+regularConditionGroupChain(List, _, HeadDeclRepr, HeadGraphRepr)		-->	"(", regularConditionGroup(AtBodyStr, _, HeadDeclRepr, HeadGraphRepr), ")", moreRegularConditionGroups(MIAList, _, HeadDeclRepr, HeadGraphRepr),
+											{
+												split_string(AtBodyStr, "\n\t", ",\n\t\s", ConditionElementList),
+												length(ConditionElementList, Length),
+												Length > 1,
+												addToHead(MIAList, AtBodyStr, List)
+											}.
+regularConditionGroupChain(List, _, HeadDeclRepr, HeadGraphRepr)		-->	regularConditionGroup(AtBodyStr, _, HeadDeclRepr, HeadGraphRepr), moreRegularConditionGroups([], _, HeadDeclRepr, HeadGraphRepr),
+											{
+												split_string(AtBodyStr, "\n\t", ",\n\t\s", ConditionElementList),
+												length(ConditionElementList, Length),
+												Length > 1,
+												addToHead([], AtBodyStr, List)
+											}.
+regularConditionGroupChain(List, _, HeadDeclRepr, HeadGraphRepr)		-->	"(", regularConditionGroupChain(List, _, HeadDeclRepr, HeadGraphRepr), ")".
 
-moreAlternatives(MIAList, _, HeadDeclRepr, HeadGraphRepr)		-->	space, "or", space, conditionGroup(AtBodyStr, _, HeadDeclRepr, HeadGraphRepr), moreAlternatives(MMIAList, _, HeadDeclRepr, HeadGraphRepr),
-										{
-											split_string(AtBodyStr, "\n\t", ",\n\t\s", ConditionElementList),
-											length(ConditionElementList, Length),
-											Length = 1,
-											addToHead(MMIAList, AtBodyStr, MIAList)
-										}.
-moreAlternatives(MIAList, _, HeadDeclRepr, HeadGraphRepr)		-->	space, "or", space, "(", conditionGroup(AtBodyStr, _, HeadDeclRepr, HeadGraphRepr), ")", moreAlternatives(MMIAList, _, HeadDeclRepr, HeadGraphRepr),
-										{
-											split_string(AtBodyStr, "\n\t", ",\n\t\s", ConditionElementList),
-											length(ConditionElementList, Length),
-											Length > 1,
-											addToHead(MMIAList, AtBodyStr, MIAList)
-										}.
-moreAlternatives([], _, _, _)						-->	[].
+moreRegularConditionGroups(MIAList, _, HeadDeclRepr, HeadGraphRepr)		-->	space, "or", space, regularConditionGroup(AtBodyStr, _, HeadDeclRepr, HeadGraphRepr), moreRegularConditionGroups(MMIAList, _, HeadDeclRepr, HeadGraphRepr),
+											{
+												split_string(AtBodyStr, "\n\t", ",\n\t\s", ConditionElementList),
+												length(ConditionElementList, Length),
+												Length = 1,
+												addToHead(MMIAList, AtBodyStr, MIAList)
+											}.
+moreRegularConditionGroups(MIAList, _, HeadDeclRepr, HeadGraphRepr)		-->	space, "or", space, "(", regularConditionGroup(AtBodyStr, _, HeadDeclRepr, HeadGraphRepr), ")", moreRegularConditionGroups(MMIAList, _, HeadDeclRepr, HeadGraphRepr),
+											{
+												split_string(AtBodyStr, "\n\t", ",\n\t\s", ConditionElementList),
+												length(ConditionElementList, Length),
+												Length > 1,
+												addToHead(MMIAList, AtBodyStr, MIAList)
+											}.
+moreRegularConditionGroups([], _, _, _)						-->	[].
 
-initialCondition(CondStr, _, HeadDeclRepr, HeadGraphRepr)		-->	"start", space, fluent("sD", "input", CTStr, _, _, _, _, HeadDeclRepr, HeadGraphRepr),
-										{
-											atomics_to_string([",\n\thappensAt(start(", CTStr, "), T)"], "", CondStr)
-										}.
-initialCondition(CondStr, _, HeadDeclRepr, HeadGraphRepr)		-->	"end", space, fluent("sD", "input", CTStr, _, _, _, _, HeadDeclRepr, HeadGraphRepr),
-										{
-											atomics_to_string([",\n\thappensAt(end(", CTStr, "), T)"], "", CondStr)
-										}.
-initialCondition(CondStr, _, HeadDeclRepr, HeadGraphRepr)		-->	event("input", CTStr, _, _, _, HeadDeclRepr, HeadGraphRepr),
-										{
-											atomics_to_string([",\n\thappensAt(", CTStr, ", T)"], "", CondStr)
-										}.
+initialConditionGroup(AtBodyStr, _, HeadDeclRepr, HeadGraphRepr)		-->	initialCondition(CondStr, _, HeadDeclRepr, HeadGraphRepr), regularConditions(MCondStr, _, HeadDeclRepr, HeadGraphRepr),
+											{
+												atomics_to_string([CondStr, MCondStr], "", AtBodyStr)
+											}.
 
-moreConditions(MCondStr, _, HeadDeclRepr, HeadGraphRepr)		-->	",", space, condition(CondStr, _, HeadDeclRepr, HeadGraphRepr), moreConditions(MMCondStr, _, HeadDeclRepr, HeadGraphRepr),
-										{
-											string_concat(CondStr, MMCondStr, MCondStr)
-										}.
-moreConditions("", 0, _, _)						-->	[].
+initialCondition(CondStr, _, HeadDeclRepr, HeadGraphRepr)			-->	"start", space, fluent("sD", "input", CTStr, _, _, _, _, HeadDeclRepr, HeadGraphRepr),
+											{
+												atomics_to_string([",\n\thappensAt(start(", CTStr, "), T)"], "", CondStr)
+											}.
+initialCondition(CondStr, _, HeadDeclRepr, HeadGraphRepr)			-->	"end", space, fluent("sD", "input", CTStr, _, _, _, _, HeadDeclRepr, HeadGraphRepr),
+											{
+												atomics_to_string([",\n\thappensAt(end(", CTStr, "), T)"], "", CondStr)
+											}.
+initialCondition(CondStr, _, HeadDeclRepr, HeadGraphRepr)			-->	event("input", CTStr, _, _, _, HeadDeclRepr, HeadGraphRepr),
+											{
+												atomics_to_string([",\n\thappensAt(", CTStr, ", T)"], "", CondStr)
+											}.
 
-initialConditionGroup(AtBodyStr, _, HeadDeclRepr, HeadGraphRepr)	-->	initialCondition(CondStr, _, HeadDeclRepr, HeadGraphRepr), moreConditions(MCondStr, _, HeadDeclRepr, HeadGraphRepr),
-										{
-											atomics_to_string([CondStr, MCondStr], "", AtBodyStr)
-										}.
+regularConditions(MCondStr, _, HeadDeclRepr, HeadGraphRepr)			-->	",", space, regularCondition(CondStr, _, HeadDeclRepr, HeadGraphRepr), regularConditions(MMCondStr, _, HeadDeclRepr, HeadGraphRepr),
+											{
+												string_concat(CondStr, MMCondStr, MCondStr)
+											}.
+regularConditions("", 0, _, _)							-->	[].
 
-condition(CondStr, Priority, HeadDeclRepr, HeadGraphRepr)		-->	"start", space, fluent("sD", "input", CTStr, _, _, Priority, _, HeadDeclRepr, HeadGraphRepr),
-										{
-											atomics_to_string([",\n\thappensAt(start(", CTStr, "), T)"], "", CondStr)
-										}.
-condition(CondStr, Priority, HeadDeclRepr, HeadGraphRepr)		-->	"end", space, fluent("sD", "input", CTStr, _, _, Priority, _, HeadDeclRepr, HeadGraphRepr),
-										{
-											atomics_to_string([",\n\thappensAt(end(", CTStr, "), T)"], "", CondStr)
-										}.
-condition(CondStr, Priority, HeadDeclRepr, HeadGraphRepr)		-->	"happens", space, event("input", CTStr, _, _, Priority, HeadDeclRepr, HeadGraphRepr),
-										{
-											atomics_to_string([",\n\thappensAt(", CTStr, ", T)"], "", CondStr)
-										}.
-condition(CondStr, Priority, HeadDeclRepr, HeadGraphRepr)		-->	"not happens", space, event("input", CTStr, _, _, Priority, HeadDeclRepr, HeadGraphRepr),
-										{
-											atomics_to_string([",\n\t\\+ happensAt(", CTStr, ", T)"], "", CondStr)
-										}.
-condition(ACStr, 0, _, _)						-->	atemporalConstraint(ACStr, _).
-condition(CondStr, Priority, HeadDeclRepr, HeadGraphRepr)		-->	fluaint("sD", "input", FluentStr, ConstraintStr, Priority, HeadDeclRepr, HeadGraphRepr),
-										{
-											atomics_to_string([",\n\tholdsAt(", FluentStr, ", T),\n\t", ConstraintStr], "", CondStr)
-										}.
-condition(CondStr, Priority, HeadDeclRepr, HeadGraphRepr)		-->	fluent("sD", "input", CTStr, _, _, Priority, _, HeadDeclRepr, HeadGraphRepr),
-										{
-											atomics_to_string([",\n\tholdsAt(", CTStr, ", T)"], "", CondStr)
-										}.
-condition(CondStr, Priority, HeadDeclRepr, HeadGraphRepr)		-->	"not", space, fluent("sD", "input", CTStr, _, _, Priority, _, HeadDeclRepr, HeadGraphRepr),
-										{
-											atomics_to_string([",\n\t\\+ holdsAt(", CTStr, ", T)"], "", CondStr)
-										}.
+regularCondition(CondStr, Priority, HeadDeclRepr, HeadGraphRepr)		-->	"start", space, fluent("sD", "input", CTStr, _, _, Priority, _, HeadDeclRepr, HeadGraphRepr),
+											{
+												atomics_to_string([",\n\thappensAt(start(", CTStr, "), T)"], "", CondStr)
+											}.
+regularCondition(CondStr, Priority, HeadDeclRepr, HeadGraphRepr)		-->	"end", space, fluent("sD", "input", CTStr, _, _, Priority, _, HeadDeclRepr, HeadGraphRepr),
+											{
+												atomics_to_string([",\n\thappensAt(end(", CTStr, "), T)"], "", CondStr)
+											}.
+regularCondition(CondStr, Priority, HeadDeclRepr, HeadGraphRepr)		-->	"happens", space, event("input", CTStr, _, _, Priority, HeadDeclRepr, HeadGraphRepr),
+											{
+												atomics_to_string([",\n\thappensAt(", CTStr, ", T)"], "", CondStr)
+											}.
+regularCondition(CondStr, Priority, HeadDeclRepr, HeadGraphRepr)		-->	"not happens", space, event("input", CTStr, _, _, Priority, HeadDeclRepr, HeadGraphRepr),
+											{
+												atomics_to_string([",\n\t\\+ happensAt(", CTStr, ", T)"], "", CondStr)
+											}.
+regularCondition(ACStr, 0, _, _)						-->	atemporalConstraint(ACStr, _).
+regularCondition(CondStr, Priority, HeadDeclRepr, HeadGraphRepr)		-->	fluaint("sD", "input", FluentStr, ConstraintStr, Priority, HeadDeclRepr, HeadGraphRepr),
+											{
+												atomics_to_string([",\n\tholdsAt(", FluentStr, ", T),\n\t", ConstraintStr], "", CondStr)
+											}.
+regularCondition(CondStr, Priority, HeadDeclRepr, HeadGraphRepr)		-->	fluent("sD", "input", CTStr, _, _, Priority, _, HeadDeclRepr, HeadGraphRepr),
+											{
+												atomics_to_string([",\n\tholdsAt(", CTStr, ", T)"], "", CondStr)
+											}.
+regularCondition(CondStr, Priority, HeadDeclRepr, HeadGraphRepr)		-->	"not", space, fluent("sD", "input", CTStr, _, _, Priority, _, HeadDeclRepr, HeadGraphRepr),
+											{
+												atomics_to_string([",\n\t\\+ holdsAt(", CTStr, ", T)"], "", CondStr)
+											}.
 
-conditionGroup(AtBodyStr, _, HeadDeclRepr, HeadGraphRepr)		-->	condition(CondStr, _, HeadDeclRepr, HeadGraphRepr), moreConditions(MCondStr, _, HeadDeclRepr, HeadGraphRepr),
-										{
-											atomics_to_string([CondStr, MCondStr], "", AtBodyStr)
-										}.
+regularConditionGroup(AtBodyStr, _, HeadDeclRepr, HeadGraphRepr)		-->	regularCondition(CondStr, _, HeadDeclRepr, HeadGraphRepr), regularConditions(MCondStr, _, HeadDeclRepr, HeadGraphRepr),
+											{
+												atomics_to_string([CondStr, MCondStr], "", AtBodyStr)
+											}.
 
 % A constraint applied directly on the value of a fluent (e.g.: speed(VesselId, Interval) > 20, where "speed/2" is a fluent).
 fluaint("sD", "input", CTStr, MStr, Priority, HeadDeclRepr, HeadGraphRepr)	-->	functawr(FncStr), "(", argumentsList(ArgLStr, UArgLStr, GArgLStr, _, _, _), ")", space, operator(OpStr), space, variable(Var2Str),
