@@ -1,14 +1,8 @@
-% -----------------------------------------------
-% GENERAL INFO
-% -----------------------------------------------
-%
+### General info
 
 SimplEC is a simplified Event Calculus dialect. An event description in simplEC can be compiled into the RTEC format and subsequently used for narrative assimilation. SimplEC is being developed with view to making the writing of Composite Event patterns for Event Recognition purposes easier.
 
-% -----------------------------------------------
-% PREREQUISITES
-% -----------------------------------------------
-%
+### Prerequisites
 
 1) SWI-Prolog (preferably version 7.x)
 
@@ -18,10 +12,7 @@ SimplEC is a simplified Event Calculus dialect. An event description in simplEC 
 
 4) Download simplEC.prolog, compile.sh
 
-% -----------------------------------------------
-% COMPILING
-% -----------------------------------------------
-%
+### Compiling
 
 To compile a set of simplEC rules into the compiled RTEC format, the user must execute the corresponding bash script, as follows:
 
@@ -40,4 +31,3 @@ SimplEC needs 2 arguments as input: The input rules in simplEC and the desired f
 5) Dependency graph (GraphViz source).
 
 6) Log file reporting any compilation errors.
-
