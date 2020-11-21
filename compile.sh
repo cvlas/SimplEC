@@ -15,8 +15,8 @@ printf "Done.\nExporting dependency graph image... "
 dot -o dependency_graph.png -T png dependency_graph.txt
 
 printf "Done.\nProducing compiled event description... "
-swipl -l RTEC.prolog -g "trace" -g "compileEventDescription('declarations.prolog', 'event_description.prolog', 'tmp.pl')" -g "halt"
-printf ":- ['RTEC.prolog'].\n:- ['declarations.prolog'].\n\n" > event_description_compiled.prolog
+swipl -l RTEC/RTEC.prolog -g "trace" -g "compileEventDescription('declarations.prolog', 'event_description.prolog', 'tmp.pl')" -g "halt"
+printf ":- ['RTEC/RTEC.prolog'].\n:- ['declarations.prolog'].\n\n" > event_description_compiled.prolog
 cat tmp.pl >> event_description_compiled.prolog
 
 printf "Done.\nCleaning up temporary files... "
