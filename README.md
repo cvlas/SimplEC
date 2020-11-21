@@ -11,12 +11,16 @@ SimplEC comes with ABSOLUTELY NO WARRANTY. This is free software, and you are we
 1. [SWI-Prolog](https://www.swi-prolog.org/) (preferably version 7.x)
 1. [GraphViz](http://www.graphviz.org/)
 1. [RTEC](https://github.com/aartikis/RTEC)
-1. ./simplEC.prolog
-1. ./compile.sh
 
 ### Compiling
 
-To compile a set of simplEC rules into the compiled RTEC format, please make sure that you include the source files of RTEC in your working directory in a subdirectory named \"RTEC/\". Afterwards, you can execute the corresponding bash script, as follows:
+To compile a set of simplEC rules into the compiled RTEC format, please make sure that you include the following files in your working directory:
+
+* a text file containing the set of simplEC rules, say \"sample_rules.txt\"
+* the SimplEC source files \"simplEC.prolog\" and \"compile.sh\"
+* the RTEC source files, in a subdirectory named \"RTEC/\"
+
+Afterwards, you can execute the corresponding bash script, as follows:
 
 	user@machine:your/working/directory$ bash compile.sh sample_rules.txt 16.0
 
