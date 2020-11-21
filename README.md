@@ -8,10 +8,11 @@ SimplEC comes with ABSOLUTELY NO WARRANTY. This is free software, and you are we
 
 ### Prerequisites
 
-1. SWI-Prolog (preferably version 7.x)
+1. [SWI-Prolog](https://www.swi-prolog.org/) (preferably version 7.x)
 1. [GraphViz](http://www.graphviz.org/)
 1. [RTEC](https://github.com/aartikis/RTEC)
-1. Download simplEC.prolog, compile.sh
+1. ./simplEC.prolog
+1. ./compile.sh
 
 ### Compiling
 
