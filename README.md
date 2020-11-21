@@ -30,7 +30,7 @@ SimplEC needs 2 arguments as input: The input rules in simplEC and the desired f
 
 ### Related publications
 
-* Vlassopoulos C. and Artikis A. [Towards A Simple Event Calculus for Run-Time Reasoning](http://ceur-ws.org/Vol-2052/paper20.pdf) Proceedings of the Thirteenth International Symposium on Commonsense Reasoning, COMMONSENSE 2017, London, UK, November 6-8, 2017.
+* Vlassopoulos C. and Artikis A. [Towards A Simple Event Calculus for Run-Time Reasoning](http://ceur-ws.org/Vol-2052/paper20.pdf). Proceedings of the Thirteenth International Symposium on Commonsense Reasoning, COMMONSENSE 2017, London, UK, November 6-8, 2017.
 
 ### Relevant software
 
