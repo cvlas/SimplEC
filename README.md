@@ -1,18 +1,18 @@
-### General info
+## General info
 
 SimplEC is a simplified [Event Calculus](https://en.wikipedia.org/wiki/Event_calculus) dialect. An event description in simplEC can be compiled into the RTEC format and subsequently used for narrative assimilation. SimplEC has been developed with view to making the writing of Composite Event patterns for Event Recognition purposes easier.
 
-### License
+## License
 
 SimplEC comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it under certain conditions. See the [GNU Lesser General Public License v3 for more details](http://www.gnu.org/licenses/lgpl-3.0.html).
 
-### Prerequisites
+## Prerequisites
 
 1. [SWI-Prolog](https://www.swi-prolog.org/) (preferably version 7.x)
 1. [GraphViz](http://www.graphviz.org/)
 1. [RTEC](https://github.com/aartikis/RTEC)
 
-### Compiling
+## Compiling
 
 To compile a set of simplEC rules into the compiled RTEC format, please make sure that you include the following files in your working directory:
 
@@ -33,11 +33,11 @@ SimplEC needs 2 arguments as input: The input rules in simplEC and the desired f
 1. Dependency graph (GraphViz source).
 1. Log file reporting any compilation errors.
 
-### Related publications
+## Related publications
 
 * Vlassopoulos C. and Artikis A. [Towards A Simple Event Calculus for Run-Time Reasoning](http://ceur-ws.org/Vol-2052/paper20.pdf). Proceedings of the Thirteenth International Symposium on Commonsense Reasoning, COMMONSENSE 2017, London, UK, November 6-8, 2017.
 
-### Relevant software
+## Relevant software
 
 * [RTEC](https://github.com/aartikis/RTEC)
 * [ScaRTEC](https://github.com/kontopoulos/ScaRTEC)
